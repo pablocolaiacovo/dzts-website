@@ -1,4 +1,4 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# DZTS Inmobiliaria
 
 ## Getting Started
 
@@ -20,17 +20,24 @@ You can start editing the page by modifying `app/page.tsx`. The page auto-update
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
-## Learn More
+## Sanity Studio
 
-To learn more about Next.js, take a look at the following resources:
+### Configuration
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+1. Create an account on [Sanity](https://www.sanity.io/).
+2. Accept the invitation to the project.
+3. Create a `.env.local` file in the root of your project and add the following variables:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```bash
+NEXT_PUBLIC_SANITY_PROJECT_ID=your_project_id
+NEXT_PUBLIC_SANITY_DATASET=your_dataset
+```
 
-## Deploy on Vercel
+4. Replace `your_project_id` and `your_dataset` with the actual values from your Sanity project.
+5. Create a read token in the Sanity project settings and add it to your `.env.local` file:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```bash
+SANITY_API_READ_TOKEN=your_api_token
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+6. Replace `your_api_token` with the actual token you created in the Sanity project settings.
