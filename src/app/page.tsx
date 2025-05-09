@@ -1,10 +1,10 @@
 import SearchProperties from "@/components/SearchProperties";
-import PropertyCard from "@/components/PropertyCard";
+import FeaturedProperties from "@/components/FeaturedProperties";
 export default function Home() {
   return (
     <>
    <SearchProperties />
-   <PropertyCard />
+   <FeaturedProperties />
     </>
   );
 }
