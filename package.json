@@ -10,10 +10,15 @@
   },
   "dependencies": {
     "@popperjs/core": "^2.11.8",
+    "@sanity/image-url": "^1.1.0",
+    "@sanity/vision": "^3.87.1",
     "bootstrap": "^5.3.5",
     "next": "15.3.1",
+    "next-sanity": "^9.10.6",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "sanity": "^3.87.1",
+    "styled-components": "^6.1.17",
     "sass": "^1.87.0"
   },
   "devDependencies": {
