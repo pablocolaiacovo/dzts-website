@@ -1,5 +1,5 @@
 {
-  "name": "proyectodzts",
+  "name": "dzts-inmobiliaria",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -13,6 +13,7 @@
     "@sanity/image-url": "^1.1.0",
     "@sanity/vision": "^3.87.1",
     "bootstrap": "^5.3.5",
+    "bootstrap-icons": "^1.12.1",
     "next": "15.3.1",
     "next-sanity": "^9.10.6",
     "react": "^19.0.0",
