@@ -3,8 +3,8 @@ import FeaturedProperties from "@/components/FeaturedProperties";
 export default function Home() {
   return (
     <>
-   <SearchProperties />
-   <FeaturedProperties />
+      <SearchProperties />
+      <FeaturedProperties />
     </>
   );
 }
