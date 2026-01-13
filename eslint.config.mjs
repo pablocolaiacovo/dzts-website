@@ -35,6 +35,13 @@ const eslintConfig = [
       ...nextPlugin.configs["core-web-vitals"].rules,
     },
   },
+  ...compat.extends("next/core-web-vitals", "next/typescript"),
+  {
+    plugins: ["react"],
+    rules: {
+      "react/no-inline-styles": "off" 
+    }
+  }
 ];
 
 export default eslintConfig;

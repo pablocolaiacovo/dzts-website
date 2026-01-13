@@ -20,7 +20,7 @@
     "react-dom": "^19.2.3",
     "sanity": "^5.2.0",
     "sass": "^1.87.0",
-    "styled-components": "^6.1.17"
+    "styled-components": "^6.1.18"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
@@ -33,6 +33,7 @@
     "babel-plugin-react-compiler": "^1.0.0",
     "eslint": "^9",
     "eslint-config-next": "^16.1.1",
+    "eslint-plugin-react": "^7.37.5",
     "tailwindcss": "^4",
     "typescript": "^5"
   }
