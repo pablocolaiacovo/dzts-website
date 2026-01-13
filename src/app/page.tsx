@@ -5,6 +5,7 @@ export default function Home() {
   return (
     <>
       <SearchProperties />
+      <FeaturedProperties />
       <TextImageSection
         title="Nosotros"
         mainParagraph="Este es el párrafo principal que aparece debajo del título."
