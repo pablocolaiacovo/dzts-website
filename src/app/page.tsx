@@ -1,3 +1,4 @@
+import FeaturedProperties from "@/components/FeaturedProperties";
 import SearchProperties from "@/components/SearchProperties";
 import TextImageSection from "@/components/TextImageSection";
 
