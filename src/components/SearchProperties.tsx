@@ -1,6 +1,6 @@
 'use client';
 import Image from 'next/image';
-import "./custom-searchProperties.scss";
+import './SearchProperties.css';
 
 export default function SearchProperties() {
   return (

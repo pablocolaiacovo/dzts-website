@@ -1,0 +1,14 @@
+:root {
+  --primary: #01BCF3;
+  --secondary: #ffffff;
+  --font-family-base: 'Roboto', sans-serif;
+  --border-radius: 0.375rem;
+}
+
+@font-face {
+  font-family: 'Roboto';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
+}

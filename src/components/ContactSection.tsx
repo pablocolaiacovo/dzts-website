@@ -1,6 +1,6 @@
 'use client';
 
-import './contactSection.scss';
+import './ContactSection.css';
 
 interface ContactSectionProps {
     address: string;
