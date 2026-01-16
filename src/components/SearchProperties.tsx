@@ -10,12 +10,12 @@ export default function SearchProperties() {
         src="/Images/backgroun.jpg"
         alt="Imagen de fondo del formulario de búsqueda"
         fill
-        className="object-cover z-n1"
+        className="object-cover negative-z"
         priority
       />
 
       {/* Overlay oscuro */}
-      <div className="overlay position-absolute top-0 start-0 w-100 h-100 z-0"></div>
+      <div className="overlay position-absolute top-0 start-0 w-100 h-100 position-relative"></div>
 
       {/* Contenido centrado */}
       <div className="container position-relative z-1 text-center">
