@@ -2,6 +2,10 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## About Website
+
+This is a small real-state website, to work as a catalog of the available properties for rent or sale.
+
 ## Build & Development Commands
 
 ```bash
@@ -13,10 +17,10 @@ npm run lint     # Run ESLint
 
 ## Tech Stack
 
-- **Next.js 15** with App Router (`/src/app`)
+- **Next.js 16** with App Router (`/src/app`)
 - **React 19** with Server Components by default
 - **TypeScript** with strict mode
-- **Tailwind CSS 4** via `@tailwindcss/postcss`
+- **Bootstrap 5.x**
 
 ## Architecture
 
