@@ -69,7 +69,7 @@ export default function SearchProperties() {
         </div>
 
         <div className="pt-2">
-          <button type="button" className="btn btn-lg btn-outline-primary bg-secondary fw-semibold">Buscar</button>
+          <button type="button" className="btn-custom">Buscar</button>
         </div>
       </div>
     </section>

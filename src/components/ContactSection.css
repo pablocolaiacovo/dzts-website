@@ -1,5 +1,5 @@
 .contact-section {
-  background-color: #56b6e6;
+  background-color: var(--bs-primary);
   padding-top: 3rem;
 }
 
