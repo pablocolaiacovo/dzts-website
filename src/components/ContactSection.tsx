@@ -1,6 +1,6 @@
 'use client';
 
-import './contactSection.scss';
+import './ContactSection.css';
 
 interface ContactSectionProps {
     address: string;
@@ -16,12 +16,12 @@ const ContactSection = ({ address, phones, email, instagram }: ContactSectionPro
             <div className="row g-4 justify-content-center">
                 <div className="col-6 col-md-3 d-flex flex-column align-items-center">
                     <div className="icon-circle bg-white mb-3">
-                        <i className="bi bi-geo-alt-fill" style={{ color: '#56b6e6' }}></i>
+                        <i className="bi bi-geo-alt-fill" style={{ color: 'var(--bs-primary)' }}></i>
                     </div>
                     <div className="fs-responsive text-break text-white text-center">{address}</div>
                 </div>
                 <div className="col-6 col-md-3 d-flex flex-column align-items-center">
-                    <div className="icon-circle mb-3" style={{ backgroundColor: '#222' }}>
+                    <div className="icon-circle mb-3" style={{ backgroundColor: 'var(--bs-dark)' }}>
                         <i className="bi bi-telephone-fill text-info"></i>
                     </div>
                     <div className="fs-responsive text-break text-white text-center text-md-start">
@@ -31,7 +31,7 @@ const ContactSection = ({ address, phones, email, instagram }: ContactSectionPro
                     </div>
                 </div>
                 <div className="col-6 col-md-3 d-flex flex-column align-items-center">
-                    <div className="icon-circle mb-3" style={{ backgroundColor: '#222' }}>
+                    <div className="icon-circle mb-3" style={{ backgroundColor: 'var(--bs-dark)' }}>
                         <i className="bi bi-envelope-fill text-info"></i>
                     </div>
                     <div className="fs-responsive text-break text-white text-center">{email}</div>
@@ -45,7 +45,7 @@ const ContactSection = ({ address, phones, email, instagram }: ContactSectionPro
                         style={{ cursor: 'pointer' }}
                     >
                         <div className="icon-circle bg-white mb-3">
-                            <i className="bi bi-instagram" style={{ color: '#56b6e6' }}></i>
+                            <i className="bi bi-instagram" style={{ color: 'var(--bs-primary)' }}></i>
                         </div>
                         <div className="fs-responsive text-break text-white text-center">{instagram}</div>
                     </a>
