@@ -56,14 +56,8 @@ export const propertyType = defineType({
     defineField({
       name: "propertyType",
       title: "Tipo de propiedad",
-      type: "string",
-      options: {
-        list: [
-          { title: "Casa", value: "casa" },
-          { title: "Departamento", value: "departamento" },
-          { title: "Terreno", value: "terreno" },
-        ],
-      },
+      type: "reference",
+      to: [{ type: "propertyTypeCategory" }],
     }),
     defineField({
       name: "address",
@@ -72,17 +66,35 @@ export const propertyType = defineType({
       validation: (rule) => rule.required(),
     }),
     defineField({
+      name: "neighborhood",
+      title: "Barrio",
+      type: "string",
+    }),
+    defineField({
       name: "city",
       title: "Ciudad",
-      type: "string",
-      options: {
-        list: [
-          { title: "Buenos Aires", value: "buenos-aires" },
-          { title: "Córdoba", value: "cordoba" },
-          { title: "Rosario", value: "rosario" },
-          { title: "Mendoza", value: "mendoza" },
-        ],
-      },
+      type: "reference",
+      to: [{ type: "city" }],
+    }),
+    defineField({
+      name: "rooms",
+      title: "Habitaciones",
+      type: "number",
+    }),
+    defineField({
+      name: "bathrooms",
+      title: "Baños",
+      type: "number",
+    }),
+    defineField({
+      name: "garages",
+      title: "Cocheras",
+      type: "number",
+    }),
+    defineField({
+      name: "size",
+      title: "Superficie (m²)",
+      type: "number",
     }),
     defineField({
       name: "price",
@@ -100,6 +112,12 @@ export const propertyType = defineType({
         ],
       },
       initialValue: "USD",
+    }),
+    defineField({
+      name: "featured",
+      title: "Destacada",
+      type: "boolean",
+      initialValue: false,
     }),
   ],
 });

@@ -11,7 +11,7 @@ interface Property {
 }
 
 const FEATURED_QUERY = `
-  *[_type == "property"] | order(publishedAt desc)[0...6] {
+  *[_type == "property" && featured == true] | order(publishedAt desc)[0...6] {
     title,
     "slug": slug.current,
     subtitle,
