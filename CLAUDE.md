@@ -9,10 +9,10 @@ This is a small real-state website, to work as a catalog of the available proper
 ## Build & Development Commands
 
 ```bash
-npm run dev      # Start dev server with Turbopack
-npm run build    # Production build
-npm run start    # Run production server
-npm run lint     # Run ESLint
+pnpm dev      # Start dev server with Turbopack
+pnpm build    # Production build
+pnpm start    # Run production server
+pnpm lint     # Run ESLint
 ```
 
 ## Tech Stack
@@ -38,3 +38,4 @@ Path alias: `@/*` maps to `./src/*`
 - Use `next/image` for optimized images
 - Dark mode supported via `prefers-color-scheme` CSS media query.
 - Don't add too many comments to the code.
+- Use double quotes for strings (Prettier is pre-configured for this).
