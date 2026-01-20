@@ -36,4 +36,5 @@ Path alias: `@/*` maps to `./src/*`
 - Components in `/app` are Server Components unless marked with `"use client"`
 - Use Next.js Metadata API for SEO (exported `metadata` object)
 - Use `next/image` for optimized images
-- Dark mode supported via `prefers-color-scheme` CSS media query
+- Dark mode supported via `prefers-color-scheme` CSS media query.
+- Don't add too many comments to the code.
