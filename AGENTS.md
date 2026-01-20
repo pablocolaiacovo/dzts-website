@@ -1,160 +1,138 @@
-# Agent Guidelines for DZTS Inmobiliaria
+# AGENTS.md - DZTS Inmobiliaria
 
-This file provides guidance for AI agents working on this Next.js real estate website.
+This file contains essential information for agentic coding agents working in this repository.
 
-Tech stack: Next.js 16, React 19, TypeScript, Sanity CMS, Bootstrap 5, Tailwind CSS 4, SCSS
-
-## Build & Development Commands
+## Build, Lint, and Test Commands
 
 ```bash
-npm run dev          # Start development server on localhost:3000
-npm run build        # Build for production
+npm run dev          # Start development server (Next.js 16 with Turbopack)
+npm run build        # Production build
 npm run start        # Start production server
-npm run lint         # Run ESLint on all files
+npm run lint         # Run ESLint
 ```
 
-**Note**: No test framework is configured. When adding tests, choose a framework that fits the codebase.
+**Note**: This project does not currently have a test suite configured. No test commands are available.
+
+## Project Stack
+
+- **Framework**: Next.js 16.1.1 with App Router
+- **Language**: TypeScript 5 with strict mode
+- **Styling**: Bootstrap 5.3.5 + custom CSS modules
+- **CMS**: Sanity v5 for content management
+- **Icons**: Bootstrap Icons 1.12.1
+- **React**: 19.2.3 with React Compiler enabled
 
 ## Code Style Guidelines
 
-### File Structure
-
-- `src/app/` - Next.js App Router pages and layouts
-- `src/components/` - React components
-- `src/sanity/` - Sanity CMS configuration and utilities
-- `styles/` - Global styles and Bootstrap overrides
-
-### Imports
-
-- Use ES modules with `import/export`
-- Use `@/*` alias for src directory imports (configured in tsconfig.json)
-- Type imports: `import type { TypeName }` for type-only imports
-- Order: external dependencies first, then internal imports
-
-```typescript
-import type { Metadata } from 'next';
-import { createClient } from 'next-sanity';
-import PropertyCard from '@/components/PropertyCard';
+### File Organization
+```
+src/
+├── app/              # Next.js App Router pages
+├── components/       # React components
+│   ├── ComponentName.tsx
+│   └── ComponentName.css
+├── sanity/          # Sanity CMS configuration
+│   ├── lib/         # Client helpers
+│   ├── schemaTypes/
+│   └── env.ts
+└── styles/          # Global styles and variables
 ```
 
-### Components
+### Imports and Exports
+- Use `type` keyword for type-only imports: `import type { Metadata } from "next"`
+- Named imports from libraries: `import { createClient } from 'next-sanity'`
+- Use path alias `@/*` for absolute imports: `import Component from "@/components/Component"`
+- Default exports for components: `export default function ComponentName() {}`
 
-- Use functional components with explicit returns
-- Client components must include `'use client'` at the top of the file
-- Component files: PascalCase (e.g., `PropertyCard.tsx`)
-- Use TypeScript interfaces for component props
+### Component Patterns
+- Add `'use client'` directive at the top for client-side components
+- Define prop interfaces above the component function
+- Use function declarations for components: `export default function ComponentName() {}`
+- Arrow functions acceptable for simple presentational components
+- Bootstrap classes for styling, inline styles for dynamic values
 
-```typescript
-'use client';
+### TypeScript Conventions
+- Always type function parameters and return types when clear
+- Use interfaces for prop definitions: `interface Props { title: string }`
+- Strict mode is enabled - no `any` types unless absolutely necessary
+- Environment variables validated with `assertValue()` helper in `src/sanity/env.ts`
 
-interface ComponentProps {
-  title: string;
-  items: string[];
-}
-
-export default function Component({ title, items }: ComponentProps) {
-  return <div>{content}</div>;
-}
-```
-
-### TypeScript
-
-- Strict mode enabled in tsconfig.json
-- All components should be properly typed
-- Use `Readonly<>` for complex prop types
-
-```typescript
-export default function Layout({ children }: Readonly<{ children: React.ReactNode }>) {
-  return <html>{children}</html>;
-}
-```
-
-### Styling
-
-- **Primary**: Bootstrap 5 utility classes
-- **Secondary**: Custom SCSS files for component-specific styles
-- Inline styles are allowed (ESLint rule disabled)
-- Custom variables in `styles/custom-variables.scss` using `$primary: #01BCF3`
-
-```tsx
-<div className="container py-4">
-  <div className="row justify-content-center">
-    <div className="col-12 col-md-4">Content</div>
-  </div>
-</div>
-```
+### Styling Guidelines
+- Use Bootstrap utility classes for layout and spacing
+- Co-locate CSS with component: `ComponentName.css` in same directory
+- Custom CSS variables defined in `src/styles/variables.css`
+- Inline styles only for dynamic values: `style={{ color: primaryColor }}`
+- Use Bootstrap's color variables: `var(--bs-primary)`, `var(--bs-dark)`
 
 ### Naming Conventions
+- **Components**: PascalCase (`PropertyCard.tsx`)
+- **Functions/Variables**: camelCase (`getPropertyData`)
+- **CSS Files**: kebab-case (`search-properties.css`)
+- **CSS Classes**: kebab-case (Bootstrap convention)
+- **Constants**: UPPER_SNAKE_CASE (`const API_VERSION`)
 
-- **Components**: PascalCase (`PropertyCard`, `FeaturedProperties`)
-- **Functions/Variables**: camelCase (`createClient`, `assertValue`)
-- **Constants**: UPPER_SNAKE_CASE for global constants
-- **Files**: PascalCase for components, kebab-case for utilities
-- **Sanity schemas**: camelCase type exports, lowercase schema names
-
-### Sanity CMS Integration
-
-- Schema types in `src/sanity/schemaTypes/`
-- Use `defineType` and `defineField` from `sanity`
-- Environment variables validated in `src/sanity/env.ts`
-- Client configured in `src/sanity/lib/client.ts`
-
-```typescript
-import { defineType, defineField } from 'sanity';
-
-export const propertyType = defineType({
-  name: 'property',
-  title: 'Properties',
-  type: 'document',
-  fields: [defineField({ name: 'title', title: 'Title', type: 'string' })]
-});
-```
+### Formatting and Style
+- 2-space indentation
+- Single quotes for strings
+- Semicolons required at end of statements
+- Trailing commas in multi-line arrays/objects
+- Maximum line length: not strictly enforced but prefer readability
+- No code comments unless explicitly required
 
 ### Error Handling
+- Throw `Error` for invalid configuration/missing env vars
+- Use TypeScript strict mode to catch type errors at compile time
+- Environment variables must be validated before use (see `src/sanity/env.ts`)
 
-- Validate environment variables with assertion helper
-- Use TypeScript optional chaining for potentially null/undefined values
+### Image Handling
+- Use Next.js `Image` component for all images
+- Set `priority` on above-the-fold images
+- Use `fill` prop for full-width/background images with parent positioning
+- Add remote domains to `next.config.ts` when using external images
 
-```typescript
-function assertValue<T>(v: T | undefined, errorMessage: string): T {
-  if (v === undefined) throw new Error(errorMessage);
-  return v;
-}
-```
+### Environment Variables
+- Client-accessible vars prefixed with `NEXT_PUBLIC_`
+- Store in `.env.local` (gitignored)
+- Required env vars: `NEXT_PUBLIC_SANITY_PROJECT_ID`, `NEXT_PUBLIC_SANITY_DATASET`
+- Optional env var: `NEXT_PUBLIC_SANITY_API_VERSION` (defaults to '2025-05-06')
 
-### ESLint & Configuration
+### Next.js Specifics
+- Use App Router (no Pages Router)
+- Use `layout.tsx` for root layout with metadata
+- Client components must have `'use client'` directive
+- Server components by default (no directive needed)
+- Use Turbopack in development (enabled by default in Next.js 16)
 
-- ESLint with TypeScript and Next.js rules
-- Inline styles allowed: `react/no-inline-styles: off`
-- Core Web Vitals enabled
-- React Compiler enabled in next.config.ts
+### Sanity CMS Integration
+- Client configured in `src/sanity/lib/client.ts`
+- Use `sanityFetch` for live content with `<SanityLive />` in layout
+- Schema definitions in `src/sanity/schemaTypes/`
+- Image URL builder available via `urlFor()` from `src/sanity/lib/image.ts`
+- Studio available at `/studio` route
 
-### Images
+### ESLint Rules
+- Extends `@typescript-eslint/recommended`
+- Next.js core web vitals rules enabled
+- React rules with `react/no-inline-styles` disabled
+- Linting ignores `.next/` and `node_modules/`
+- Run `npm run lint` to check code before committing
 
-- Use `next/image` component for all images
-- Specify width, height, and objectFit for responsive images
-- Configure remote domains in `next.config.ts` when adding external images
+### Path Aliases
+- `@/*` resolves to `./src/*`
+- Configure new aliases in `tsconfig.json` under `paths`
 
-```tsx
-<Image
-  src="/path/to/image.jpg"
-  alt="Description"
-  width={400}
-  height={220}
-  style={{ objectFit: 'cover' }}
-/>
-```
+### Security Headers
+- X-Content-Type-Options: nosniff
+- X-Frame-Options: DENY
+- Referrer-Policy: strict-origin-when-cross-origin
+- All configured in `next.config.ts`
 
-## Before Submitting Changes
+### When Working with This Codebase
 
-1. Run `npm run lint` to ensure code passes ESLint
-2. Verify TypeScript types with editor or build process
-3. Test responsive design (mobile, tablet, desktop)
-4. Ensure all imports are properly typed
-5. Check that Bootstrap and SCSS styles are correctly applied
-
-## Important Notes
-
-- The project uses both Bootstrap and Tailwind CSS (prefer Bootstrap for consistency)
-- Spanish language content in UI
-- Primary brand color: `#01BCF3` (cyan blue)
+1. **Before adding dependencies**: Check if similar functionality exists in Bootstrap or React
+2. **Before creating new components**: Check existing components for patterns to follow
+3. **When styling**: Prefer Bootstrap classes over custom CSS
+4. **When fetching data**: Use Sanity client, ensure proper typing
+5. **When modifying types**: Update related components to ensure type safety
+6. **Before committing**: Run `npm run lint` to verify code quality
+7. **When adding images**: Use Next.js Image component with proper props

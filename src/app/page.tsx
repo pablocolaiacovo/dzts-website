@@ -16,7 +16,7 @@ export default function Home() {
           "Más texto de ejemplo para la sección."
         ]}
         image="/Images/backgroun.jpg"
-        backgroundColor="#01BCF3"
+        backgroundColor="var(--bs-primary)"
       />
     </>
   );

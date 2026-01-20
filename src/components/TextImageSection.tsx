@@ -27,11 +27,11 @@ export default function TextImageSection({
   subtitleColor,
 }: TextImageSectionProps) {
 
-  const isDarkBackground = backgroundColor === '#000000';
-  const isBlueBackground = backgroundColor === '#01BCF3';
-  const defaultTitleColor = isDarkBackground ? '#FFFFFF' : isBlueBackground ? '#000000' : '#01BCF3';
-  const defaultSubtitleColor = isDarkBackground ? '#01BCF3' : isBlueBackground ? '#000000' : '#01BCF3';
-  const textColor = isDarkBackground ? '#FFFFFF' : isBlueBackground ? '#000000' : '#000000';
+  const isDarkBackground = backgroundColor === 'var(--bs-dark)';
+  const isBlueBackground = backgroundColor === 'var(--bs-primary)';
+  const defaultTitleColor = isDarkBackground ? 'var(--bs-secondary)' : isBlueBackground ? 'var(--bs-dark)' : 'var(--bs-primary)';
+  const defaultSubtitleColor = isDarkBackground ? 'var(--bs-primary)' : isBlueBackground ? 'var(--bs-dark)' : 'var(--bs-primary)';
+  const textColor = isDarkBackground ? 'var(--bs-secondary)' : isBlueBackground ? 'var(--bs-dark)' : 'var(--bs-dark)';
 
   return (
     <div 
