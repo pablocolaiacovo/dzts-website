@@ -7,6 +7,7 @@ interface Property {
   subtitle: string | null;
   price: number | null;
   imageUrl: string | null;
+  operationType: string | null;
 }
 
 const FEATURED_QUERY = `
@@ -15,6 +16,7 @@ const FEATURED_QUERY = `
     "slug": slug.current,
     subtitle,
     price,
+    operationType,
     "imageUrl": images[0].asset->url
   }
 `;
@@ -35,6 +37,7 @@ export default async function FeaturedProperties() {
                 subtitle={property.subtitle ?? undefined}
                 price={property.price ?? undefined}
                 imageUrl={property.imageUrl ?? undefined}
+                operationType={property.operationType ?? undefined}
               />
             </div>
           ))

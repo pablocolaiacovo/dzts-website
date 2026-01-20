@@ -7,9 +7,10 @@ interface PropertyCardProps {
     subtitle?: string;
     price?: number;
     imageUrl?: string;
+    operationType?: string;
 }
 
-export default function PropertyCard({ title, slug, subtitle, price, imageUrl }: PropertyCardProps) {
+export default function PropertyCard({ title, slug, subtitle, price, imageUrl, operationType }: PropertyCardProps) {
     return (
         <Link href={`/properties/${slug}`} className="text-decoration-none">
             <div className="card shadow-sm rounded-4 border-0" style={{ maxWidth: 400 }}>
@@ -22,6 +23,13 @@ export default function PropertyCard({ title, slug, subtitle, price, imageUrl }:
                         className="card-img-top rounded-top-4"
                         style={{ objectFit: 'cover', height: 220 }}
                     />
+                    {operationType && (
+                        <span
+                            className={`position-absolute top-0 end-0 m-2 badge rounded-pill ${operationType === 'venta' ? 'bg-success' : 'bg-warning text-dark'}`}
+                        >
+                            {operationType === 'venta' ? 'Venta' : 'Alquiler'}
+                        </span>
+                    )}
                 </div>
                 <div className="w-100 bg-primary" style={{ height: 4 }}></div>
                 <div className="card-body text-center pb-2">
