@@ -5,19 +5,16 @@ import './SearchProperties.css';
 export default function SearchProperties() {
   return (
     <section className="hero min-vh-100 w-100 overflow-hidden position-relative text-white d-flex align-items-center justify-content-center">
-      {/* Imagen de fondo */}
       <Image
         src="/Images/backgroun.jpg"
         alt="Imagen de fondo del formulario de búsqueda"
         fill
-        className="object-cover z-n1"
+        className="object-cover negative-z"
         priority
       />
+      
+      <div className="overlay position-absolute top-0 start-0 w-100 h-100 position-relative"></div>
 
-      {/* Overlay oscuro */}
-      <div className="overlay position-absolute top-0 start-0 w-100 h-100 z-0"></div>
-
-      {/* Contenido centrado */}
       <div className="container position-relative z-1 text-center">
         <div className="row pb-4">
           <div className="col-12 col-md-3 logo-container pb-4 mx-auto position-relative">
