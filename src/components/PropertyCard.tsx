@@ -12,7 +12,7 @@ interface PropertyCardProps {
 
 export default function PropertyCard({ title, slug, subtitle, price, imageUrl, operationType }: PropertyCardProps) {
     return (
-        <Link href={`/properties/${slug}`} className="text-decoration-none">
+        <Link href={`/propiedades/${slug}`} className="text-decoration-none">
             <div className="card shadow-sm rounded-4 border-0" style={{ maxWidth: 400 }}>
                 <div className="position-relative">
                     <Image
