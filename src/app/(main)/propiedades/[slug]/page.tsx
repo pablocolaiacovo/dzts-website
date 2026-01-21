@@ -23,10 +23,10 @@ const PROPERTY_QUERY = `
     address,
     description,
     price,
-    propertyType,
+    "propertyType": propertyType->name,
     operationType,
     currency,
-    city,
+    "city": city->name,
     "images": images[].asset->url
   }
 `;
@@ -57,7 +57,7 @@ export default async function PropertyPage({
               </span>
             )}
             {property.propertyType && (
-              <span className="badge rounded-pill bg-info text-white fs-6 text-capitalize">
+              <span className="badge rounded-pill bg-info text-white fs-6">
                 {property.propertyType}
               </span>
             )}
@@ -68,7 +68,7 @@ export default async function PropertyPage({
             <div>
               {property.address}
               {property.address && property.city && ', '}
-              {property.city && <span className="text-capitalize">{property.city.replace('-', ' ')}</span>}
+              {property.city && <span>{property.city}</span>}
             </div>
           </div>
           <hr className="border-primary mb-4" />
