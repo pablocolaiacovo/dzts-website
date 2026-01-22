@@ -39,3 +39,4 @@ Path alias: `@/*` maps to `./src/*`
 - Dark mode supported via `prefers-color-scheme` CSS media query.
 - Don't add too many comments to the code.
 - Use double quotes for strings (Prettier is pre-configured for this).
+- Use CSS over JavaScript when possible for animations and dynamic behavior.
