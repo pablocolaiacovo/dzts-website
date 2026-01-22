@@ -1,23 +1,34 @@
 import Image from 'next/image';
 import Link from 'next/link';
+import { urlFor } from "@/sanity/lib/image";
+import { SanityImageSource } from '@sanity/image-url';
 
 interface PropertyCardProps {
-    title: string;
-    slug: string;
+    title?: string | null;
+    slug?: string | null;
     subtitle?: string;
     price?: number;
-    imageUrl?: string;
+    image?: SanityImageSource;
     operationType?: string;
 }
 
-export default function PropertyCard({ title, slug, subtitle, price, imageUrl, operationType }: PropertyCardProps) {
+export default function PropertyCard({ title, slug, subtitle, price, image, operationType }: PropertyCardProps) {
+    const imageUrl = image
+        ? urlFor(image)
+            .height(220)
+            .width(400)
+            .quality(80)
+            .auto("format")
+            .url()
+        : "https://placehold.co/400x220/png";
+
     return (
         <Link href={`/propiedades/${slug}`} className="text-decoration-none">
             <div className="card shadow-sm rounded-4 border-0" style={{ maxWidth: 400 }}>
                 <div className="position-relative">
                     <Image
-                        src={imageUrl || '/Images/cardImage.jpg'}
-                        alt={title}
+                        src={imageUrl || 'https://placehold.co/400x220/png'}
+                        alt={title || 'Property Image'}
                         width={400}
                         height={220}
                         className="card-img-top rounded-top-4"

@@ -1,23 +1,13 @@
-import { client } from '@/sanity/lib/client';
-import ImageCarousel from '@/components/ImageCarousel';
 import { PortableText } from '@portabletext/react';
 import { notFound } from 'next/navigation';
+import { defineQuery } from 'next-sanity';
+import { sanityFetch } from '@/sanity/lib/live';
 
-interface Property {
-  title: string;
-  subtitle: string | null;
-  address: string;
-  description: Array<{ _type: string; children?: Array<{ text: string }> }> | null;
-  price: number | null;
-  images: string[];
-  propertyType: string | null;
-  operationType: string | null;
-  currency: string | null;
-  city: string | null;
-}
+import ImageCarousel from '@/components/ImageCarousel';
 
-const PROPERTY_QUERY = `
-  *[_type == "property" && slug.current == $slug][0] {
+const PROPERTY_QUERY = defineQuery(`
+  *[_type == "property" && slug.current == $slug][0] 
+  {
     title,
     subtitle,
     address,
@@ -27,9 +17,9 @@ const PROPERTY_QUERY = `
     operationType,
     currency,
     "city": city->name,
-    "images": images[].asset->url
+    "images": images[]
   }
-`;
+`);
 
 export default async function PropertyPage({
   params,
@@ -37,7 +27,10 @@ export default async function PropertyPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const property = await client.fetch<Property | null>(PROPERTY_QUERY, { slug });
+  const { data: property } = await sanityFetch({
+    query: PROPERTY_QUERY,
+    params: { slug },
+  });
 
   if (!property) {
     notFound();

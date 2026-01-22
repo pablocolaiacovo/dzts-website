@@ -1,9 +1,11 @@
 'use client';
 
+import { urlFor } from '@/sanity/lib/image';
+import { SanityImageSource } from '@sanity/image-url';
 import Image from 'next/image';
 
 interface ImageCarouselProps {
-  images: string[];
+  images: SanityImageSource[];
   title: string;
 }
 
@@ -26,19 +28,24 @@ export default function ImageCarousel({ images, title }: ImageCarouselProps) {
         ))}
       </div>
       <div className="carousel-inner">
-        {images.map((imageUrl, index) => (
-          <div key={index} className={`carousel-item ${index === 0 ? 'active' : ''}`}>
-            <div className="position-relative" style={{ height: '500px' }}>
-              <Image
-                src={imageUrl}
-                alt={`${title} - Imagen ${index + 1}`}
-                fill
-                className="object-fit-cover"
-                priority={index === 0}
-              />
+        {images.map((asset, index) => {
+          const url = asset ? urlFor(asset).width(1200).height(500).auto('format').url()
+            : 'https://placehold.co/1200x500/png';
+
+          return (
+            <div key={index} className={`carousel-item ${index === 0 ? 'active' : ''}`}>
+              <div className="position-relative" style={{ height: '500px' }}>
+                <Image
+                  src={url}
+                  alt={`${title} - Imagen ${index + 1}`}
+                  fill
+                  className="object-fit-cover"
+                  priority={index === 0}
+                />
+              </div>
             </div>
-          </div>
-        ))}
+          )
+        })}
       </div>
       {images.length > 1 && (
         <>

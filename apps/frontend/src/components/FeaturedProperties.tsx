@@ -1,28 +1,31 @@
-import { client } from '@/sanity/lib/client';
 import PropertyCard from './PropertyCard';
+import { defineQuery } from 'next-sanity';
+import { sanityFetch } from '@/sanity/lib/live';
 
 interface Property {
   title: string;
   slug: string;
   subtitle: string | null;
   price: number | null;
-  imageUrl: string | null;
+  image: string | null;
   operationType: string | null;
 }
 
-const FEATURED_QUERY = `
-  *[_type == "property" && featured == true] | order(publishedAt desc)[0...6] {
+const FEATURED_QUERY = defineQuery(`*
+  [_type == "property" && featured == true] 
+  | order(publishedAt desc)[0...6] 
+  {
     title,
     "slug": slug.current,
     subtitle,
     price,
     operationType,
-    "imageUrl": images[0].asset->url
-  }
-`;
+    "image": images[0]
+  }`
+);
 
 export default async function FeaturedProperties() {
-  const properties = await client.fetch<Property[]>(FEATURED_QUERY);
+  const { data: properties } = await sanityFetch({ query: FEATURED_QUERY });
 
   return (
     <div className="container py-4">
@@ -36,7 +39,7 @@ export default async function FeaturedProperties() {
                 slug={property.slug}
                 subtitle={property.subtitle ?? undefined}
                 price={property.price ?? undefined}
-                imageUrl={property.imageUrl ?? undefined}
+                image={property.image ?? undefined}
                 operationType={property.operationType ?? undefined}
               />
             </div>

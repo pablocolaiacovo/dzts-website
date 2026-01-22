@@ -3,6 +3,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import "bootstrap/dist/css/bootstrap.min.css";
+import { SanityLive } from "@/sanity/lib/live";
 
 export default function MainLayout({
   children,
@@ -15,6 +16,7 @@ export default function MainLayout({
       <main>{children}</main>
       <Footer />
       <BootstrapClient />
+      <SanityLive />
     </>
   );
 }
