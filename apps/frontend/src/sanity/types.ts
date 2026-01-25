@@ -250,9 +250,9 @@ type ArrayOf<T> = Array<
   }
 >;
 
-// Source: ../frontend/src/app/(main)/propiedades/[slug]/page.tsx
+// Source: ../frontend/src/app/propiedades/[slug]/page.tsx
 // Variable: PROPERTY_QUERY
-// Query: *[_type == "property" && slug.current == $slug][0]   {    title,    subtitle,    address,    description,    price,    "propertyType": propertyType->name,    operationType,    currency,    "city": city->name,    "images": images[].asset->url  }
+// Query: *[_type == "property" && slug.current == $slug][0]   {    title,    subtitle,    address,    description,    price,    "propertyType": propertyType->name,    operationType,    currency,    "city": city->name,    "images": images[]  }
 export type PROPERTY_QUERY_RESULT = {
   title: string | null;
   subtitle: string | null;
@@ -280,7 +280,14 @@ export type PROPERTY_QUERY_RESULT = {
   operationType: "alquiler" | "venta" | null;
   currency: "ARS" | "USD" | null;
   city: string | null;
-  images: Array<string | null> | null;
+  images: Array<{
+    asset?: SanityImageAssetReference;
+    media?: unknown;
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    _type: "image";
+    _key: string;
+  }> | null;
 } | null;
 
 // Source: ../frontend/src/components/FeaturedProperties.tsx
@@ -306,7 +313,7 @@ export type FEATURED_QUERY_RESULT = Array<{
 import "@sanity/client";
 declare module "@sanity/client" {
   interface SanityQueries {
-    '\n  *[_type == "property" && slug.current == $slug][0] \n  {\n    title,\n    subtitle,\n    address,\n    description,\n    price,\n    "propertyType": propertyType->name,\n    operationType,\n    currency,\n    "city": city->name,\n    "images": images[].asset->url\n  }\n': PROPERTY_QUERY_RESULT;
+    '\n  *[_type == "property" && slug.current == $slug][0] \n  {\n    title,\n    subtitle,\n    address,\n    description,\n    price,\n    "propertyType": propertyType->name,\n    operationType,\n    currency,\n    "city": city->name,\n    "images": images[]\n  }\n': PROPERTY_QUERY_RESULT;
     '*\n  [_type == "property" && featured == true] \n  | order(publishedAt desc)[0...6] \n  {\n    title,\n    "slug": slug.current,\n    subtitle,\n    price,\n    operationType,\n    "image": images[0]\n  }': FEATURED_QUERY_RESULT;
   }
 }

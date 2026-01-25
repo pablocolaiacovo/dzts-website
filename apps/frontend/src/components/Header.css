@@ -44,11 +44,3 @@
 .header-nav .nav-link:focus {
   color: var(--bs-primary);
 }
-
-@media (min-width: 992px) {
-  .header-nav .nav-item:not(:last-child) .nav-link::after {
-    content: "·";
-    margin-left: 0.75rem;
-    color: #ffffff;
-  }
-}

@@ -25,6 +25,7 @@ pnpm lint     # Run ESLint
 ## Architecture
 
 This is a Next.js App Router project:
+
 - `src/app/` - Routes and layouts (file-based routing)
 - `src/app/layout.tsx` - Root layout with Geist font configuration
 - `src/app/globals.css` - Global styles with Tailwind and CSS variables for theming
@@ -39,4 +40,6 @@ Path alias: `@/*` maps to `./src/*`
 - Dark mode supported via `prefers-color-scheme` CSS media query.
 - Don't add too many comments to the code.
 - Use double quotes for strings (Prettier is pre-configured for this).
+- Use mobile fist for css.
+- Prefer bootstrap css classes and components over custom css.
 - Use CSS over JavaScript when possible for animations and dynamic behavior.

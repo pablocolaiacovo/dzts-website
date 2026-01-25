@@ -1,5 +1,11 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
+import BootstrapClient from "@/components/BootstrapClient";
+import Header from "@/components/Header";
+import Footer from "@/components/Footer";
+import { SanityLive } from "@/sanity/lib/live";
+import "bootstrap-icons/font/bootstrap-icons.css";
+import "bootstrap/dist/css/bootstrap.min.css";
 import "@/styles/variables.css";
 
 const inter = Inter({
@@ -20,7 +26,13 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={inter.className}>{children}</body>
+      <body className={inter.className}>
+        <Header />
+        <main>{children}</main>
+        <Footer />
+        <BootstrapClient />
+        <SanityLive />
+      </body>
     </html>
   );
 }
