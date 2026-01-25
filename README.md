@@ -1,41 +1,63 @@
 # DZTS Inmobiliaria
 
+A real estate website built as a pnpm monorepo.
+
+## Structure
+
+```text
+apps/
+  frontend/   # Next.js website
+  studio/     # Sanity Studio CMS
+```
+
+## Apps
+
+### Frontend
+
+Public-facing website built with Next.js 16 and React 19. Displays property listings for rent and sale, fetching content from Sanity CMS. Styled with Bootstrap 5.
+
+### Studio
+
+Sanity Studio for content management. Used to create and edit properties, images, and other site content.
+
 ## Requirements
 
-- [pnpm](https://pnpm.io/)
+- Node.js >= 20.0.0
+- [pnpm](https://pnpm.io/) >= 10.0.0
 
 ## Getting Started
 
-First, run the development server:
+Install dependencies:
+
+```bash
+pnpm install
+```
+
+Run both apps in development mode:
 
 ```bash
 pnpm dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+- Frontend: [http://localhost:3000](http://localhost:3000)
+- Studio: [http://localhost:3333](http://localhost:3333)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Scripts
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| Command      | Description                          |
+|--------------|--------------------------------------|
+| `pnpm dev`   | Start both apps in development mode  |
+| `pnpm build` | Build both apps for production       |
 
-## Sanity Studio
+## Sanity Configuration
 
-### Configuration
+1. Create an account on [Sanity](https://www.sanity.io/) and accept the project invitation.
+1. Create a `.env.local` file in `apps/frontend/` with:
 
-1. Create an account on [Sanity](https://www.sanity.io/).
-2. Accept the invitation to the project.
-3. Create a `.env.local` file in the root of your project and add the following variables:
+    ```bash
+    NEXT_PUBLIC_SANITY_PROJECT_ID=your_project_id
+    NEXT_PUBLIC_SANITY_DATASET=your_dataset
+    SANITY_API_READ_TOKEN=your_api_token
+    ```
 
-```bash
-NEXT_PUBLIC_SANITY_PROJECT_ID=your_project_id
-NEXT_PUBLIC_SANITY_DATASET=your_dataset
-```
-
-4. Replace `your_project_id` and `your_dataset` with the actual values from your Sanity project.
-5. Create a read token in the Sanity project settings and add it to your `.env.local` file:
-
-```bash
-SANITY_API_READ_TOKEN=your_api_token
-```
-
-6. Replace `your_api_token` with the actual token you created in the Sanity project settings.
+1. Get these values from your Sanity project settings. The read token can be created in the API section.
