@@ -62,6 +62,28 @@ pnpm typegen  # Generate TypeScript types from schema
 - **React 19**
 - **TypeScript**
 
+## Environment Variables
+
+Each app has its own `.env.local` file with different prefixes (Next.js uses `NEXT_PUBLIC_`, Sanity Studio uses `SANITY_STUDIO_`).
+
+### Frontend (`apps/frontend/.env.local`)
+
+| Variable                         | Description                       |
+| -------------------------------- | --------------------------------- |
+| `NEXT_PUBLIC_SANITY_PROJECT_ID`  | Sanity project identifier         |
+| `NEXT_PUBLIC_SANITY_DATASET`     | Sanity dataset name               |
+| `SANITY_API_READ_TOKEN`          | Server-side Sanity API read token |
+| `NEXT_PUBLIC_WEB3FORMS_KEY`      | Web3Forms API key for contact form|
+
+### Studio (`apps/studio/.env.local`)
+
+| Variable                   | Description               |
+| -------------------------- | ------------------------- |
+| `SANITY_STUDIO_PROJECT_ID` | Sanity project identifier |
+| `SANITY_STUDIO_DATASET`    | Sanity dataset name       |
+
+See `.env.example` files in each app for templates.
+
 ## Architecture
 
 ### Frontend
