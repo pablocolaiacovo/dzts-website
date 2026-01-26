@@ -126,6 +126,70 @@ export type City = {
   slug?: Slug;
 };
 
+export type SiteSettings = {
+  _id: string;
+  _type: "siteSettings";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  siteName?: string;
+  logo?: {
+    asset?: SanityImageAssetReference;
+    media?: unknown;
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    alt?: string;
+    _type: "image";
+  };
+  favicon?: {
+    asset?: SanityImageAssetReference;
+    media?: unknown;
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    _type: "image";
+  };
+  mainNavigation?: Array<{
+    label?: string;
+    linkType?: "internal" | "external" | "action";
+    internalPath?: string;
+    externalUrl?: string;
+    actionId?: string;
+    _type: "navItem";
+    _key: string;
+  }>;
+  phone?: string;
+  email?: string;
+  address?: string;
+  whatsappNumber?: string;
+  socialLinks?: Array<{
+    platform?: "facebook" | "instagram" | "twitter" | "linkedin" | "youtube";
+    url?: string;
+    _type: "socialLink";
+    _key: string;
+  }>;
+  copyrightText?: string;
+  footerLinks?: Array<{
+    label?: string;
+    url?: string;
+    _type: "footerLink";
+    _key: string;
+  }>;
+  certificationLogos?: Array<{
+    image?: {
+      asset?: SanityImageAssetReference;
+      media?: unknown;
+      hotspot?: SanityImageHotspot;
+      crop?: SanityImageCrop;
+      _type: "image";
+    };
+    alt?: string;
+    title?: string;
+    url?: string;
+    _type: "certificationLogo";
+    _key: string;
+  }>;
+};
+
 export type SanityImagePaletteSwatch = {
   _type: "sanity.imagePaletteSwatch";
   background?: string;
@@ -233,6 +297,7 @@ export type AllSanitySchemaTypes =
   | Slug
   | PropertyTypeCategory
   | City
+  | SiteSettings
   | SanityImagePaletteSwatch
   | SanityImagePalette
   | SanityImageDimensions
@@ -309,11 +374,81 @@ export type FEATURED_QUERY_RESULT = Array<{
   } | null;
 }>;
 
+// Source: ../frontend/src/sanity/queries/siteSettings.ts
+// Variable: SITE_SETTINGS_QUERY
+// Query: *[_type == "siteSettings"][0] {    siteName,    logo {      asset->{        _id,        url,        metadata { lqip, dimensions }      },      alt    },    favicon {      asset->{        _id,        url      }    },    mainNavigation[] {      _key,      label,      linkType,      internalPath,      externalUrl,      actionId    },    phone,    email,    address,    whatsappNumber,    socialLinks[] {      _key,      platform,      url    },    copyrightText,    footerLinks[] {      _key,      label,      url    },    certificationLogos[] {      _key,      image {        asset->{          _id,          url,          metadata { lqip, dimensions }        }      },      alt,      title,      url    }  }
+export type SITE_SETTINGS_QUERY_RESULT = {
+  siteName: string | null;
+  logo: {
+    asset: {
+      _id: string;
+      url: string | null;
+      metadata: {
+        lqip: string | null;
+        dimensions: SanityImageDimensions | null;
+      } | null;
+    } | null;
+    alt: string | null;
+  } | null;
+  favicon: {
+    asset: {
+      _id: string;
+      url: string | null;
+    } | null;
+  } | null;
+  mainNavigation: Array<{
+    _key: string;
+    label: string | null;
+    linkType: "action" | "external" | "internal" | null;
+    internalPath: string | null;
+    externalUrl: string | null;
+    actionId: string | null;
+  }> | null;
+  phone: string | null;
+  email: string | null;
+  address: string | null;
+  whatsappNumber: string | null;
+  socialLinks: Array<{
+    _key: string;
+    platform:
+      | "facebook"
+      | "instagram"
+      | "linkedin"
+      | "twitter"
+      | "youtube"
+      | null;
+    url: string | null;
+  }> | null;
+  copyrightText: string | null;
+  footerLinks: Array<{
+    _key: string;
+    label: string | null;
+    url: string | null;
+  }> | null;
+  certificationLogos: Array<{
+    _key: string;
+    image: {
+      asset: {
+        _id: string;
+        url: string | null;
+        metadata: {
+          lqip: string | null;
+          dimensions: SanityImageDimensions | null;
+        } | null;
+      } | null;
+    } | null;
+    alt: string | null;
+    title: string | null;
+    url: string | null;
+  }> | null;
+} | null;
+
 // Query TypeMap
 import "@sanity/client";
 declare module "@sanity/client" {
   interface SanityQueries {
     '\n  *[_type == "property" && slug.current == $slug][0] \n  {\n    title,\n    subtitle,\n    address,\n    description,\n    price,\n    "propertyType": propertyType->name,\n    operationType,\n    currency,\n    "city": city->name,\n    "images": images[]\n  }\n': PROPERTY_QUERY_RESULT;
     '*\n  [_type == "property" && featured == true] \n  | order(publishedAt desc)[0...6] \n  {\n    title,\n    "slug": slug.current,\n    subtitle,\n    price,\n    operationType,\n    "image": images[0]\n  }': FEATURED_QUERY_RESULT;
+    '\n  *[_type == "siteSettings"][0] {\n    siteName,\n    logo {\n      asset->{\n        _id,\n        url,\n        metadata { lqip, dimensions }\n      },\n      alt\n    },\n    favicon {\n      asset->{\n        _id,\n        url\n      }\n    },\n    mainNavigation[] {\n      _key,\n      label,\n      linkType,\n      internalPath,\n      externalUrl,\n      actionId\n    },\n    phone,\n    email,\n    address,\n    whatsappNumber,\n    socialLinks[] {\n      _key,\n      platform,\n      url\n    },\n    copyrightText,\n    footerLinks[] {\n      _key,\n      label,\n      url\n    },\n    certificationLogos[] {\n      _key,\n      image {\n        asset->{\n          _id,\n          url,\n          metadata { lqip, dimensions }\n        }\n      },\n      alt,\n      title,\n      url\n    }\n  }\n': SITE_SETTINGS_QUERY_RESULT;
   }
 }

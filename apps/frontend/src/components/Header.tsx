@@ -4,9 +4,20 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRef, useState } from "react";
 import ContactModal from "./ContactModal";
+import { urlFor } from "@/sanity/lib/image";
+import type { SITE_SETTINGS_QUERY_RESULT } from "@/sanity/types";
 import "./Header.css";
 
-export default function Header() {
+type SiteSettings = NonNullable<SITE_SETTINGS_QUERY_RESULT>;
+type NavItem = NonNullable<SiteSettings["mainNavigation"]>[number];
+
+type HeaderProps = {
+  logo?: SiteSettings["logo"];
+  siteName?: SiteSettings["siteName"];
+  navigation?: SiteSettings["mainNavigation"];
+};
+
+export default function Header({ logo, siteName, navigation }: HeaderProps) {
   const [showContactModal, setShowContactModal] = useState(false);
   const navCollapseRef = useRef<HTMLDivElement>(null);
 
@@ -27,6 +38,49 @@ export default function Header() {
     collapseNav();
   };
 
+  const renderNavItem = (item: NavItem) => {
+    if (item.linkType === "action") {
+      return (
+        <a
+          href={`#${item.actionId || ""}`}
+          className="nav-link"
+          onClick={handleContactClick}
+          role="button"
+          aria-haspopup="dialog"
+        >
+          {item.label}
+        </a>
+      );
+    }
+
+    if (item.linkType === "external" && item.externalUrl) {
+      return (
+        <a
+          href={item.externalUrl}
+          className="nav-link"
+          target="_blank"
+          rel="noopener noreferrer"
+          onClick={handleNavClick}
+        >
+          {item.label}
+        </a>
+      );
+    }
+
+    return (
+      <Link
+        href={item.internalPath || "/"}
+        className="nav-link"
+        onClick={handleNavClick}
+      >
+        {item.label}
+      </Link>
+    );
+  };
+
+  const logoUrl = logo?.asset ? urlFor(logo).width(300).url() : null;
+  const logoAlt = logo?.alt || siteName || "";
+
   return (
     <>
       <header className="sticky-header">
@@ -36,14 +90,16 @@ export default function Header() {
           aria-label="Main navigation"
         >
           <div className="container">
-            <Link href="/" className="navbar-brand header-logo" aria-label="DZTS Inmobiliaria - Home">
-              <Image
-                src="/Images/logoDzts.png"
-                alt="DZTS Inmobiliaria logo"
-                width={150}
-                height={60}
-                priority
-              />
+            <Link href="/" className="navbar-brand header-logo" aria-label={`${siteName || ""} - Home`}>
+              {logoUrl && (
+                <Image
+                  src={logoUrl}
+                  alt={logoAlt}
+                  width={150}
+                  height={60}
+                  priority
+                />
+              )}
             </Link>
 
             <button
@@ -60,32 +116,11 @@ export default function Header() {
 
             <div className="collapse navbar-collapse" id="mainNavigation" ref={navCollapseRef}>
               <ul className="navbar-nav header-nav ms-auto mb-2 mb-lg-0 gap-lg-3">
-                <li className="nav-item">
-                  <Link href="/propiedades" className="nav-link" onClick={handleNavClick}>
-                    propiedades
-                  </Link>
-                </li>
-                <li className="nav-item">
-                  <Link href="/servicios" className="nav-link" onClick={handleNavClick}>
-                    servicios
-                  </Link>
-                </li>
-                <li className="nav-item">
-                  <Link href="/nosotros" className="nav-link" onClick={handleNavClick}>
-                    nosotros
-                  </Link>
-                </li>
-                <li className="nav-item">
-                  <a
-                    href="#contacto"
-                    className="nav-link"
-                    onClick={handleContactClick}
-                    role="button"
-                    aria-haspopup="dialog"
-                  >
-                    contacto
-                  </a>
-                </li>
+                {navigation?.map((item) => (
+                  <li key={item._key} className="nav-item">
+                    {renderNavItem(item)}
+                  </li>
+                ))}
               </ul>
             </div>
           </div>

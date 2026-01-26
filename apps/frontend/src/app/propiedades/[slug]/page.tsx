@@ -66,7 +66,7 @@ export default async function PropertyPage({
           </div>
           <hr className="border-primary mb-4" />
 
-          <ImageCarousel images={property.images ?? []} title={property.title} />
+          <ImageCarousel images={property.images ?? []} title={property.title ?? ""} />
           {property.description && (
             <div className="mb-5">
               <PortableText value={property.description} />
