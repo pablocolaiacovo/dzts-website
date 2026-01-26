@@ -2,41 +2,84 @@
 
 This file contains essential information for agentic coding agents working in this repository.
 
+## Monorepo Structure
+
+This is a **pnpm workspace monorepo** with two apps:
+
+```text
+apps/
+  frontend/   # Next.js 16 website (public-facing)
+  studio/     # Sanity Studio CMS (content management)
+```
+
+**Important**: This monorepo uses simple pnpm workspaces without Turborepo. Keep the setup simple.
+
 ## Build, Lint, and Test Commands
 
+From repository root:
+
 ```bash
-pnpm run dev          # Start development server (Next.js 16 with Turbopack)
-pnpm run build        # Production build
-pnpm run start        # Start production server
-pnpm run lint         # Run ESLint
+pnpm install          # Install all dependencies
+pnpm dev              # Start both apps in parallel
+pnpm build            # Production build for both apps
+```
+
+Frontend-specific (from `apps/frontend/`):
+
+```bash
+pnpm dev              # Start Next.js dev server with Turbopack
+pnpm build            # Production build
+pnpm start            # Start production server
+pnpm lint             # Run ESLint
+```
+
+Studio-specific (from `apps/studio/`):
+
+```bash
+pnpm dev              # Start Sanity Studio
+pnpm build            # Build for deployment
+pnpm deploy           # Deploy to Sanity hosting
+pnpm typegen          # Generate TypeScript types from schema
 ```
 
 **Note**: This project does not currently have a test suite configured. No test commands are available.
 
 ## Project Stack
 
-- **Framework**: Next.js 16.1.1 with App Router
+### Frontend (`apps/frontend/`)
+
+- **Framework**: Next.js 16 with App Router
 - **Language**: TypeScript 5 with strict mode
-- **Styling**: Bootstrap 5.3.5 + custom CSS modules
-- **CMS**: Sanity v5 for content management
-- **Icons**: Bootstrap Icons 1.12.1
-- **React**: 19.2.3 with React Compiler enabled
+- **Styling**: Bootstrap 5.x + custom CSS
+- **CMS Integration**: next-sanity for content fetching
+- **Icons**: Bootstrap Icons
+- **React**: 19 with React Compiler enabled
+
+### Studio (`apps/studio/`)
+
+- **Framework**: Sanity Studio v5
+- **Language**: TypeScript 5
+- **React**: 19
 
 ## Code Style Guidelines
 
 ### File Organization
 
-```
-src/
-├── app/              # Next.js App Router pages
-├── components/       # React components
-│   ├── ComponentName.tsx
-│   └── ComponentName.css
-├── sanity/          # Sanity CMS configuration
-│   ├── lib/         # Client helpers
-│   ├── schemaTypes/
-│   └── env.ts
-└── styles/          # Global styles and variables
+```text
+apps/
+├── frontend/                    # Next.js website
+│   └── src/
+│       ├── app/                 # Next.js App Router pages
+│       ├── components/          # React components
+│       │   ├── ComponentName.tsx
+│       │   └── ComponentName.css
+│       ├── sanity/              # Sanity CMS configuration
+│       │   ├── lib/             # Client helpers
+│       │   └── env.ts
+│       └── styles/              # Global styles and variables
+└── studio/                      # Sanity Studio
+    ├── schemaTypes/             # Content schema definitions
+    └── sanity.config.ts         # Studio configuration
 ```
 
 ### Imports and Exports
@@ -59,7 +102,7 @@ src/
 - Always type function parameters and return types when clear
 - Use interfaces for prop definitions: `interface Props { title: string }`
 - Strict mode is enabled - no `any` types unless absolutely necessary
-- Environment variables validated with `assertValue()` helper in `src/sanity/env.ts`
+- Environment variables validated with `assertValue()` helper in `apps/frontend/src/sanity/env.ts`
 
 ### Styling Guidelines
 
@@ -90,7 +133,7 @@ src/
 
 - Throw `Error` for invalid configuration/missing env vars
 - Use TypeScript strict mode to catch type errors at compile time
-- Environment variables must be validated before use (see `src/sanity/env.ts`)
+- Environment variables must be validated before use (see `apps/frontend/src/sanity/env.ts`)
 
 ### Image Handling
 
@@ -101,10 +144,12 @@ src/
 
 ### Environment Variables
 
+Frontend environment variables (in `apps/frontend/.env.local`):
+
 - Client-accessible vars prefixed with `NEXT_PUBLIC_`
-- Store in `.env.local` (gitignored)
-- Required env vars: `NEXT_PUBLIC_SANITY_PROJECT_ID`, `NEXT_PUBLIC_SANITY_DATASET`
-- Optional env var: `NEXT_PUBLIC_SANITY_API_VERSION` (defaults to '2025-05-06')
+- Required: `NEXT_PUBLIC_SANITY_PROJECT_ID`, `NEXT_PUBLIC_SANITY_DATASET`
+- Optional: `NEXT_PUBLIC_SANITY_API_VERSION` (has default value)
+- Optional: `SANITY_API_READ_TOKEN` (for authenticated API requests)
 
 ### Next.js Specifics
 
@@ -116,38 +161,46 @@ src/
 
 ### Sanity CMS Integration
 
+**Frontend** (`apps/frontend/`):
+
 - Client configured in `src/sanity/lib/client.ts`
 - Use `sanityFetch` for live content with `<SanityLive />` in layout
-- Schema definitions in `src/sanity/schemaTypes/`
 - Image URL builder available via `urlFor()` from `src/sanity/lib/image.ts`
-- Studio available at `/studio` route
 
-### ESLint Rules
+**Studio** (`apps/studio/`):
+
+- Runs as a separate app at `http://localhost:3333`
+- Schema definitions in `schemaTypes/`
+- Run `pnpm typegen` to regenerate TypeScript types after schema changes
+
+### ESLint Rules (Frontend)
 
 - Extends `@typescript-eslint/recommended`
 - Next.js core web vitals rules enabled
 - React rules with `react/no-inline-styles` disabled
 - Linting ignores `.next/` and `node_modules/`
-- Run `pnpm run lint` to check code before committing
+- Run `pnpm lint` from `apps/frontend/` to check code before committing
 
-### Path Aliases
+### Path Aliases (Frontend)
 
-- `@/*` resolves to `./src/*`
-- Configure new aliases in `tsconfig.json` under `paths`
+- `@/*` resolves to `./src/*` within `apps/frontend/`
+- Configure new aliases in `apps/frontend/tsconfig.json` under `paths`
 
-### Security Headers
+### Security Headers (Frontend)
 
 - X-Content-Type-Options: nosniff
 - X-Frame-Options: DENY
 - Referrer-Policy: strict-origin-when-cross-origin
-- All configured in `next.config.ts`
+- All configured in `apps/frontend/next.config.ts`
 
 ### When Working with This Codebase
 
-1. **Before adding dependencies**: Check if similar functionality exists in Bootstrap or React
-2. **Before creating new components**: Check existing components for patterns to follow
-3. **When styling**: Prefer Bootstrap classes over custom CSS
-4. **When fetching data**: Use Sanity client, ensure proper typing
-5. **When modifying types**: Update related components to ensure type safety
-6. **Before committing**: Run `pnpm run lint` to verify code quality
-7. **When adding images**: Use Next.js Image component with proper props
+1. **Monorepo awareness**: Run commands from appropriate directory (root for both apps, or specific app folder)
+2. **Before adding dependencies**: Check if similar functionality exists in Bootstrap or React
+3. **Before creating new components**: Check existing components for patterns to follow
+4. **When styling**: Prefer Bootstrap classes over custom CSS
+5. **When fetching data**: Use Sanity client, ensure proper typing
+6. **When modifying types**: Update related components to ensure type safety
+7. **Before committing**: Run `pnpm lint` from the frontend directory to verify code quality
+8. **When adding images**: Use Next.js Image component with proper props
+9. **When changing schema**: Update in `apps/studio/schemaTypes/`, then run `pnpm typegen` in studio

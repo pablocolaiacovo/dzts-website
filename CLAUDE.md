@@ -4,32 +4,83 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## About Website
 
-This is a small real-state website, to work as a catalog of the available properties for rent or sale.
+This is a small real estate website, to work as a catalog of the available properties for rent or sale.
+
+## Monorepo Structure
+
+This is a **pnpm workspace monorepo** with two apps:
+
+```text
+apps/
+  frontend/   # Next.js 16 website (public-facing)
+  studio/     # Sanity Studio CMS (content management)
+```
+
+**Note**: The monorepo uses simple pnpm workspaces without Turborepo. This was a deliberate decision to keep the setup simple for a two-app monorepo without shared packages.
 
 ## Build & Development Commands
 
+From the repository root:
+
 ```bash
-pnpm dev      # Start dev server with Turbopack
+pnpm install  # Install all dependencies
+pnpm dev      # Start both apps in parallel (frontend + studio)
+pnpm build    # Production build for both apps
+```
+
+Frontend-specific (from `apps/frontend/`):
+
+```bash
+pnpm dev      # Start Next.js dev server with Turbopack
 pnpm build    # Production build
 pnpm start    # Run production server
 pnpm lint     # Run ESLint
 ```
 
+Studio-specific (from `apps/studio/`):
+
+```bash
+pnpm dev      # Start Sanity Studio
+pnpm build    # Build for deployment
+pnpm deploy   # Deploy to Sanity hosting
+pnpm typegen  # Generate TypeScript types from schema
+```
+
 ## Tech Stack
 
-- **Next.js 16** with App Router (`/src/app`)
+### Frontend (`apps/frontend/`)
+
+- **Next.js 16** with App Router
 - **React 19** with Server Components by default
 - **TypeScript** with strict mode
-- **Bootstrap 5.x**
+- **Bootstrap 5.x** for styling
+- **next-sanity** for CMS integration
+
+### Studio (`apps/studio/`)
+
+- **Sanity Studio v5** for content management
+- **React 19**
+- **TypeScript**
 
 ## Architecture
 
-This is a Next.js App Router project:
-- `src/app/` - Routes and layouts (file-based routing)
-- `src/app/layout.tsx` - Root layout with Geist font configuration
-- `src/app/globals.css` - Global styles with Tailwind and CSS variables for theming
+### Frontend
 
-Path alias: `@/*` maps to `./src/*`
+Next.js App Router project:
+
+- `apps/frontend/src/app/` - Routes and layouts (file-based routing)
+- `apps/frontend/src/components/` - React components
+- `apps/frontend/src/sanity/` - Sanity client and configuration
+- `apps/frontend/src/styles/` - Global styles and CSS variables
+
+Path alias: `@/*` maps to `./src/*` within the frontend app
+
+### Studio
+
+Sanity Studio project:
+
+- `apps/studio/schemaTypes/` - Content schema definitions
+- `apps/studio/sanity.config.ts` - Studio configuration
 
 ## Conventions
 
@@ -39,4 +90,6 @@ Path alias: `@/*` maps to `./src/*`
 - Dark mode supported via `prefers-color-scheme` CSS media query.
 - Don't add too many comments to the code.
 - Use double quotes for strings (Prettier is pre-configured for this).
+- Use mobile fist for css.
+- Prefer bootstrap css classes and components over custom css.
 - Use CSS over JavaScript when possible for animations and dynamic behavior.
