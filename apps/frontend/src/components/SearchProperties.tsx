@@ -1,8 +1,44 @@
-'use client';
-import Image from 'next/image';
-import './SearchProperties.css';
+"use client";
 
-export default function SearchProperties() {
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import Image from "next/image";
+import "./SearchProperties.css";
+
+interface FilterOption {
+  name: string;
+  slug: string;
+}
+
+interface SearchPropertiesProps {
+  filterOptions?: {
+    cities: FilterOption[];
+    propertyTypes: FilterOption[];
+    roomCounts: number[];
+  };
+}
+
+export default function SearchProperties({
+  filterOptions,
+}: SearchPropertiesProps) {
+  const router = useRouter();
+  const [operacion, setOperacion] = useState("");
+  const [propiedad, setPropiedad] = useState("");
+  const [localidad, setLocalidad] = useState("");
+  const [dormitorios, setDormitorios] = useState("");
+
+  const handleSearch = () => {
+    const params = new URLSearchParams();
+
+    if (operacion) params.set("operacion", operacion);
+    if (propiedad) params.set("propiedad", propiedad);
+    if (localidad) params.set("localidad", localidad);
+    if (dormitorios) params.set("dormitorios", dormitorios);
+
+    const queryString = params.toString();
+    router.push(queryString ? `/propiedades?${queryString}` : "/propiedades");
+  };
+
   return (
     <section className="hero min-vh-100 w-100 overflow-hidden position-relative text-white d-flex align-items-center justify-content-center">
       <Image
@@ -12,7 +48,7 @@ export default function SearchProperties() {
         className="object-cover negative-z"
         priority
       />
-      
+
       <div className="overlay position-absolute top-0 start-0 w-100 h-100 position-relative"></div>
 
       <div className="container position-relative z-1 text-center">
@@ -31,42 +67,80 @@ export default function SearchProperties() {
 
         <div className="row gap-4 pb-4 flex-wrap flex-md-nowrap justify-content-center">
           <div className="col-12 col-md-3">
-            <label htmlFor="operacion" className="visually-hidden">Operación</label>
-            <select id="operacion" className="form-select ">
+            <label htmlFor="operacion" className="visually-hidden">
+              Operación
+            </label>
+            <select
+              id="operacion"
+              className="form-select"
+              value={operacion}
+              onChange={(e) => setOperacion(e.target.value)}
+            >
               <option value="">Operación</option>
               <option value="venta">Venta</option>
               <option value="alquiler">Alquiler</option>
             </select>
           </div>
           <div className="col-12 col-md-3">
-            <label htmlFor="propiedad" className="visually-hidden">Propiedad</label>
-            <select id="propiedad" className="form-select ">
+            <label htmlFor="propiedad" className="visually-hidden">
+              Propiedad
+            </label>
+            <select
+              id="propiedad"
+              className="form-select"
+              value={propiedad}
+              onChange={(e) => setPropiedad(e.target.value)}
+            >
               <option value="">Propiedad</option>
-              <option value="casa">Casa</option>
-              <option value="departamento">Departamento</option>
+              {filterOptions?.propertyTypes.map((type) => (
+                <option key={type.slug} value={type.slug}>
+                  {type.name}
+                </option>
+              ))}
             </select>
           </div>
           <div className="col-12 col-md-3">
-            <label htmlFor="localidad" className="visually-hidden">Localidad</label>
-            <select id="localidad" className="form-select ">
+            <label htmlFor="localidad" className="visually-hidden">
+              Localidad
+            </label>
+            <select
+              id="localidad"
+              className="form-select"
+              value={localidad}
+              onChange={(e) => setLocalidad(e.target.value)}
+            >
               <option value="">Localidad</option>
-              <option value="palermo">Palermo</option>
-              <option value="belgrano">Belgrano</option>
+              {filterOptions?.cities.map((city) => (
+                <option key={city.slug} value={city.slug}>
+                  {city.name}
+                </option>
+              ))}
             </select>
           </div>
           <div className="col-12 col-md-3">
-            <label htmlFor="dormitorios" className="visually-hidden">Dormitorios</label>
-            <select id="dormitorios" className="form-select ">
+            <label htmlFor="dormitorios" className="visually-hidden">
+              Dormitorios
+            </label>
+            <select
+              id="dormitorios"
+              className="form-select"
+              value={dormitorios}
+              onChange={(e) => setDormitorios(e.target.value)}
+            >
               <option value="">Dormitorios</option>
-              <option value="1">1 dormitorio</option>
-              <option value="2">2 dormitorios</option>
-              <option value="3">3 dormitorios</option>
+              {filterOptions?.roomCounts.map((count) => (
+                <option key={count} value={count.toString()}>
+                  {count} {count === 1 ? "dormitorio" : "dormitorios"}
+                </option>
+              ))}
             </select>
           </div>
         </div>
 
         <div className="pt-2">
-          <button type="button" className="btn-custom">Buscar</button>
+          <button type="button" className="btn-custom" onClick={handleSearch}>
+            Buscar
+          </button>
         </div>
       </div>
     </section>

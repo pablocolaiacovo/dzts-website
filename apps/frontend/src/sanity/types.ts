@@ -315,6 +315,27 @@ type ArrayOf<T> = Array<
   }
 >;
 
+// Source: ../frontend/src/app/page.tsx
+// Variable: CITIES_QUERY
+// Query: *[_type == "city"] | order(name asc) { name, "slug": slug.current }
+export type CITIES_QUERY_RESULT = Array<{
+  name: string | null;
+  slug: string | null;
+}>;
+
+// Source: ../frontend/src/app/page.tsx
+// Variable: PROPERTY_TYPES_QUERY
+// Query: *[_type == "propertyTypeCategory"] | order(name asc) { name, "slug": slug.current }
+export type PROPERTY_TYPES_QUERY_RESULT = Array<{
+  name: string | null;
+  slug: string | null;
+}>;
+
+// Source: ../frontend/src/app/page.tsx
+// Variable: ROOM_COUNTS_QUERY
+// Query: array::unique(*[_type == "property" && defined(rooms)].rooms) | order(@ asc)
+export type ROOM_COUNTS_QUERY_RESULT = Array<number>;
+
 // Source: ../frontend/src/app/propiedades/[slug]/page.tsx
 // Variable: PROPERTY_QUERY
 // Query: *[_type == "property" && slug.current == $slug][0]   {    title,    subtitle,    address,    description,    price,    "propertyType": propertyType->name,    operationType,    currency,    "city": city->name,    "images": images[]  }
@@ -357,13 +378,17 @@ export type PROPERTY_QUERY_RESULT = {
 
 // Source: ../frontend/src/components/FeaturedProperties.tsx
 // Variable: FEATURED_QUERY
-// Query: *  [_type == "property" && featured == true]   | order(publishedAt desc)[0...6]   {    title,    "slug": slug.current,    subtitle,    price,    operationType,    "image": images[0]  }
+// Query: *  [_type == "property" && featured == true]  | order(publishedAt desc)[0...6]  {    _id,    title,    "slug": slug.current,    subtitle,    price,    currency,    operationType,    rooms,    "city": city->name,    "image": images[0]  }
 export type FEATURED_QUERY_RESULT = Array<{
+  _id: string;
   title: string | null;
   slug: string | null;
   subtitle: string | null;
   price: number | null;
+  currency: "ARS" | "USD" | null;
   operationType: "alquiler" | "venta" | null;
+  rooms: number | null;
+  city: string | null;
   image: {
     asset?: SanityImageAssetReference;
     media?: unknown;
@@ -447,8 +472,11 @@ export type SITE_SETTINGS_QUERY_RESULT = {
 import "@sanity/client";
 declare module "@sanity/client" {
   interface SanityQueries {
+    '\n  *[_type == "city"] | order(name asc) { name, "slug": slug.current }\n': CITIES_QUERY_RESULT;
+    '\n  *[_type == "propertyTypeCategory"] | order(name asc) { name, "slug": slug.current }\n': PROPERTY_TYPES_QUERY_RESULT;
+    '\n  array::unique(*[_type == "property" && defined(rooms)].rooms) | order(@ asc)\n': ROOM_COUNTS_QUERY_RESULT;
     '\n  *[_type == "property" && slug.current == $slug][0] \n  {\n    title,\n    subtitle,\n    address,\n    description,\n    price,\n    "propertyType": propertyType->name,\n    operationType,\n    currency,\n    "city": city->name,\n    "images": images[]\n  }\n': PROPERTY_QUERY_RESULT;
-    '*\n  [_type == "property" && featured == true] \n  | order(publishedAt desc)[0...6] \n  {\n    title,\n    "slug": slug.current,\n    subtitle,\n    price,\n    operationType,\n    "image": images[0]\n  }': FEATURED_QUERY_RESULT;
+    '*\n  [_type == "property" && featured == true]\n  | order(publishedAt desc)[0...6]\n  {\n    _id,\n    title,\n    "slug": slug.current,\n    subtitle,\n    price,\n    currency,\n    operationType,\n    rooms,\n    "city": city->name,\n    "image": images[0]\n  }': FEATURED_QUERY_RESULT;
     '\n  *[_type == "siteSettings"][0] {\n    siteName,\n    logo {\n      asset->{\n        _id,\n        url,\n        metadata { lqip, dimensions }\n      },\n      alt\n    },\n    favicon {\n      asset->{\n        _id,\n        url\n      }\n    },\n    mainNavigation[] {\n      _key,\n      label,\n      linkType,\n      internalPath,\n      externalUrl,\n      actionId\n    },\n    phone,\n    email,\n    address,\n    whatsappNumber,\n    socialLinks[] {\n      _key,\n      platform,\n      url\n    },\n    copyrightText,\n    footerLinks[] {\n      _key,\n      label,\n      url\n    },\n    certificationLogos[] {\n      _key,\n      image {\n        asset->{\n          _id,\n          url,\n          metadata { lqip, dimensions }\n        }\n      },\n      alt,\n      title,\n      url\n    }\n  }\n': SITE_SETTINGS_QUERY_RESULT;
   }
 }

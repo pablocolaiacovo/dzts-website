@@ -24,6 +24,7 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.3",
+    "@next/eslint-plugin-next": "^16.1.5",
     "@sanity/client": "^7.14.0",
     "@types/node": "^25.0.9",
     "@types/react": "^19.2.9",
