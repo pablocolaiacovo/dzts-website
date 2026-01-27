@@ -112,6 +112,22 @@ apps/
 - Inline styles only for dynamic values: `style={{ color: primaryColor }}`
 - Use Bootstrap's color variables: `var(--bs-primary)`, `var(--bs-dark)`
 
+### Responsive Breakpoints
+
+Use Bootstrap 5 breakpoints consistently. **Important:** CSS custom properties cannot be used in `@media` queries (CSS limitation), so use these hardcoded values:
+
+| Breakpoint | Min-width (mobile-first) | Max-width (desktop-first) |
+|------------|--------------------------|---------------------------|
+| sm         | `min-width: 576px`       | `max-width: 575.98px`     |
+| md         | `min-width: 768px`       | `max-width: 767.98px`     |
+| lg         | `min-width: 992px`       | `max-width: 991.98px`     |
+| xl         | `min-width: 1200px`      | `max-width: 1199.98px`    |
+| xxl        | `min-width: 1400px`      | -                         |
+
+- **Prefer mobile-first** (`min-width`) over desktop-first (`max-width`)
+- Use `.98px` for max-width queries to avoid 1px overlap at exact breakpoints
+- Reference: `src/styles/variables.css` contains the full breakpoint documentation
+
 ### Naming Conventions
 
 - **Components**: PascalCase (`PropertyCard.tsx`)

@@ -1,8 +1,9 @@
 'use client';
 
 import { urlFor } from '@/sanity/lib/image';
-import { SanityImageSource } from '@sanity/image-url';
+import type { SanityImageSource } from '@sanity/image-url';
 import Image from 'next/image';
+import './ImageCarousel.css';
 
 interface ImageCarouselProps {
   images: SanityImageSource[];
@@ -34,7 +35,7 @@ export default function ImageCarousel({ images, title }: ImageCarouselProps) {
 
           return (
             <div key={index} className={`carousel-item ${index === 0 ? 'active' : ''}`}>
-              <div className="position-relative" style={{ height: '500px' }}>
+              <div className="carousel-image-container position-relative">
                 <Image
                   src={url}
                   alt={`${title} - Imagen ${index + 1}`}
