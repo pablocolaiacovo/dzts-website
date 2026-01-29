@@ -184,10 +184,9 @@ export const siteSettingsType = defineType({
     // Pie de Página
     defineField({
       name: "copyrightText",
-      title: "Texto de Copyright",
+      title: "Texto Footer",
       type: "string",
-      group: "footer",
-      description: "Ej: 2015 © DZTS Inmobiliaria | Todos los derechos reservados",
+      group: "footer"
     }),
     defineField({
       name: "footerLinks",
