@@ -103,6 +103,30 @@ Sanity Studio project:
 - `apps/studio/schemaTypes/` - Content schema definitions
 - `apps/studio/sanity.config.ts` - Studio configuration
 
+## Git Workflow
+
+- **Default PR Target**: Create PRs against the `dev` branch, not `main`
+- Feature branches follow the naming convention: `feat/feature-name`
+- Push changes and create PRs using `gh pr create` command
+
+## Page Structure & Routes
+
+### Frontend Routes
+
+- `/` - Home page with search, featured properties, and location map
+- `/propiedades` - Properties listing page
+- `/propiedades/[slug]` - Property detail page with images, description, and location map
+
+### Content Integration
+
+- Property schema includes: title, subtitle, address, description, price, images, operationType (rent/sale), currency, city, and propertyType
+- Site Settings singleton in Sanity stores office address for home page map display
+- All property and site data is fetched server-side via `sanityFetch` for optimal performance
+
+## Components
+
+- **MapSection** - Reusable component for displaying embedded Google Maps. Renders full-width iframe (450px height) when address is provided, returns null if no address exists.
+
 ## Conventions
 
 - Components in `/app` are Server Components unless marked with `"use client"`
@@ -111,6 +135,6 @@ Sanity Studio project:
 - Dark mode supported via `prefers-color-scheme` CSS media query.
 - Don't add too many comments to the code.
 - Use double quotes for strings (Prettier is pre-configured for this).
-- Use mobile fist for css.
+- Use mobile first for css.
 - Prefer bootstrap css classes and components over custom css.
 - Use CSS over JavaScript when possible for animations and dynamic behavior.
