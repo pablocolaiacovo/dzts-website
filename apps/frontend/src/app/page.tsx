@@ -1,3 +1,6 @@
+import { cacheLife } from "next/cache";
+import { defineQuery } from "next-sanity";
+import { sanityFetch } from "@/sanity/lib/live";
 import {
   getCachedCities,
   getCachedPropertyTypes,
@@ -6,12 +9,25 @@ import {
 import FeaturedProperties from "@/components/FeaturedProperties";
 import SearchProperties from "@/components/SearchProperties";
 import TextImageSection from "@/components/TextImageSection";
+import MapSection from "@/components/MapSection";
+
+const MAP_ADDRESS_QUERY = defineQuery(`
+  *[_type == "siteSettings"][0].address
+`);
+
+async function getCachedMapAddress() {
+  "use cache";
+  cacheLife("hours");
+  const { data } = await sanityFetch({ query: MAP_ADDRESS_QUERY });
+  return data;
+}
 
 export default async function Home() {
-  const [cities, propertyTypes, roomCounts] = await Promise.all([
+  const [cities, propertyTypes, roomCounts, address] = await Promise.all([
     getCachedCities(),
     getCachedPropertyTypes(),
     getCachedRoomCounts(),
+    getCachedMapAddress(),
   ]);
 
   const filterOptions = {
@@ -41,6 +57,7 @@ export default async function Home() {
         image="/Images/backgroun.jpg"
         backgroundColor="var(--bs-primary)"
       />
+      <MapSection address={address} />
     </>
   );
 }
