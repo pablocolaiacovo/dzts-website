@@ -1,4 +1,5 @@
 import { defineQuery } from "next-sanity";
+import { cacheLife } from "next/cache";
 import type { SanityImageSource } from "@sanity/image-url";
 import { sanityFetch } from "@/sanity/lib/live";
 import PropertyCard from "./PropertyCard";
@@ -16,7 +17,7 @@ const FEATURED_QUERY = defineQuery(`*
     operationType,
     rooms,
     "city": city->name,
-    "image": images[0]
+    "image": images[0] { asset->{ _id, url, metadata { lqip } } }
   }`);
 
 interface FeaturedProperty {
@@ -29,10 +30,12 @@ interface FeaturedProperty {
   operationType: string | null;
   rooms: number | null;
   city: string | null;
-  image: SanityImageSource | null;
+  image: { asset: { _id: string; url: string; metadata: { lqip: string } } | null } | null;
 }
 
 export default async function FeaturedProperties() {
+  "use cache";
+  cacheLife("minutes");
   const { data: properties } = await sanityFetch({ query: FEATURED_QUERY }) as { data: FeaturedProperty[] };
 
   return (
@@ -53,6 +56,7 @@ export default async function FeaturedProperties() {
                 currency={property.currency}
                 operationType={property.operationType}
                 image={property.image}
+                lqip={property.image?.asset?.metadata?.lqip}
                 rooms={property.rooms}
                 city={property.city}
               />

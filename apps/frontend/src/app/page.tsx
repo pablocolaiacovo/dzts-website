@@ -1,28 +1,18 @@
-import { defineQuery } from "next-sanity";
-import { sanityFetch } from "@/sanity/lib/live";
+import {
+  getCachedCities,
+  getCachedPropertyTypes,
+  getCachedRoomCounts,
+} from "@/sanity/queries/properties";
 import FeaturedProperties from "@/components/FeaturedProperties";
 import SearchProperties from "@/components/SearchProperties";
 import TextImageSection from "@/components/TextImageSection";
 
-const CITIES_QUERY = defineQuery(`
-  *[_type == "city"] | order(name asc) { name, "slug": slug.current }
-`);
-
-const PROPERTY_TYPES_QUERY = defineQuery(`
-  *[_type == "propertyTypeCategory"] | order(name asc) { name, "slug": slug.current }
-`);
-
-const ROOM_COUNTS_QUERY = defineQuery(`
-  array::unique(*[_type == "property" && defined(rooms)].rooms) | order(@ asc)
-`);
-
 export default async function Home() {
-  const [{ data: cities }, { data: propertyTypes }, { data: roomCounts }] =
-    await Promise.all([
-      sanityFetch({ query: CITIES_QUERY }),
-      sanityFetch({ query: PROPERTY_TYPES_QUERY }),
-      sanityFetch({ query: ROOM_COUNTS_QUERY }),
-    ]);
+  const [cities, propertyTypes, roomCounts] = await Promise.all([
+    getCachedCities(),
+    getCachedPropertyTypes(),
+    getCachedRoomCounts(),
+  ]);
 
   const filterOptions = {
     cities: (cities || []).filter(

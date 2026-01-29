@@ -5,8 +5,13 @@ import type { SanityImageSource } from '@sanity/image-url';
 import Image from 'next/image';
 import './ImageCarousel.css';
 
+interface CarouselImage {
+  asset: SanityImageSource;
+  lqip?: string | null;
+}
+
 interface ImageCarouselProps {
-  images: SanityImageSource[];
+  images: CarouselImage[];
   title: string;
 }
 
@@ -19,6 +24,7 @@ export default function ImageCarousel({ images, title }: ImageCarouselProps) {
             src="https://placehold.co/1200x500/png"
             alt={`${title} - Sin imagen`}
             fill
+            sizes="100vw"
             className="object-fit-cover"
           />
         </div>
@@ -42,8 +48,8 @@ export default function ImageCarousel({ images, title }: ImageCarouselProps) {
         ))}
       </div>
       <div className="carousel-inner">
-        {images.map((asset, index) => {
-          const url = asset ? urlFor(asset).width(1200).height(500).auto('format').url()
+        {images.map((image, index) => {
+          const url = image.asset ? urlFor(image.asset).width(1200).height(500).auto('format').url()
             : 'https://placehold.co/1200x500/png';
 
           return (
@@ -53,8 +59,10 @@ export default function ImageCarousel({ images, title }: ImageCarouselProps) {
                   src={url}
                   alt={`${title} - Imagen ${index + 1}`}
                   fill
+                  sizes="100vw"
                   className="object-fit-cover"
                   priority={index === 0}
+                  {...(image.lqip ? { placeholder: "blur" as const, blurDataURL: image.lqip } : {})}
                 />
               </div>
             </div>

@@ -11,6 +11,7 @@ interface PropertyCardProps {
   currency?: string | null;
   operationType?: string | null;
   image?: SanityImageSource | null;
+  lqip?: string | null;
   rooms?: number | null;
   city?: string | null;
 }
@@ -23,6 +24,7 @@ export default function PropertyCard({
   currency = "USD",
   operationType,
   image,
+  lqip,
   rooms,
   city,
 }: PropertyCardProps) {
@@ -44,8 +46,10 @@ export default function PropertyCard({
             alt={title || "Property Image"}
             width={400}
             height={220}
+            sizes="(min-width: 992px) 33vw, (min-width: 768px) 50vw, 100vw"
             className="card-img-top rounded-top-4"
             style={{ objectFit: "cover", height: 220 }}
+            {...(lqip ? { placeholder: "blur" as const, blurDataURL: lqip } : {})}
           />
           {operationType && (
             <span

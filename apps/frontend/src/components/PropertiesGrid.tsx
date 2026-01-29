@@ -10,6 +10,7 @@ interface Property {
   currency?: string | null;
   operationType?: string | null;
   image?: SanityImageSource | null;
+  lqip?: string | null;
   rooms?: number | null;
   city?: string | null;
 }
@@ -47,6 +48,7 @@ export default function PropertiesGrid({ properties }: PropertiesGridProps) {
             currency={property.currency}
             operationType={property.operationType}
             image={property.image}
+            lqip={property.lqip}
             rooms={property.rooms}
             city={property.city}
           />

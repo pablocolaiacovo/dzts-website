@@ -1,6 +1,11 @@
 import type { Metadata } from "next";
 import { defineQuery } from "next-sanity";
 import { sanityFetch } from "@/sanity/lib/live";
+import {
+  getCachedCities,
+  getCachedPropertyTypes,
+  getCachedRoomCounts,
+} from "@/sanity/queries/properties";
 import Breadcrumb from "@/components/Breadcrumb";
 import PropertiesLayout from "@/components/PropertiesLayout";
 import PropertiesGrid from "@/components/PropertiesGrid";
@@ -30,7 +35,7 @@ const PROPERTIES_QUERY = defineQuery(`
     "propertyType": propertyType->name,
     "city": city->name,
     rooms,
-    "image": images[0]
+    "image": images[0] { asset->{ _id, url, metadata { lqip } } }
   }
 `);
 
@@ -41,18 +46,6 @@ const COUNT_QUERY = defineQuery(`
     && (count($citySlugs) == 0 || city->slug.current in $citySlugs)
     && (count($roomsList) == 0 || rooms in $roomsList)
   ])
-`);
-
-const CITIES_QUERY = defineQuery(`
-  *[_type == "city"] | order(name asc) { name, "slug": slug.current }
-`);
-
-const PROPERTY_TYPES_QUERY = defineQuery(`
-  *[_type == "propertyTypeCategory"] | order(name asc) { name, "slug": slug.current }
-`);
-
-const ROOM_COUNTS_QUERY = defineQuery(`
-  array::unique(*[_type == "property" && defined(rooms)].rooms) | order(@ asc)
 `);
 
 interface PageProps {
@@ -86,9 +79,9 @@ export default async function PropiedadesPage({ searchParams }: PageProps) {
   const [
     { data: properties },
     { data: totalCount },
-    { data: cities },
-    { data: propertyTypes },
-    { data: roomCounts },
+    cities,
+    propertyTypes,
+    roomCounts,
   ] = await Promise.all([
     sanityFetch({
       query: PROPERTIES_QUERY,
@@ -110,9 +103,9 @@ export default async function PropiedadesPage({ searchParams }: PageProps) {
         roomsList,
       },
     }),
-    sanityFetch({ query: CITIES_QUERY }),
-    sanityFetch({ query: PROPERTY_TYPES_QUERY }),
-    sanityFetch({ query: ROOM_COUNTS_QUERY }),
+    getCachedCities(),
+    getCachedPropertyTypes(),
+    getCachedRoomCounts(),
   ]);
 
   const totalPages = Math.ceil((totalCount || 0) / PAGE_SIZE);
@@ -147,7 +140,13 @@ export default async function PropiedadesPage({ searchParams }: PageProps) {
       <h1 className="text-center mb-4 fw-bold">Propiedades</h1>
 
       <PropertiesLayout filterOptions={filterOptions} totalCount={totalCount || 0}>
-        <PropertiesGrid properties={properties || []} />
+        <PropertiesGrid
+          properties={(properties || []).map((p: Record<string, unknown>) => ({
+            ...p,
+            lqip: (p.image as { asset?: { metadata?: { lqip?: string } } } | null)
+              ?.asset?.metadata?.lqip ?? null,
+          }))}
+        />
 
         <Pagination
           currentPage={currentPage}

@@ -1,10 +1,12 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import Image from "next/image";
 import Link from "next/link";
 import { useRef, useState } from "react";
-import ContactModal from "./ContactModal";
 import { urlFor } from "@/sanity/lib/image";
+
+const ContactModal = dynamic(() => import("./ContactModal"), { ssr: false });
 import type { SITE_SETTINGS_QUERY_RESULT } from "@/sanity/types";
 import "./Header.css";
 

@@ -1,13 +1,15 @@
+import type { Metadata } from 'next';
 import { PortableText } from '@portabletext/react';
 import { notFound } from 'next/navigation';
 import { defineQuery } from 'next-sanity';
 import { sanityFetch } from '@/sanity/lib/live';
+import { urlFor } from '@/sanity/lib/image';
 
 import Breadcrumb from '@/components/Breadcrumb';
 import ImageCarousel from '@/components/ImageCarousel';
 
 const PROPERTY_QUERY = defineQuery(`
-  *[_type == "property" && slug.current == $slug][0] 
+  *[_type == "property" && slug.current == $slug][0]
   {
     title,
     subtitle,
@@ -18,9 +20,40 @@ const PROPERTY_QUERY = defineQuery(`
     operationType,
     currency,
     "city": city->name,
-    "images": images[]
+    "images": images[] { asset->{ _id, url, metadata { lqip } } }
   }
 `);
+
+const METADATA_QUERY = defineQuery(`
+  *[_type == "property" && slug.current == $slug][0]
+  { title, subtitle, "image": images[0] }
+`);
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await params;
+  const { data } = await sanityFetch({ query: METADATA_QUERY, params: { slug } });
+
+  if (!data) return {};
+
+  const title = `${data.title || "Propiedad"} | DZTS Inmobiliaria`;
+  const description = data.subtitle || "Propiedad en DZTS Inmobiliaria";
+
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      ...(data.image
+        ? { images: [{ url: urlFor(data.image).width(1200).height(630).url() }] }
+        : {}),
+    },
+  };
+}
 
 export default async function PropertyPage({
   params,
@@ -74,7 +107,15 @@ export default async function PropertyPage({
           </div>
           <hr className="border-primary mb-4" />
 
-          <ImageCarousel images={property.images ?? []} title={property.title ?? ""} />
+          <ImageCarousel
+            images={(property.images ?? []).map(
+              (img: { asset: { _id: string; url: string; metadata: { lqip: string } } | null } | null) => ({
+                asset: img,
+                lqip: img?.asset?.metadata?.lqip ?? null,
+              })
+            )}
+            title={property.title ?? ""}
+          />
           {property.description && (
             <div className="mb-5">
               <PortableText value={property.description} />
