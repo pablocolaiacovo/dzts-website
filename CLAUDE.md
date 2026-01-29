@@ -138,3 +138,11 @@ Sanity Studio project:
 - Use mobile first for css.
 - Prefer bootstrap css classes and components over custom css.
 - Use CSS over JavaScript when possible for animations and dynamic behavior.
+
+## Recent Implementation Notes
+
+- Listing skeleton lives at `apps/frontend/src/app/propiedades/loading.tsx` and mirrors `PropertiesLayout` (filters sidebar + badges/count + grid).
+- Property detail skeleton lives at `apps/frontend/src/app/propiedades/[slug]/loading.tsx` and includes carousel-sized media + map placeholder (450px height) to reduce layout shift.
+- Sanity property images can have `url`/`metadata` as `null`; normalize before passing to `ImageCarousel` and only cast to `SanityImageSource` when `url` is present.
+- `ImageCarousel` accepts `asset?: SanityImageSource | null` and `lqip?: string | null`.
+- Property detail `description` is Portable Text; use `PortableTextBlock[] | null` and import `@portabletext/types` (dependency added to frontend).

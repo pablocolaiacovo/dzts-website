@@ -6,7 +6,7 @@ import Image from 'next/image';
 import './ImageCarousel.css';
 
 interface CarouselImage {
-  asset: SanityImageSource;
+  asset?: SanityImageSource | null;
   lqip?: string | null;
 }
 

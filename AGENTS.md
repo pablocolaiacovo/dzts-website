@@ -219,3 +219,11 @@ Frontend environment variables (in `apps/frontend/.env.local`):
 7. **Before committing**: Run `pnpm lint` from the frontend directory to verify code quality
 8. **When adding images**: Use Next.js Image component with proper props
 9. **When changing schema**: Update in `apps/studio/schemaTypes/`, then run `pnpm typegen` in studio
+
+## Recent Implementation Notes
+
+- Listing skeleton: `apps/frontend/src/app/propiedades/loading.tsx` mirrors `PropertiesLayout` (filters sidebar + badges/count + grid).
+- Property detail skeleton: `apps/frontend/src/app/propiedades/[slug]/loading.tsx` includes carousel-sized media + 450px map placeholder.
+- Sanity property images can have `url`/`metadata` as `null`; only cast to `SanityImageSource` when `url` is present before using `urlFor`.
+- `ImageCarousel` accepts `asset?: SanityImageSource | null` and `lqip?: string | null`.
+- Property detail `description` is Portable Text; use `PortableTextBlock[] | null` and ensure `@portabletext/types` is installed in the frontend.

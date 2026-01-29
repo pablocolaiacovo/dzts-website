@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { defineQuery } from "next-sanity";
 import { sanityFetch } from "@/sanity/lib/live";
+import type { SanityImageSource } from "@sanity/image-url";
 import {
   getCachedCities,
   getCachedPropertyTypes,
@@ -17,6 +18,20 @@ export const metadata: Metadata = {
 };
 
 const PAGE_SIZE = 12;
+
+interface PropertyListItem {
+  _id: string;
+  title: string | null;
+  slug: string | null;
+  subtitle?: string | null;
+  price?: number | null;
+  currency?: string | null;
+  operationType?: string | null;
+  propertyType?: string | null;
+  city?: string | null;
+  rooms?: number | null;
+  image?: SanityImageSource | null;
+}
 
 const PROPERTIES_QUERY = defineQuery(`
   *[_type == "property"
@@ -69,7 +84,9 @@ export default async function PropiedadesPage({ searchParams }: PageProps) {
   const operationType = params.operacion || "";
   const propertyTypeSlugs = parseMultiple(params.propiedad);
   const citySlugs = parseMultiple(params.localidad);
-  const roomsList = parseMultiple(params.dormitorios).map((r) => parseInt(r, 10));
+  const roomsList = parseMultiple(params.dormitorios)
+    .map((r) => parseInt(r, 10))
+    .filter((room) => Number.isFinite(room));
   const parsedPage = params.pagina ? parseInt(params.pagina, 10) : 1;
   const currentPage = Number.isFinite(parsedPage) ? Math.max(1, parsedPage) : 1;
 
@@ -109,6 +126,7 @@ export default async function PropiedadesPage({ searchParams }: PageProps) {
   ]);
 
   const totalPages = Math.ceil((totalCount || 0) / PAGE_SIZE);
+  const propertiesList = (properties || []) as PropertyListItem[];
 
   const filterOptions = {
     cities: (cities || []).filter(
@@ -141,10 +159,14 @@ export default async function PropiedadesPage({ searchParams }: PageProps) {
 
       <PropertiesLayout filterOptions={filterOptions} totalCount={totalCount || 0}>
         <PropertiesGrid
-          properties={(properties || []).map((p: Record<string, unknown>) => ({
-            ...p,
-            lqip: (p.image as { asset?: { metadata?: { lqip?: string } } } | null)
-              ?.asset?.metadata?.lqip ?? null,
+          properties={propertiesList.map((property) => ({
+            ...property,
+            lqip:
+              (
+                property.image as {
+                  asset?: { metadata?: { lqip?: string | null } | null } | null;
+                } | null
+              )?.asset?.metadata?.lqip ?? null,
           }))}
         />
 

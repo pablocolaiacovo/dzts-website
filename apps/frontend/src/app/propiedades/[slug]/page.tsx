@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import { PortableText } from "@portabletext/react";
+import type { PortableTextBlock } from "@portabletext/types";
 import { notFound } from "next/navigation";
 import { defineQuery } from "next-sanity";
+import type { SanityImageSource } from "@sanity/image-url";
 import { sanityFetch } from "@/sanity/lib/live";
 import { urlFor } from "@/sanity/lib/image";
 
@@ -29,6 +31,29 @@ const METADATA_QUERY = defineQuery(`
   *[_type == "property" && slug.current == $slug][0]
   { title, subtitle, "image": images[0] }
 `);
+
+interface PropertyImageAsset {
+  _id: string;
+  url?: string | null;
+  metadata?: { lqip?: string | null } | null;
+}
+
+interface PropertyImage {
+  asset: PropertyImageAsset | null;
+}
+
+interface PropertyDetail {
+  title: string | null;
+  subtitle?: string | null;
+  address?: string | null;
+  description?: PortableTextBlock[] | null;
+  price?: number | null;
+  propertyType?: string | null;
+  operationType?: string | null;
+  currency?: string | null;
+  city?: string | null;
+  images?: Array<PropertyImage | null> | null;
+}
 
 export async function generateMetadata({
   params,
@@ -62,10 +87,11 @@ export default async function PropertyPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const { data: property } = await sanityFetch({
+  const { data } = await sanityFetch({
     query: PROPERTY_QUERY,
     params: { slug },
   });
+  const property = data as PropertyDetail | null;
 
   if (!property) {
     notFound();
@@ -112,19 +138,23 @@ export default async function PropertyPage({
             <hr className="border-primary mb-4" />
 
             <ImageCarousel
-              images={(property.images ?? []).map(
-                (img: { asset: { _id: string; url: string; metadata: { lqip: string } } | null } | null) => ({
-                  asset: img?.asset,
+              images={(property.images ?? []).map((img) => {
+                const asset = img?.asset?.url
+                  ? (img.asset as SanityImageSource)
+                  : null;
+
+                return {
+                  asset,
                   lqip: img?.asset?.metadata?.lqip ?? null,
-                })
-              )}
+                };
+              })}
               title={property.title ?? ""}
             />
-            {property.description && (
+            {property.description ? (
               <div className="mb-5">
                 <PortableText value={property.description} />
               </div>
-            )}
+            ) : null}
 
             <hr className="border-secondary my-4" />
             <div className="d-flex flex-column flex-md-row align-items-center justify-content-between gap-3">
