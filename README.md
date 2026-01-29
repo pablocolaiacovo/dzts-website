@@ -57,7 +57,15 @@ pnpm dev
     ```bash
     NEXT_PUBLIC_SANITY_PROJECT_ID=your_project_id
     NEXT_PUBLIC_SANITY_DATASET=your_dataset
-    SANITY_API_READ_TOKEN=your_api_token
     ```
 
-1. Get these values from your Sanity project settings. The read token can be created in the API section.
+1. Get these values from your Sanity project settings.
+
+### Studio
+
+Create a `.env.local` file in `apps/studio/` with:
+
+```bash
+SANITY_STUDIO_PROJECT_ID=your_project_id
+SANITY_STUDIO_DATASET=your_dataset
+```

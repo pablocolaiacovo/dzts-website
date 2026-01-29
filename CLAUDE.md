@@ -72,7 +72,6 @@ Each app has its own `.env.local` file with different prefixes (Next.js uses `NE
 | -------------------------------- | --------------------------------- |
 | `NEXT_PUBLIC_SANITY_PROJECT_ID`  | Sanity project identifier         |
 | `NEXT_PUBLIC_SANITY_DATASET`     | Sanity dataset name               |
-| `SANITY_API_READ_TOKEN`          | Server-side Sanity API read token |
 | `NEXT_PUBLIC_WEB3FORMS_KEY`      | Web3Forms API key for contact form|
 
 ### Studio (`apps/studio/.env.local`)

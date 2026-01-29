@@ -165,7 +165,6 @@ Frontend environment variables (in `apps/frontend/.env.local`):
 - Client-accessible vars prefixed with `NEXT_PUBLIC_`
 - Required: `NEXT_PUBLIC_SANITY_PROJECT_ID`, `NEXT_PUBLIC_SANITY_DATASET`
 - Optional: `NEXT_PUBLIC_SANITY_API_VERSION` (has default value)
-- Optional: `SANITY_API_READ_TOKEN` (for authenticated API requests)
 
 ### Next.js Specifics
 

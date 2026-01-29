@@ -5,8 +5,10 @@
   "description": "DZTS Inmobiliaria",
   "scripts": {
     "dev": "pnpm run --parallel dev",
-    "build": "pnpm run --parallel build"
+    "build": "pnpm run --parallel build",
+    "lint": "pnpm -r --if-present run lint"
   },
+  "packageManager": "pnpm@10.0.0",
   "engines": {
     "node": ">=20.0.0",
     "pnpm": ">=10.0.0"
