@@ -49,23 +49,30 @@ pnpm dev
 | `pnpm dev`   | Start both apps in development mode  |
 | `pnpm build` | Build both apps for production       |
 
-## Sanity Configuration
+### Frontend (`apps/frontend/`)
 
-1. Create an account on [Sanity](https://www.sanity.io/) and accept the project invitation.
-1. Create a `.env.local` file in `apps/frontend/` with:
+| Command      | Description                          |
+|--------------|--------------------------------------|
+| `pnpm dev`   | Start Next.js dev server             |
+| `pnpm build` | Production build                     |
+| `pnpm lint`  | Run ESLint                           |
 
-    ```bash
-    NEXT_PUBLIC_SANITY_PROJECT_ID=your_project_id
-    NEXT_PUBLIC_SANITY_DATASET=your_dataset
-    ```
+### Studio (`apps/studio/`)
 
-1. Get these values from your Sanity project settings.
+| Command        | Description                          |
+|----------------|--------------------------------------|
+| `pnpm dev`     | Start Sanity Studio                  |
+| `pnpm build`   | Build for deployment                 |
+| `pnpm deploy`  | Deploy to Sanity hosting             |
+| `pnpm typegen` | Generate TypeScript types from schema|
 
-### Studio
+## Environment Variables
 
-Create a `.env.local` file in `apps/studio/` with:
+Each app has a `.env.example` file. Copy it to `.env.local` and fill in your values:
 
 ```bash
-SANITY_STUDIO_PROJECT_ID=your_project_id
-SANITY_STUDIO_DATASET=your_dataset
+cp apps/frontend/.env.example apps/frontend/.env.local
+cp apps/studio/.env.example apps/studio/.env.local
 ```
+
+Get the Sanity project ID and dataset from your [Sanity project settings](https://www.sanity.io/manage). The Web3Forms key is needed for the contact form — get one at [web3forms.com](https://web3forms.com).
