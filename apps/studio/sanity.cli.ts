@@ -10,5 +10,10 @@ export default defineCliConfig({
   },
   deployment: {
     autoUpdates: true,
-  }
+  },
+  typegen: {
+    path: "../frontend/src/**/*.{ts,tsx,js,jsx}",
+    schema: "./schema.json",
+    generates: "../frontend/src/sanity/types.ts",
+  },
 })
