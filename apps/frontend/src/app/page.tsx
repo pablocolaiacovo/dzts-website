@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { cacheLife } from "next/cache";
 import { defineQuery } from "next-sanity";
 import { sanityFetch } from "@/sanity/lib/live";
@@ -10,6 +11,13 @@ import FeaturedProperties from "@/components/FeaturedProperties";
 import SearchProperties from "@/components/SearchProperties";
 import TextImageSection from "@/components/TextImageSection";
 import MapSection from "@/components/MapSection";
+import { buildFilterOptions } from "@/lib/filters";
+
+export const metadata: Metadata = {
+  title: "Inicio",
+  description:
+    "Encontrá la propiedad a medida. Buscá casas, departamentos y terrenos en venta y alquiler con DZTS Inmobiliaria.",
+};
 
 const MAP_ADDRESS_QUERY = defineQuery(`
   *[_type == "siteSettings"][0].address
@@ -30,17 +38,7 @@ export default async function Home() {
     getCachedMapAddress(),
   ]);
 
-  const filterOptions = {
-    cities: (cities || []).filter(
-      (c): c is { name: string; slug: string } => c.name !== null && c.slug !== null
-    ),
-    propertyTypes: (propertyTypes || []).filter(
-      (t): t is { name: string; slug: string } => t.name !== null && t.slug !== null
-    ),
-    roomCounts: (roomCounts || []).filter(
-      (r: number | null): r is number => r !== null && r !== undefined
-    ),
-  };
+  const filterOptions = buildFilterOptions(cities, propertyTypes, roomCounts);
 
   return (
     <>

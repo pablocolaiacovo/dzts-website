@@ -40,7 +40,7 @@ export default async function FeaturedProperties() {
 
   return (
     <div className="container py-4">
-      <h1 className="text-center mb-5 fw-bold">Propiedades Destacadas</h1>
+      <h2 className="text-center mb-5 fw-bold">Propiedades Destacadas</h2>
       <div className="row justify-content-center g-4">
         {properties.length > 0 ? (
           properties.map((property) => (

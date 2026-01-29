@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { PortableText } from "@portabletext/react";
 import type { PortableTextBlock } from "@portabletext/types";
+import { cacheLife } from "next/cache";
 import { notFound } from "next/navigation";
 import { defineQuery } from "next-sanity";
 import type { SanityImageSource } from "@sanity/image-url";
@@ -8,6 +9,7 @@ import { sanityFetch } from "@/sanity/lib/live";
 import { urlFor } from "@/sanity/lib/image";
 
 import Breadcrumb from "@/components/Breadcrumb";
+import ContactButton from "@/components/ContactButton";
 import ImageCarousel from "@/components/ImageCarousel";
 import MapSection from "@/components/MapSection";
 
@@ -65,7 +67,7 @@ export async function generateMetadata({
 
   if (!data) return {};
 
-  const title = `${data.title || "Propiedad"} | DZTS Inmobiliaria`;
+  const title = data.title || "Propiedad";
   const description = data.subtitle || "Propiedad en DZTS Inmobiliaria";
 
   return {
@@ -81,24 +83,62 @@ export async function generateMetadata({
   };
 }
 
+async function getCachedProperty(slug: string) {
+  "use cache";
+  cacheLife("minutes");
+  const { data } = await sanityFetch({
+    query: PROPERTY_QUERY,
+    params: { slug },
+  });
+  return data as PropertyDetail | null;
+}
+
 export default async function PropertyPage({
   params,
 }: {
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const { data } = await sanityFetch({
-    query: PROPERTY_QUERY,
-    params: { slug },
-  });
-  const property = data as PropertyDetail | null;
+  const property = await getCachedProperty(slug);
 
   if (!property) {
     notFound();
   }
 
+  const imageUrls = (property.images ?? [])
+    .filter((img) => img?.asset?.url)
+    .map((img) => img!.asset!.url!);
+
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "RealEstateListing",
+    name: property.title,
+    description: property.subtitle,
+    url: `${process.env.NEXT_PUBLIC_SITE_URL || ""}/propiedades/${slug}`,
+    ...(property.price != null && {
+      offers: {
+        "@type": "Offer",
+        price: property.price,
+        priceCurrency: property.currency === "ARS" ? "ARS" : "USD",
+      },
+    }),
+    ...(property.address && {
+      address: {
+        "@type": "PostalAddress",
+        streetAddress: property.address,
+        ...(property.city && { addressLocality: property.city }),
+        addressCountry: "AR",
+      },
+    }),
+    ...(imageUrls.length > 0 && { image: imageUrls }),
+  };
+
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <div className="container py-5">
         <div className="row justify-content-center">
           <div className="col-12 col-lg-10">
@@ -163,15 +203,10 @@ export default async function PropertyPage({
                 style={{ fontSize: "clamp(1.5rem, 5vw, 2.5rem)" }}
               >
                 {property.price != null
-                  ? `${property.currency === "ARS" ? "ARS" : "USD"} $${property.price.toLocaleString()}`
+                  ? `${property.currency === "ARS" ? "AR$" : "US$"}${property.price.toLocaleString("es-AR")}`
                   : "Consultar precio"}
               </span>
-              <button
-                className="btn btn-info text-white px-4 py-2 fw-bold w-100 w-md-auto"
-                style={{ maxWidth: "300px" }}
-              >
-                contactate con <span className="fw-bold">dzts</span>
-              </button>
+              <ContactButton />
             </div>
           </div>
         </div>

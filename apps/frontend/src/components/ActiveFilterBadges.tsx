@@ -1,11 +1,8 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
-
-interface FilterOption {
-  name: string;
-  slug: string;
-}
+import type { FilterOption } from "@/types/filters";
+import { parseMultiple } from "@/lib/filters";
 
 interface ActiveFilterBadgesProps {
   cities: FilterOption[];
@@ -18,11 +15,6 @@ export default function ActiveFilterBadges({
 }: ActiveFilterBadgesProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
-
-  const parseMultiple = (value: string | null): string[] => {
-    if (!value) return [];
-    return value.split(",").filter(Boolean);
-  };
 
   const appliedOperacion = searchParams.get("operacion") || "";
   const appliedPropiedad = parseMultiple(searchParams.get("propiedad"));

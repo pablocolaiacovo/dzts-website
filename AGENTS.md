@@ -70,9 +70,15 @@ apps/
 ├── frontend/                    # Next.js website
 │   └── src/
 │       ├── app/                 # Next.js App Router pages
+│       │   ├── error.tsx        # Global error boundary
+│       │   └── not-found.tsx    # Custom 404 page
 │       ├── components/          # React components
 │       │   ├── ComponentName.tsx
 │       │   └── ComponentName.css
+│       ├── lib/                 # Shared utility functions
+│       │   └── filters.ts      # parseMultiple(), buildFilterOptions()
+│       ├── types/               # Shared TypeScript type definitions
+│       │   └── filters.ts      # FilterOption, FilterOptions
 │       ├── sanity/              # Sanity CMS configuration
 │       │   ├── lib/             # Client helpers
 │       │   └── env.ts
@@ -132,14 +138,14 @@ Use Bootstrap 5 breakpoints consistently. **Important:** CSS custom properties c
 
 - **Components**: PascalCase (`PropertyCard.tsx`)
 - **Functions/Variables**: camelCase (`getPropertyData`)
-- **CSS Files**: kebab-case (`search-properties.css`)
+- **CSS Files**: PascalCase matching component name (`SearchProperties.css`, co-located with `SearchProperties.tsx`)
 - **CSS Classes**: kebab-case (Bootstrap convention)
 - **Constants**: UPPER_SNAKE_CASE (`const API_VERSION`)
 
 ### Formatting and Style
 
 - 2-space indentation
-- Single quotes for strings
+- Double quotes for strings (Prettier is pre-configured for this)
 - Semicolons required at end of statements
 - Trailing commas in multi-line arrays/objects
 - Maximum line length: not strictly enforced but prefer readability
@@ -150,13 +156,16 @@ Use Bootstrap 5 breakpoints consistently. **Important:** CSS custom properties c
 - Throw `Error` for invalid configuration/missing env vars
 - Use TypeScript strict mode to catch type errors at compile time
 - Environment variables must be validated before use (see `apps/frontend/src/sanity/env.ts`)
+- App-level error boundary exists at `src/app/error.tsx` (client component with retry button)
+- Custom 404 page exists at `src/app/not-found.tsx` with navigation links back to home/properties
 
 ### Image Handling
 
 - Use Next.js `Image` component for all images
-- Set `priority` on above-the-fold images
+- Only one image per page should have `priority` (the LCP candidate). Do not mark logos or secondary images as priority.
 - Use `fill` prop for full-width/background images with parent positioning
 - Add remote domains to `next.config.ts` when using external images
+- Use `.quality(80)` on Sanity image URLs (`urlFor(...).quality(80)`) for consistent compression
 
 ### Environment Variables
 
@@ -170,9 +179,37 @@ Frontend environment variables (in `apps/frontend/.env.local`):
 
 - Use App Router (no Pages Router)
 - Use `layout.tsx` for root layout with metadata
-- Client components must have `'use client'` directive
+- Client components must have `"use client"` directive
 - Server components by default (no directive needed)
 - Use Turbopack in development (enabled by default in Next.js 16)
+- React Compiler and cache components are enabled in `next.config.ts` (`reactCompiler: true`, `cacheComponents: true`)
+
+### Caching
+
+- Use `"use cache"` directive + `cacheLife()` from `next/cache` for server-side data caching
+- `cacheLife("hours")` for rarely-changing data (site settings, filter option lists)
+- `cacheLife("minutes")` for content that updates more often (featured properties, property detail)
+- Pattern: standalone `async function` with `"use cache"` as first line, wrapping `sanityFetch` calls
+
+### SEO
+
+- Root layout uses `metadata.title.template` (`"%s | DZTS Inmobiliaria"`). Child pages set only the page-specific title (e.g., `title: "Propiedades"`), not the full title with suffix.
+- Property detail pages include JSON-LD structured data (`RealEstateListing`) and OpenGraph metadata via `generateMetadata()`.
+- Ensure only one `<h1>` per page. Section headings use `<h2>` or lower.
+- The `html` element uses `lang="es"` (Spanish site, Argentine audience).
+- Format prices with `toLocaleString("es-AR")` and display currency as `AR$`/`US$`.
+
+### Shared Code
+
+- **Types**: Shared type definitions go in `src/types/`. Example: `FilterOption` and `FilterOptions` in `src/types/filters.ts`.
+- **Utilities**: Shared helper functions go in `src/lib/`. Example: `parseMultiple()` and `buildFilterOptions()` in `src/lib/filters.ts`.
+- Do not duplicate type definitions or utility functions across components. Import from the shared location.
+
+### Client/Server Component Boundaries
+
+- When a server component page needs client interactivity (e.g., opening a modal), extract a thin client component for just that interaction rather than converting the entire page.
+- Example: `ContactButton` is a client component that wraps button + dynamically imported `ContactModal`, used inside the server-rendered property detail page.
+- Use `next/dynamic` with `{ ssr: false }` for modals and other components that depend on browser APIs.
 
 ### Sanity CMS Integration
 
@@ -225,5 +262,9 @@ Frontend environment variables (in `apps/frontend/.env.local`):
 - Listing skeleton: `apps/frontend/src/app/propiedades/loading.tsx` mirrors `PropertiesLayout` (filters sidebar + badges/count + grid).
 - Property detail skeleton: `apps/frontend/src/app/propiedades/[slug]/loading.tsx` includes carousel-sized media + 450px map placeholder.
 - Sanity property images can have `url`/`metadata` as `null`; only cast to `SanityImageSource` when `url` is present before using `urlFor`.
-- `ImageCarousel` accepts `asset?: SanityImageSource | null` and `lqip?: string | null`.
+- `ImageCarousel` accepts `asset?: SanityImageSource | null` and `lqip?: string | null`. Uses `.quality(80)` for compression.
 - Property detail `description` is Portable Text; use `PortableTextBlock[] | null` and ensure `@portabletext/types` is installed in the frontend.
+- `FilterOption` (`{ name: string; slug: string }`) and `FilterOptions` types are in `src/types/filters.ts`. `parseMultiple()` and `buildFilterOptions()` are in `src/lib/filters.ts`. Both are imported by multiple components and pages — do not redeclare locally.
+- `ContactButton` is used on the property detail page to open the contact modal from within a server component.
+- Property detail page includes JSON-LD structured data (`RealEstateListing` schema) for SEO.
+- Property detail page data is cached via `getCachedProperty()` with `cacheLife("minutes")`.

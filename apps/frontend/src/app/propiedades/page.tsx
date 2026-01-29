@@ -11,9 +11,10 @@ import Breadcrumb from "@/components/Breadcrumb";
 import PropertiesLayout from "@/components/PropertiesLayout";
 import PropertiesGrid from "@/components/PropertiesGrid";
 import Pagination from "@/components/Pagination";
+import { parseMultiple, buildFilterOptions } from "@/lib/filters";
 
 export const metadata: Metadata = {
-  title: "Propiedades | DZTS Inmobiliaria",
+  title: "Propiedades",
   description: "Explora nuestras propiedades disponibles para venta y alquiler",
 };
 
@@ -73,11 +74,6 @@ interface PageProps {
   }>;
 }
 
-const parseMultiple = (value: string | undefined): string[] => {
-  if (!value) return [];
-  return value.split(",").filter(Boolean);
-};
-
 export default async function PropiedadesPage({ searchParams }: PageProps) {
   const params = await searchParams;
 
@@ -128,17 +124,7 @@ export default async function PropiedadesPage({ searchParams }: PageProps) {
   const totalPages = Math.ceil((totalCount || 0) / PAGE_SIZE);
   const propertiesList = (properties || []) as PropertyListItem[];
 
-  const filterOptions = {
-    cities: (cities || []).filter(
-      (c): c is { name: string; slug: string } => c.name !== null && c.slug !== null
-    ),
-    propertyTypes: (propertyTypes || []).filter(
-      (t): t is { name: string; slug: string } => t.name !== null && t.slug !== null
-    ),
-    roomCounts: (roomCounts || []).filter(
-      (r: number | null): r is number => r !== null && r !== undefined
-    ),
-  };
+  const filterOptions = buildFilterOptions(cities, propertyTypes, roomCounts);
 
   const currentSearchParams = {
     operacion: operationType || undefined,

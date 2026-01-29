@@ -3,19 +3,11 @@
 import { useState, Suspense } from "react";
 import PropertiesFilters from "./PropertiesFilters";
 import ActiveFilterBadges from "./ActiveFilterBadges";
+import type { FilterOptions } from "@/types/filters";
 import "./PropertiesLayout.css";
 
-interface FilterOption {
-  name: string;
-  slug: string;
-}
-
 interface PropertiesLayoutProps {
-  filterOptions: {
-    cities: FilterOption[];
-    propertyTypes: FilterOption[];
-    roomCounts: number[];
-  };
+  filterOptions: FilterOptions;
   totalCount: number;
   children: React.ReactNode;
 }

@@ -42,7 +42,7 @@ export default function PropertyCard({
       >
         <div className="position-relative">
           <Image
-            src={imageUrl || "https://placehold.co/400x220/png"}
+            src={imageUrl}
             alt={title || "Property Image"}
             width={400}
             height={220}
@@ -76,7 +76,7 @@ export default function PropertyCard({
             </span>
             <span className="fw-bold text-primary fs-5">
               {price != null
-                ? `${currencySymbol}${price.toLocaleString()}`
+                ? `${currencySymbol}${price.toLocaleString("es-AR")}`
                 : "Consultar precio"}
             </span>
           </div>

@@ -49,7 +49,7 @@ export default function ImageCarousel({ images, title }: ImageCarouselProps) {
       </div>
       <div className="carousel-inner">
         {images.map((image, index) => {
-          const url = image.asset ? urlFor(image.asset).width(1200).height(500).auto('format').url()
+          const url = image.asset ? urlFor(image.asset).width(1200).height(500).quality(80).auto('format').url()
             : 'https://placehold.co/1200x500/png';
 
           return (
