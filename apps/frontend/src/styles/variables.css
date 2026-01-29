@@ -1,3 +1,27 @@
+/*
+ * ==========================================================================
+ * Bootstrap 5 Breakpoints Reference
+ * ==========================================================================
+ * Use these values consistently across all CSS files.
+ * Note: CSS custom properties cannot be used in @media queries.
+ *
+ * Breakpoint | Min-width (mobile-first) | Max-width (desktop-first)
+ * -----------|--------------------------|---------------------------
+ * xs         | (default, no query)      | max-width: 575.98px
+ * sm         | min-width: 576px         | max-width: 767.98px
+ * md         | min-width: 768px         | max-width: 991.98px
+ * lg         | min-width: 992px         | max-width: 1199.98px
+ * xl         | min-width: 1200px        | max-width: 1399.98px
+ * xxl        | min-width: 1400px        | -
+ *
+ * Mobile-first example:
+ *   @media (min-width: 768px) { ... }   // md and up
+ *
+ * Desktop-first example (avoid when possible):
+ *   @media (max-width: 767.98px) { ... } // below md
+ * ==========================================================================
+ */
+
 :root {
   --bs-primary: #01BCF3;
   --bs-secondary: #ffffff;

@@ -1,8 +1,9 @@
 'use client';
 
 import { urlFor } from '@/sanity/lib/image';
-import { SanityImageSource } from '@sanity/image-url';
+import type { SanityImageSource } from '@sanity/image-url';
 import Image from 'next/image';
+import './ImageCarousel.css';
 
 interface ImageCarouselProps {
   images: SanityImageSource[];
@@ -10,7 +11,20 @@ interface ImageCarouselProps {
 }
 
 export default function ImageCarousel({ images, title }: ImageCarouselProps) {
-  if (images.length === 0) return null;
+  if (images.length === 0) {
+    return (
+      <div className="mb-4">
+        <div className="carousel-image-container position-relative">
+          <Image
+            src="https://placehold.co/1200x500/png"
+            alt={`${title} - Sin imagen`}
+            fill
+            className="object-fit-cover"
+          />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div id="propertyCarousel" className="carousel slide mb-4" data-bs-ride="carousel">
@@ -34,7 +48,7 @@ export default function ImageCarousel({ images, title }: ImageCarouselProps) {
 
           return (
             <div key={index} className={`carousel-item ${index === 0 ? 'active' : ''}`}>
-              <div className="position-relative" style={{ height: '500px' }}>
+              <div className="carousel-image-container position-relative">
                 <Image
                   src={url}
                   alt={`${title} - Imagen ${index + 1}`}

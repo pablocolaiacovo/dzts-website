@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import { defineQuery } from 'next-sanity';
 import { sanityFetch } from '@/sanity/lib/live';
 
+import Breadcrumb from '@/components/Breadcrumb';
 import ImageCarousel from '@/components/ImageCarousel';
 
 const PROPERTY_QUERY = defineQuery(`
@@ -40,6 +41,13 @@ export default async function PropertyPage({
     <div className="container py-5">
       <div className="row justify-content-center">
         <div className="col-12 col-lg-10">
+          <Breadcrumb
+            items={[
+              { label: "Inicio", href: "/", isHome: true },
+              { label: "Propiedades", href: "/propiedades" },
+              { label: property.title || "Propiedad" },
+            ]}
+          />
           <h1 className="text-secondary mb-2" style={{ fontSize: '2.5rem' }}>
             {property.title}
           </h1>
