@@ -11,7 +11,20 @@ interface ImageCarouselProps {
 }
 
 export default function ImageCarousel({ images, title }: ImageCarouselProps) {
-  if (images.length === 0) return null;
+  if (images.length === 0) {
+    return (
+      <div className="mb-4">
+        <div className="carousel-image-container position-relative">
+          <Image
+            src="https://placehold.co/1200x500/png"
+            alt={`${title} - Sin imagen`}
+            fill
+            className="object-fit-cover"
+          />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div id="propertyCarousel" className="carousel slide mb-4" data-bs-ride="carousel">
