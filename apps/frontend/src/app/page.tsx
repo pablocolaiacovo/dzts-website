@@ -48,7 +48,11 @@ export default async function Home() {
       <SearchProperties filterOptions={filterOptions} />
       <FeaturedProperties />
       {sections?.map((section, index) => (
-        <TextImageSection key={index} index={index} {...section} />
+        <TextImageSection
+          key={section?._key ?? index}
+          index={index}
+          {...section}
+        />
       ))}
       <MapSection address={address} />
     </>

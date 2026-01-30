@@ -16,9 +16,9 @@ interface CircularCarouselProps {
 
 export default function CircularCarousel({ images, id }: CircularCarouselProps) {
   return (
-      <div
-        id={id}
-        className="carousel slide carousel-fade pointer-event"
+    <div
+      id={id}
+      className="carousel slide carousel-fade pointer-event"
       data-bs-ride="carousel"
       data-bs-interval="4000"
     >
@@ -48,7 +48,10 @@ export default function CircularCarousel({ images, id }: CircularCarouselProps) 
                 sizes="300px"
                 className="object-fit-cover"
                 {...(image.asset?.metadata?.lqip
-                  ? { placeholder: "blur" as const, blurDataURL: image.asset.metadata.lqip }
+                  ? {
+                      placeholder: "blur" as const,
+                      blurDataURL: image.asset.metadata.lqip,
+                    }
                   : {})}
               />
             </div>

@@ -4,6 +4,7 @@ import { sanityFetch } from "@/sanity/lib/live";
 
 export const HOME_SECTIONS_QUERY = defineQuery(`
   *[_type == "homePage"][0].sections[]{
+    _key,
     title,
     anchorId,
     content,
