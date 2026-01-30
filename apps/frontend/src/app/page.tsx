@@ -8,17 +8,22 @@ import {
   getCachedRoomCounts,
 } from "@/sanity/queries/properties";
 import { getCachedHomeSections } from "@/sanity/queries/homePage";
+import { getCachedHomeSeo, getCachedSiteSeo } from "@/sanity/queries/seo";
+import { resolveMetadata } from "@/lib/seo";
 import FeaturedProperties from "@/components/FeaturedProperties";
 import SearchProperties from "@/components/SearchProperties";
 import TextImageSection from "@/components/TextImageSection";
 import MapSection from "@/components/MapSection";
 import { buildFilterOptions } from "@/lib/filters";
 
-export const metadata: Metadata = {
-  title: "Inicio",
-  description:
-    "Encontrá la propiedad a medida. Buscá casas, departamentos y terrenos en venta y alquiler con DZTS Inmobiliaria.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const [pageSeo, siteSeo] = await Promise.all([
+    getCachedHomeSeo(),
+    getCachedSiteSeo(),
+  ]);
+
+  return resolveMetadata(pageSeo, siteSeo);
+}
 
 const MAP_ADDRESS_QUERY = defineQuery(`
   *[_type == "siteSettings"][0].address

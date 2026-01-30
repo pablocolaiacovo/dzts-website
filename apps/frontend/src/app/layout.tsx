@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { cacheLife } from "next/cache";
 import { Inter } from "next/font/google";
 import BootstrapClient from "@/components/BootstrapClient";
@@ -32,30 +33,40 @@ async function getSiteSettings() {
   return data;
 }
 
-export default async function RootLayout({
+async function SiteShell({ children }: { children: React.ReactNode }) {
+  const siteSettings = await getSiteSettings();
+
+  return (
+    <>
+      <Header
+        logo={siteSettings?.logo}
+        siteName={siteSettings?.siteName}
+        navigation={siteSettings?.mainNavigation}
+      />
+      <main>{children}</main>
+      <Footer
+        logo={siteSettings?.logo}
+        siteName={siteSettings?.siteName}
+        copyrightText={siteSettings?.copyrightText}
+        footerLinks={siteSettings?.footerLinks}
+        certificationLogos={siteSettings?.certificationLogos}
+        socialLinks={siteSettings?.socialLinks}
+      />
+    </>
+  );
+}
+
+export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const siteSettings = await getSiteSettings();
-
   return (
     <html lang="es">
       <body className={inter.className}>
-        <Header
-          logo={siteSettings?.logo}
-          siteName={siteSettings?.siteName}
-          navigation={siteSettings?.mainNavigation}
-        />
-        <main>{children}</main>
-        <Footer
-          logo={siteSettings?.logo}
-          siteName={siteSettings?.siteName}
-          copyrightText={siteSettings?.copyrightText}
-          footerLinks={siteSettings?.footerLinks}
-          certificationLogos={siteSettings?.certificationLogos}
-          socialLinks={siteSettings?.socialLinks}
-        />
+        <Suspense>
+          <SiteShell>{children}</SiteShell>
+        </Suspense>
         <BootstrapClient />
       </body>
     </html>

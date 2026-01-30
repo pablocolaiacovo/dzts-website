@@ -82,6 +82,21 @@ export type Property = {
   price?: number;
   currency?: "USD" | "ARS";
   featured?: boolean;
+  seo?: Seo;
+};
+
+export type Seo = {
+  _type: "seo";
+  metaTitle?: string;
+  metaDescription?: string;
+  ogImage?: {
+    asset?: SanityImageAssetReference;
+    media?: unknown;
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    _type: "image";
+  };
+  noIndex?: boolean;
 };
 
 export type City = {
@@ -188,6 +203,16 @@ export type SiteSettings = {
     _type: "certificationLogo";
     _key: string;
   }>;
+  seo?: Seo;
+};
+
+export type PropiedadesPage = {
+  _id: string;
+  _type: "propiedadesPage";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  seo?: Seo;
 };
 
 export type HomePage = {
@@ -231,6 +256,7 @@ export type HomePage = {
     _type: "section";
     _key: string;
   }>;
+  seo?: Seo;
 };
 
 export type SanityImagePaletteSwatch = {
@@ -335,12 +361,14 @@ export type AllSanitySchemaTypes =
   | PropertyTypeCategoryReference
   | CityReference
   | Property
+  | Seo
   | City
   | Slug
   | PropertyTypeCategory
   | SanityImageCrop
   | SanityImageHotspot
   | SiteSettings
+  | PropiedadesPage
   | HomePage
   | SanityImagePaletteSwatch
   | SanityImagePalette
@@ -366,7 +394,7 @@ export type MAP_ADDRESS_QUERY_RESULT = string | null;
 
 // Source: ../frontend/src/app/propiedades/[slug]/page.tsx
 // Variable: PROPERTY_QUERY
-// Query: *[_type == "property" && slug.current == $slug][0]  {    title,    subtitle,    address,    description,    price,    "propertyType": propertyType->name,    operationType,    currency,    "city": city->name,    "images": images[] { asset->{ _id, url, metadata { lqip } } }  }
+// Query: *[_type == "property" && slug.current == $slug][0]  {    title,    subtitle,    address,    description,    price,    "propertyType": propertyType->name,    operationType,    currency,    "city": city->name,    "images": images[] { asset->{ _id, url, metadata { lqip } } },    "ogImage": images[0],    seo {      metaTitle,      metaDescription,      ogImage { asset->{ url } },      noIndex    }  }
 export type PROPERTY_QUERY_RESULT = {
   title: string | null;
   subtitle: string | null;
@@ -403,21 +431,23 @@ export type PROPERTY_QUERY_RESULT = {
       } | null;
     } | null;
   }> | null;
-} | null;
-
-// Source: ../frontend/src/app/propiedades/[slug]/page.tsx
-// Variable: METADATA_QUERY
-// Query: *[_type == "property" && slug.current == $slug][0]  { title, subtitle, "image": images[0] }
-export type METADATA_QUERY_RESULT = {
-  title: string | null;
-  subtitle: string | null;
-  image: {
+  ogImage: {
     asset?: SanityImageAssetReference;
     media?: unknown;
     hotspot?: SanityImageHotspot;
     crop?: SanityImageCrop;
     _type: "image";
     _key: string;
+  } | null;
+  seo: {
+    metaTitle: string | null;
+    metaDescription: string | null;
+    ogImage: {
+      asset: {
+        url: string | null;
+      } | null;
+    } | null;
+    noIndex: boolean | null;
   } | null;
 } | null;
 
@@ -534,6 +564,47 @@ export type PROPERTY_TYPES_QUERY_RESULT = Array<{
 // Query: array::unique(*[_type == "property" && defined(rooms)].rooms) | order(@ asc)
 export type ROOM_COUNTS_QUERY_RESULT = Array<number>;
 
+// Source: ../frontend/src/sanity/queries/seo.ts
+// Variable: SITE_SEO_QUERY
+// Query: *[_type == "siteSettings"][0].seo {    metaTitle,    metaDescription,    ogImage { asset->{ url } }  }
+export type SITE_SEO_QUERY_RESULT = {
+  metaTitle: string | null;
+  metaDescription: string | null;
+  ogImage: {
+    asset: {
+      url: string | null;
+    } | null;
+  } | null;
+} | null;
+
+// Source: ../frontend/src/sanity/queries/seo.ts
+// Variable: HOME_SEO_QUERY
+// Query: *[_type == "homePage"][0].seo {  metaTitle,  metaDescription,  ogImage { asset->{ url } },  noIndex}
+export type HOME_SEO_QUERY_RESULT = {
+  metaTitle: string | null;
+  metaDescription: string | null;
+  ogImage: {
+    asset: {
+      url: string | null;
+    } | null;
+  } | null;
+  noIndex: boolean | null;
+} | null;
+
+// Source: ../frontend/src/sanity/queries/seo.ts
+// Variable: PROPIEDADES_SEO_QUERY
+// Query: *[_type == "propiedadesPage"][0].seo {  metaTitle,  metaDescription,  ogImage { asset->{ url } },  noIndex}
+export type PROPIEDADES_SEO_QUERY_RESULT = {
+  metaTitle: string | null;
+  metaDescription: string | null;
+  ogImage: {
+    asset: {
+      url: string | null;
+    } | null;
+  } | null;
+  noIndex: boolean | null;
+} | null;
+
 // Source: ../frontend/src/sanity/queries/siteSettings.ts
 // Variable: SITE_SETTINGS_QUERY
 // Query: *[_type == "siteSettings"][0] {    siteName,    logo {      asset->{        _id,        url,        metadata { lqip, dimensions }      },      alt    },    favicon {      asset->{        _id,        url      }    },    mainNavigation[] {      _key,      label,      linkType,      internalPath,      externalUrl,      actionId    },    phone,    email,    address,    whatsappNumber,    socialLinks[] {      _key,      platform,      url    },    copyrightText,    footerLinks[] {      _key,      label,      url    },    certificationLogos[] {      _key,      image {        asset->{          _id,          url,          metadata { lqip, dimensions }        }      },      alt,      title,      url    }  }
@@ -608,8 +679,7 @@ import "@sanity/client";
 declare module "@sanity/client" {
   interface SanityQueries {
     '\n  *[_type == "siteSettings"][0].address\n': MAP_ADDRESS_QUERY_RESULT;
-    '\n  *[_type == "property" && slug.current == $slug][0]\n  {\n    title,\n    subtitle,\n    address,\n    description,\n    price,\n    "propertyType": propertyType->name,\n    operationType,\n    currency,\n    "city": city->name,\n    "images": images[] { asset->{ _id, url, metadata { lqip } } }\n  }\n': PROPERTY_QUERY_RESULT;
-    '\n  *[_type == "property" && slug.current == $slug][0]\n  { title, subtitle, "image": images[0] }\n': METADATA_QUERY_RESULT;
+    '\n  *[_type == "property" && slug.current == $slug][0]\n  {\n    title,\n    subtitle,\n    address,\n    description,\n    price,\n    "propertyType": propertyType->name,\n    operationType,\n    currency,\n    "city": city->name,\n    "images": images[] { asset->{ _id, url, metadata { lqip } } },\n    "ogImage": images[0],\n    seo {\n      metaTitle,\n      metaDescription,\n      ogImage { asset->{ url } },\n      noIndex\n    }\n  }\n': PROPERTY_QUERY_RESULT;
     '\n  *[_type == "property"\n    && ($operationType == "" || operationType == $operationType)\n    && (count($propertyTypeSlugs) == 0 || propertyType->slug.current in $propertyTypeSlugs)\n    && (count($citySlugs) == 0 || city->slug.current in $citySlugs)\n    && (count($roomsList) == 0 || rooms in $roomsList)\n  ] | order(publishedAt desc)[$start...$end] {\n    _id,\n    title,\n    "slug": slug.current,\n    subtitle,\n    price,\n    currency,\n    operationType,\n    "propertyType": propertyType->name,\n    "city": city->name,\n    rooms,\n    "image": images[0] { asset->{ _id, url, metadata { lqip } } }\n  }\n': PROPERTIES_QUERY_RESULT;
     '\n  count(*[_type == "property"\n    && ($operationType == "" || operationType == $operationType)\n    && (count($propertyTypeSlugs) == 0 || propertyType->slug.current in $propertyTypeSlugs)\n    && (count($citySlugs) == 0 || city->slug.current in $citySlugs)\n    && (count($roomsList) == 0 || rooms in $roomsList)\n  ])\n': COUNT_QUERY_RESULT;
     '*\n  [_type == "property" && featured == true]\n  | order(publishedAt desc)[0...6]\n  {\n    _id,\n    title,\n    "slug": slug.current,\n    subtitle,\n    price,\n    currency,\n    operationType,\n    rooms,\n    "city": city->name,\n    "image": images[0] { asset->{ _id, url, metadata { lqip } } }\n  }': FEATURED_QUERY_RESULT;
@@ -617,6 +687,9 @@ declare module "@sanity/client" {
     '\n  *[_type == "city"] | order(name asc) { name, "slug": slug.current }\n': CITIES_QUERY_RESULT;
     '\n  *[_type == "propertyTypeCategory"] | order(name asc) { name, "slug": slug.current }\n': PROPERTY_TYPES_QUERY_RESULT;
     '\n  array::unique(*[_type == "property" && defined(rooms)].rooms) | order(@ asc)\n': ROOM_COUNTS_QUERY_RESULT;
+    '\n  *[_type == "siteSettings"][0].seo {\n    metaTitle,\n    metaDescription,\n    ogImage { asset->{ url } }\n  }\n': SITE_SEO_QUERY_RESULT;
+    '\n  *[_type == "homePage"][0].seo {\n  metaTitle,\n  metaDescription,\n  ogImage { asset->{ url } },\n  noIndex\n}\n': HOME_SEO_QUERY_RESULT;
+    '\n  *[_type == "propiedadesPage"][0].seo {\n  metaTitle,\n  metaDescription,\n  ogImage { asset->{ url } },\n  noIndex\n}\n': PROPIEDADES_SEO_QUERY_RESULT;
     '\n  *[_type == "siteSettings"][0] {\n    siteName,\n    logo {\n      asset->{\n        _id,\n        url,\n        metadata { lqip, dimensions }\n      },\n      alt\n    },\n    favicon {\n      asset->{\n        _id,\n        url\n      }\n    },\n    mainNavigation[] {\n      _key,\n      label,\n      linkType,\n      internalPath,\n      externalUrl,\n      actionId\n    },\n    phone,\n    email,\n    address,\n    whatsappNumber,\n    socialLinks[] {\n      _key,\n      platform,\n      url\n    },\n    copyrightText,\n    footerLinks[] {\n      _key,\n      label,\n      url\n    },\n    certificationLogos[] {\n      _key,\n      image {\n        asset->{\n          _id,\n          url,\n          metadata { lqip, dimensions }\n        }\n      },\n      alt,\n      title,\n      url\n    }\n  }\n': SITE_SETTINGS_QUERY_RESULT;
   }
 }

@@ -6,6 +6,10 @@ export const propertyType = defineType({
   title: "Propiedades",
   type: "document",
   icon: HomeIcon,
+  groups: [
+    { name: "content", title: "Contenido", default: true },
+    { name: "seo", title: "SEO" },
+  ],
   fields: [
     defineField({
       name: "slug",
@@ -120,6 +124,12 @@ export const propertyType = defineType({
       title: "Destacada",
       type: "boolean",
       initialValue: false,
+    }),
+    defineField({
+      name: "seo",
+      title: "SEO",
+      type: "seo",
+      group: "seo",
     }),
   ],
 });

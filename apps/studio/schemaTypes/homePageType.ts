@@ -6,9 +6,14 @@ export const homePageType = defineType({
   title: "Página de Inicio",
   type: "document",
   icon: HomeIcon,
+  groups: [
+    { name: "content", title: "Contenido", default: true },
+    { name: "seo", title: "SEO" },
+  ],
   fields: [
     defineField({
       name: "sections",
+      group: "content",
       title: "Secciones",
       type: "array",
       of: [
@@ -100,6 +105,12 @@ export const homePageType = defineType({
           },
         }),
       ],
+    }),
+    defineField({
+      name: "seo",
+      title: "SEO",
+      type: "seo",
+      group: "seo",
     }),
   ],
   preview: {

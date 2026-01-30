@@ -7,16 +7,22 @@ import {
   getCachedPropertyTypes,
   getCachedRoomCounts,
 } from "@/sanity/queries/properties";
+import { getCachedPropiedadesSeo, getCachedSiteSeo } from "@/sanity/queries/seo";
+import { resolveMetadata } from "@/lib/seo";
 import Breadcrumb from "@/components/Breadcrumb";
 import PropertiesLayout from "@/components/PropertiesLayout";
 import PropertiesGrid from "@/components/PropertiesGrid";
 import Pagination from "@/components/Pagination";
 import { parseMultiple, buildFilterOptions } from "@/lib/filters";
 
-export const metadata: Metadata = {
-  title: "Propiedades",
-  description: "Explora nuestras propiedades disponibles para venta y alquiler",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const [pageSeo, siteSeo] = await Promise.all([
+    getCachedPropiedadesSeo(),
+    getCachedSiteSeo(),
+  ]);
+
+  return resolveMetadata(pageSeo, siteSeo);
+}
 
 const PAGE_SIZE = 12;
 
