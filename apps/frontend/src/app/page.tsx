@@ -7,7 +7,10 @@ import {
   getCachedPropertyTypes,
   getCachedRoomCounts,
 } from "@/sanity/queries/properties";
-import { getCachedHomeSections } from "@/sanity/queries/homePage";
+import {
+  getCachedHomeSections,
+  getCachedHomeContent,
+} from "@/sanity/queries/homePage";
 import { getCachedHomeSeo, getCachedSiteSeo } from "@/sanity/queries/seo";
 import { resolveMetadata } from "@/lib/seo";
 import FeaturedProperties from "@/components/FeaturedProperties";
@@ -37,21 +40,29 @@ async function getCachedMapAddress() {
 }
 
 export default async function Home() {
-  const [cities, propertyTypes, roomCounts, address, sections] =
+  const [cities, propertyTypes, roomCounts, address, sections, homeContent] =
     await Promise.all([
       getCachedCities(),
       getCachedPropertyTypes(),
       getCachedRoomCounts(),
       getCachedMapAddress(),
       getCachedHomeSections(),
+      getCachedHomeContent(),
     ]);
 
   const filterOptions = buildFilterOptions(cities, propertyTypes, roomCounts);
 
   return (
     <>
-      <SearchProperties filterOptions={filterOptions} />
-      <FeaturedProperties />
+      <SearchProperties
+        filterOptions={filterOptions}
+        heroHeading={homeContent!.heroHeading!}
+        heroImageUrl={homeContent!.heroImage!.asset!.url!}
+        heroImageLqip={homeContent!.heroImage!.asset!.metadata?.lqip}
+        heroLogoUrl={homeContent!.heroLogo!.asset!.url!}
+        heroLogoAlt={homeContent!.heroLogo!.alt}
+      />
+      <FeaturedProperties heading={homeContent!.featuredPropertiesHeading!} />
       {sections?.map((section, index) => (
         <TextImageSection
           key={section?._key ?? index}

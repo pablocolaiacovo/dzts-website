@@ -20,3 +20,19 @@ export async function getCachedHomeSections() {
   const { data } = await sanityFetch({ query: HOME_SECTIONS_QUERY });
   return data;
 }
+
+const HOME_CONTENT_QUERY = defineQuery(`
+  *[_type == "homePage"][0] {
+    heroHeading,
+    heroImage { asset->{ url, metadata { lqip } } },
+    heroLogo { asset->{ url, metadata { lqip, dimensions } }, alt },
+    featuredPropertiesHeading
+  }
+`);
+
+export async function getCachedHomeContent() {
+  "use cache";
+  cacheLife("hours");
+  const { data } = await sanityFetch({ query: HOME_CONTENT_QUERY });
+  return data;
+}

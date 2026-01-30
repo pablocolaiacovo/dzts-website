@@ -8,10 +8,20 @@ import "./SearchProperties.css";
 
 interface SearchPropertiesProps {
   filterOptions?: FilterOptions;
+  heroHeading: string;
+  heroImageUrl: string;
+  heroImageLqip?: string | null;
+  heroLogoUrl: string;
+  heroLogoAlt?: string | null;
 }
 
 export default function SearchProperties({
   filterOptions,
+  heroHeading,
+  heroImageUrl,
+  heroImageLqip,
+  heroLogoUrl,
+  heroLogoAlt,
 }: SearchPropertiesProps) {
   const router = useRouter();
   const [operacion, setOperacion] = useState("");
@@ -34,11 +44,14 @@ export default function SearchProperties({
   return (
     <section className="hero min-vh-100 w-100 overflow-hidden position-relative text-white d-flex align-items-center justify-content-center">
       <Image
-        src="/Images/backgroun.jpg"
+        src={heroImageUrl}
         alt="Imagen de fondo del formulario de búsqueda"
         fill
         className="object-cover negative-z"
         sizes="100vw"
+        {...(heroImageLqip
+          ? { placeholder: "blur" as const, blurDataURL: heroImageLqip }
+          : {})}
       />
 
       <div className="overlay position-absolute top-0 start-0 w-100 h-100 position-relative"></div>
@@ -47,13 +60,13 @@ export default function SearchProperties({
         <div className="row pb-4">
           <div className="col-12 col-md-3 logo-container pb-4 mx-auto position-relative">
             <Image
-              src="/Images/logoDzts.png"
-              alt="Logo DZTS"
+              src={heroLogoUrl}
+              alt={heroLogoAlt ?? ""}
               fill
               className="logo-image"
             />
           </div>
-          <h1 className="text-center">Encontrá la propiedad a medida</h1>
+          <h1 className="text-center">{heroHeading}</h1>
         </div>
 
         <div className="row gap-4 pb-4 flex-wrap flex-md-nowrap justify-content-center">

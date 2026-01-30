@@ -7,10 +7,50 @@ export const homePageType = defineType({
   type: "document",
   icon: HomeIcon,
   groups: [
-    { name: "content", title: "Contenido", default: true },
+    { name: "hero", title: "Hero", default: true },
+    { name: "content", title: "Contenido" },
     { name: "seo", title: "SEO" },
   ],
   fields: [
+    defineField({
+      name: "heroHeading",
+      title: "Título del Hero",
+      type: "string",
+      group: "hero",
+      initialValue: "Encontrá la propiedad a medida",
+      validation: (rule) => rule.required(),
+    }),
+    defineField({
+      name: "heroImage",
+      title: "Imagen de fondo del Hero",
+      type: "image",
+      group: "hero",
+      options: { hotspot: true },
+      validation: (rule) => rule.required(),
+    }),
+    defineField({
+      name: "heroLogo",
+      title: "Logo del Hero",
+      type: "image",
+      group: "hero",
+      options: { hotspot: true },
+      fields: [
+        defineField({
+          name: "alt",
+          title: "Texto alternativo",
+          type: "string",
+        }),
+      ],
+      validation: (rule) => rule.required(),
+    }),
+    defineField({
+      name: "featuredPropertiesHeading",
+      title: "Título de Propiedades Destacadas",
+      type: "string",
+      group: "content",
+      initialValue: "Propiedades Destacadas",
+      validation: (rule) => rule.required(),
+    }),
     defineField({
       name: "sections",
       group: "content",
