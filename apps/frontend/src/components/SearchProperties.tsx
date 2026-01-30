@@ -3,19 +3,11 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import type { FilterOptions } from "@/types/filters";
 import "./SearchProperties.css";
 
-interface FilterOption {
-  name: string;
-  slug: string;
-}
-
 interface SearchPropertiesProps {
-  filterOptions?: {
-    cities: FilterOption[];
-    propertyTypes: FilterOption[];
-    roomCounts: number[];
-  };
+  filterOptions?: FilterOptions;
 }
 
 export default function SearchProperties({
@@ -59,7 +51,6 @@ export default function SearchProperties({
               alt="Logo DZTS"
               fill
               className="logo-image"
-              priority
             />
           </div>
           <h1 className="text-center">Encontrá la propiedad a medida</h1>

@@ -2,11 +2,8 @@
 
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
-
-interface FilterOption {
-  name: string;
-  slug: string;
-}
+import type { FilterOption } from "@/types/filters";
+import { parseMultiple } from "@/lib/filters";
 
 interface PropertiesFiltersProps {
   cities: FilterOption[];
@@ -32,11 +29,6 @@ function PropertiesFiltersInner({
 }: PropertiesFiltersInnerProps) {
   const router = useRouter();
   const [isOpenMobile, setIsOpenMobile] = useState(false);
-
-  const parseMultiple = (value: string | null): string[] => {
-    if (!value) return [];
-    return value.split(",").filter(Boolean);
-  };
 
   const [operacion, setOperacion] = useState(() => searchParams.get("operacion") || "");
   const [propiedad, setPropiedad] = useState<string[]>(() => parseMultiple(searchParams.get("propiedad")));

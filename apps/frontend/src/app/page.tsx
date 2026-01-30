@@ -1,46 +1,44 @@
+import type { Metadata } from "next";
+import { cacheLife } from "next/cache";
 import { defineQuery } from "next-sanity";
 import { sanityFetch } from "@/sanity/lib/live";
+import {
+  getCachedCities,
+  getCachedPropertyTypes,
+  getCachedRoomCounts,
+} from "@/sanity/queries/properties";
 import FeaturedProperties from "@/components/FeaturedProperties";
 import SearchProperties from "@/components/SearchProperties";
 import TextImageSection from "@/components/TextImageSection";
 import MapSection from "@/components/MapSection";
+import { buildFilterOptions } from "@/lib/filters";
 
-const CITIES_QUERY = defineQuery(`
-  *[_type == "city"] | order(name asc) { name, "slug": slug.current }
-`);
-
-const PROPERTY_TYPES_QUERY = defineQuery(`
-  *[_type == "propertyTypeCategory"] | order(name asc) { name, "slug": slug.current }
-`);
-
-const ROOM_COUNTS_QUERY = defineQuery(`
-  array::unique(*[_type == "property" && defined(rooms)].rooms) | order(@ asc)
-`);
+export const metadata: Metadata = {
+  title: "Inicio",
+  description:
+    "Encontrá la propiedad a medida. Buscá casas, departamentos y terrenos en venta y alquiler con DZTS Inmobiliaria.",
+};
 
 const MAP_ADDRESS_QUERY = defineQuery(`
   *[_type == "siteSettings"][0].address
 `);
 
-export default async function Home() {
-  const [{ data: cities }, { data: propertyTypes }, { data: roomCounts }, { data: address }] =
-    await Promise.all([
-      sanityFetch({ query: CITIES_QUERY }),
-      sanityFetch({ query: PROPERTY_TYPES_QUERY }),
-      sanityFetch({ query: ROOM_COUNTS_QUERY }),
-      sanityFetch({ query: MAP_ADDRESS_QUERY }),
-    ]);
+async function getCachedMapAddress() {
+  "use cache";
+  cacheLife("hours");
+  const { data } = await sanityFetch({ query: MAP_ADDRESS_QUERY });
+  return data;
+}
 
-  const filterOptions = {
-    cities: (cities || []).filter(
-      (c): c is { name: string; slug: string } => c.name !== null && c.slug !== null
-    ),
-    propertyTypes: (propertyTypes || []).filter(
-      (t): t is { name: string; slug: string } => t.name !== null && t.slug !== null
-    ),
-    roomCounts: (roomCounts || []).filter(
-      (r: number | null): r is number => r !== null && r !== undefined
-    ),
-  };
+export default async function Home() {
+  const [cities, propertyTypes, roomCounts, address] = await Promise.all([
+    getCachedCities(),
+    getCachedPropertyTypes(),
+    getCachedRoomCounts(),
+    getCachedMapAddress(),
+  ]);
+
+  const filterOptions = buildFilterOptions(cities, propertyTypes, roomCounts);
 
   return (
     <>

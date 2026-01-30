@@ -1,17 +1,38 @@
 import type { Metadata } from "next";
 import { defineQuery } from "next-sanity";
 import { sanityFetch } from "@/sanity/lib/live";
+import type { SanityImageSource } from "@sanity/image-url";
+import {
+  getCachedCities,
+  getCachedPropertyTypes,
+  getCachedRoomCounts,
+} from "@/sanity/queries/properties";
 import Breadcrumb from "@/components/Breadcrumb";
 import PropertiesLayout from "@/components/PropertiesLayout";
 import PropertiesGrid from "@/components/PropertiesGrid";
 import Pagination from "@/components/Pagination";
+import { parseMultiple, buildFilterOptions } from "@/lib/filters";
 
 export const metadata: Metadata = {
-  title: "Propiedades | DZTS Inmobiliaria",
+  title: "Propiedades",
   description: "Explora nuestras propiedades disponibles para venta y alquiler",
 };
 
 const PAGE_SIZE = 12;
+
+interface PropertyListItem {
+  _id: string;
+  title: string | null;
+  slug: string | null;
+  subtitle?: string | null;
+  price?: number | null;
+  currency?: string | null;
+  operationType?: string | null;
+  propertyType?: string | null;
+  city?: string | null;
+  rooms?: number | null;
+  image?: SanityImageSource | null;
+}
 
 const PROPERTIES_QUERY = defineQuery(`
   *[_type == "property"
@@ -30,7 +51,7 @@ const PROPERTIES_QUERY = defineQuery(`
     "propertyType": propertyType->name,
     "city": city->name,
     rooms,
-    "image": images[0]
+    "image": images[0] { asset->{ _id, url, metadata { lqip } } }
   }
 `);
 
@@ -43,18 +64,6 @@ const COUNT_QUERY = defineQuery(`
   ])
 `);
 
-const CITIES_QUERY = defineQuery(`
-  *[_type == "city"] | order(name asc) { name, "slug": slug.current }
-`);
-
-const PROPERTY_TYPES_QUERY = defineQuery(`
-  *[_type == "propertyTypeCategory"] | order(name asc) { name, "slug": slug.current }
-`);
-
-const ROOM_COUNTS_QUERY = defineQuery(`
-  array::unique(*[_type == "property" && defined(rooms)].rooms) | order(@ asc)
-`);
-
 interface PageProps {
   searchParams: Promise<{
     operacion?: string;
@@ -65,18 +74,15 @@ interface PageProps {
   }>;
 }
 
-const parseMultiple = (value: string | undefined): string[] => {
-  if (!value) return [];
-  return value.split(",").filter(Boolean);
-};
-
 export default async function PropiedadesPage({ searchParams }: PageProps) {
   const params = await searchParams;
 
   const operationType = params.operacion || "";
   const propertyTypeSlugs = parseMultiple(params.propiedad);
   const citySlugs = parseMultiple(params.localidad);
-  const roomsList = parseMultiple(params.dormitorios).map((r) => parseInt(r, 10));
+  const roomsList = parseMultiple(params.dormitorios)
+    .map((r) => parseInt(r, 10))
+    .filter((room) => Number.isFinite(room));
   const parsedPage = params.pagina ? parseInt(params.pagina, 10) : 1;
   const currentPage = Number.isFinite(parsedPage) ? Math.max(1, parsedPage) : 1;
 
@@ -86,9 +92,9 @@ export default async function PropiedadesPage({ searchParams }: PageProps) {
   const [
     { data: properties },
     { data: totalCount },
-    { data: cities },
-    { data: propertyTypes },
-    { data: roomCounts },
+    cities,
+    propertyTypes,
+    roomCounts,
   ] = await Promise.all([
     sanityFetch({
       query: PROPERTIES_QUERY,
@@ -110,24 +116,15 @@ export default async function PropiedadesPage({ searchParams }: PageProps) {
         roomsList,
       },
     }),
-    sanityFetch({ query: CITIES_QUERY }),
-    sanityFetch({ query: PROPERTY_TYPES_QUERY }),
-    sanityFetch({ query: ROOM_COUNTS_QUERY }),
+    getCachedCities(),
+    getCachedPropertyTypes(),
+    getCachedRoomCounts(),
   ]);
 
   const totalPages = Math.ceil((totalCount || 0) / PAGE_SIZE);
+  const propertiesList = (properties || []) as PropertyListItem[];
 
-  const filterOptions = {
-    cities: (cities || []).filter(
-      (c): c is { name: string; slug: string } => c.name !== null && c.slug !== null
-    ),
-    propertyTypes: (propertyTypes || []).filter(
-      (t): t is { name: string; slug: string } => t.name !== null && t.slug !== null
-    ),
-    roomCounts: (roomCounts || []).filter(
-      (r: number | null): r is number => r !== null && r !== undefined
-    ),
-  };
+  const filterOptions = buildFilterOptions(cities, propertyTypes, roomCounts);
 
   const currentSearchParams = {
     operacion: operationType || undefined,
@@ -147,7 +144,17 @@ export default async function PropiedadesPage({ searchParams }: PageProps) {
       <h1 className="text-center mb-4 fw-bold">Propiedades</h1>
 
       <PropertiesLayout filterOptions={filterOptions} totalCount={totalCount || 0}>
-        <PropertiesGrid properties={properties || []} />
+        <PropertiesGrid
+          properties={propertiesList.map((property) => ({
+            ...property,
+            lqip:
+              (
+                property.image as {
+                  asset?: { metadata?: { lqip?: string | null } | null } | null;
+                } | null
+              )?.asset?.metadata?.lqip ?? null,
+          }))}
+        />
 
         <Pagination
           currentPage={currentPage}

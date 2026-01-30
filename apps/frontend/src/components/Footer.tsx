@@ -1,8 +1,7 @@
-"use client";
-
 import Image from "next/image";
 import { urlFor } from "@/sanity/lib/image";
 import type { SITE_SETTINGS_QUERY_RESULT } from "@/sanity/types";
+import ScrollToTopButton from "./ScrollToTopButton";
 import "./Footer.css";
 
 type SiteSettings = NonNullable<SITE_SETTINGS_QUERY_RESULT>;
@@ -22,10 +21,6 @@ export default function Footer({
   copyrightText,
   certificationLogos,
 }: FooterProps) {
-  const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  };
-
   const logoUrl = logo?.asset ? urlFor(logo).width(300).url() : null;
   const logoAlt = logo?.alt || siteName || "";
 
@@ -47,13 +42,7 @@ export default function Footer({
 
           {/* Center: Back to top + Copyright */}
           <div className="footer-center">
-            <button
-              className="back-to-top"
-              onClick={scrollToTop}
-              aria-label="Volver arriba"
-            >
-              <i className="bi bi-chevron-up"></i>
-            </button>
+            <ScrollToTopButton />
             {copyrightText && (
               <p className="copyright">{copyrightText}</p>
             )}

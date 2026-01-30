@@ -91,6 +91,8 @@ Next.js App Router project:
 
 - `apps/frontend/src/app/` - Routes and layouts (file-based routing)
 - `apps/frontend/src/components/` - React components
+- `apps/frontend/src/lib/` - Shared utility functions (e.g., `filters.ts`)
+- `apps/frontend/src/types/` - Shared TypeScript type definitions (e.g., `filters.ts`)
 - `apps/frontend/src/sanity/` - Sanity client and configuration
 - `apps/frontend/src/styles/` - Global styles and CSS variables
 
@@ -114,8 +116,9 @@ Sanity Studio project:
 ### Frontend Routes
 
 - `/` - Home page with search, featured properties, and location map
-- `/propiedades` - Properties listing page
-- `/propiedades/[slug]` - Property detail page with images, description, and location map
+- `/propiedades` - Properties listing page with filters, pagination, and active filter badges
+- `/propiedades/[slug]` - Property detail page with images, description, JSON-LD structured data, and location map
+- Custom `not-found.tsx` (branded 404 page) and `error.tsx` (error boundary with retry) at app root
 
 ### Content Integration
 
@@ -126,11 +129,13 @@ Sanity Studio project:
 ## Components
 
 - **MapSection** - Reusable component for displaying embedded Google Maps. Renders full-width iframe (450px height) when address is provided, returns null if no address exists.
+- **ContactButton** - Client component that wraps a button + dynamically imported `ContactModal`. Used on the property detail page (server component) to open the contact form without making the entire page a client component.
+- **ContactModal** - Client component with Web3Forms integration for the contact form. Dynamically imported (`next/dynamic`, `ssr: false`) wherever used.
 
 ## Conventions
 
 - Components in `/app` are Server Components unless marked with `"use client"`
-- Use Next.js Metadata API for SEO (exported `metadata` object)
+- Use Next.js Metadata API for SEO (exported `metadata` object). The root layout uses a `title.template` (`"%s | DZTS Inmobiliaria"`), so child pages only set the page-specific part (e.g., `title: "Propiedades"`, not `"Propiedades | DZTS Inmobiliaria"`).
 - Use `next/image` for optimized images
 - Dark mode supported via `prefers-color-scheme` CSS media query.
 - Don't add too many comments to the code.
@@ -138,3 +143,32 @@ Sanity Studio project:
 - Use mobile first for css.
 - Prefer bootstrap css classes and components over custom css.
 - Use CSS over JavaScript when possible for animations and dynamic behavior.
+- Format prices with `toLocaleString("es-AR")` and display currency as `AR$`/`US$` (not `ARS`/`USD`).
+- Shared types go in `src/types/`, shared utilities in `src/lib/`. Do not duplicate type definitions or utility functions across components — import from the shared location.
+
+## Caching Strategy
+
+The frontend uses Next.js 16 cache components (`"use cache"` directive + `cacheLife()`):
+
+- **`cacheLife("hours")`** - For rarely-changing data: site settings, filter option lists (cities, property types, room counts), map address.
+- **`cacheLife("minutes")`** - For content that updates more often: featured properties, individual property detail pages.
+- Cached functions are standalone `async function` with `"use cache"` as the first line, calling `sanityFetch` inside.
+
+## SEO
+
+- Root layout defines `metadata.title.template` so child pages only set the page-specific title string.
+- Property detail pages include `<script type="application/ld+json">` with Schema.org `RealEstateListing` data (name, price, address, images).
+- Property detail pages generate OpenGraph metadata via `generateMetadata()`.
+- Ensure only one `<h1>` per page. Section headings within page content should use `<h2>` or lower.
+
+## Recent Implementation Notes
+
+- Listing skeleton: `apps/frontend/src/app/propiedades/loading.tsx` mirrors `PropertiesLayout` (filters sidebar + badges/count + grid).
+- Property detail skeleton: `apps/frontend/src/app/propiedades/[slug]/loading.tsx` includes carousel-sized media + 450px map placeholder.
+- Sanity property images can have `url`/`metadata` as `null`; normalize before passing to `ImageCarousel` and only cast to `SanityImageSource` when `url` is present.
+- `ImageCarousel` accepts `asset?: SanityImageSource | null` and `lqip?: string | null`. Uses `.quality(80)` for consistent compression.
+- Property detail `description` is Portable Text; use `PortableTextBlock[] | null` and import `@portabletext/types` (dependency added to frontend).
+- `FilterOption` and `FilterOptions` types live in `src/types/filters.ts`. The `parseMultiple()` and `buildFilterOptions()` helpers live in `src/lib/filters.ts`. Both pages and multiple components import from these shared modules.
+- `ContactButton` is the pattern for triggering the contact modal from server components — a thin client component that manages modal state and dynamically imports `ContactModal`.
+- Only one image per page should have `priority` (the LCP candidate). Do not mark logos or secondary images as priority.
+- The `html` element uses `lang="es"` (Spanish site targeting Argentine audience).

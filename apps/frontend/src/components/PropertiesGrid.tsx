@@ -1,21 +1,12 @@
+import type { ComponentProps } from "react";
 import PropertyCard from "./PropertyCard";
-import type { SanityImageSource } from "@sanity/image-url";
 
-interface Property {
+type PropertyCardData = ComponentProps<typeof PropertyCard> & {
   _id: string;
-  title: string | null;
-  slug: string | null;
-  subtitle?: string | null;
-  price?: number | null;
-  currency?: string | null;
-  operationType?: string | null;
-  image?: SanityImageSource | null;
-  rooms?: number | null;
-  city?: string | null;
-}
+};
 
 interface PropertiesGridProps {
-  properties: Property[];
+  properties: PropertyCardData[];
 }
 
 export default function PropertiesGrid({ properties }: PropertiesGridProps) {
@@ -47,6 +38,7 @@ export default function PropertiesGrid({ properties }: PropertiesGridProps) {
             currency={property.currency}
             operationType={property.operationType}
             image={property.image}
+            lqip={property.lqip}
             rooms={property.rooms}
             city={property.city}
           />
