@@ -172,3 +172,8 @@ The frontend uses Next.js 16 cache components (`"use cache"` directive + `cacheL
 - `ContactButton` is the pattern for triggering the contact modal from server components — a thin client component that manages modal state and dynamically imports `ContactModal`.
 - Only one image per page should have `priority` (the LCP candidate). Do not mark logos or secondary images as priority.
 - The `html` element uses `lang="es"` (Spanish site targeting Argentine audience).
+- Home page sections come from the `homePage` singleton (`apps/frontend/src/sanity/queries/homePage.ts`) and render via `TextImageSection` with Portable Text and images.
+- `homePage.sections[]` includes optional `anchorId` for header anchors (e.g., `/#servicios`, `/#nosotros`).
+- Header smooth-scrolls to anchors when already on `/` and updates the hash without full navigation.
+- `TextImageSection` supports a carousel (multiple images) and uses `asset.url` directly when present (fallback to `urlFor`).
+- Anchored sections use `scroll-margin-top: 60px` to offset the sticky header.

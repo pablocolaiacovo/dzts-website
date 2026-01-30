@@ -268,3 +268,8 @@ Frontend environment variables (in `apps/frontend/.env.local`):
 - `ContactButton` is used on the property detail page to open the contact modal from within a server component.
 - Property detail page includes JSON-LD structured data (`RealEstateListing` schema) for SEO.
 - Property detail page data is cached via `getCachedProperty()` with `cacheLife("minutes")`.
+- Home page sections are powered by the `homePage` singleton: query in `apps/frontend/src/sanity/queries/homePage.ts` and render via `TextImageSection` (Portable Text + images).
+- `homePage.sections[]` includes optional `anchorId` (kebab-case) to support header anchors like `/#servicios` and `/#nosotros`.
+- `Header` smooth-scrolls when clicking `/#...` links on the home page and updates the hash without a full navigation.
+- `TextImageSection` handles single image vs carousel; prefer `asset.url` when present and fall back to `urlFor(...)` if needed.
+- Anchored sections use `scroll-margin-top: 60px` to account for the sticky header.
