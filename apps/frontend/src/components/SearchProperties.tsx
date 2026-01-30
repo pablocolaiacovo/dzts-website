@@ -38,7 +38,7 @@ export default function SearchProperties({
         alt="Imagen de fondo del formulario de búsqueda"
         fill
         className="object-cover negative-z"
-        priority
+        sizes="100vw"
       />
 
       <div className="overlay position-absolute top-0 start-0 w-100 h-100 position-relative"></div>

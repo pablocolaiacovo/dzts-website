@@ -1,8 +1,7 @@
 {
-  "name": "dzts-sandbox",
+  "name": "dzts-studio",
   "private": true,
   "version": "1.0.0",
-  "license": "UNLICENSED",
   "scripts": {
     "dev": "sanity dev",
     "start": "sanity start",

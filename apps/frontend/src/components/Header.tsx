@@ -4,6 +4,7 @@ import dynamic from "next/dynamic";
 import Image from "next/image";
 import Link from "next/link";
 import { useRef, useState } from "react";
+import { usePathname } from "next/navigation";
 import { urlFor } from "@/sanity/lib/image";
 
 const ContactModal = dynamic(() => import("./ContactModal"), { ssr: false });
@@ -22,6 +23,7 @@ type HeaderProps = {
 export default function Header({ logo, siteName, navigation }: HeaderProps) {
   const [showContactModal, setShowContactModal] = useState(false);
   const navCollapseRef = useRef<HTMLDivElement>(null);
+  const pathname = usePathname();
 
   const collapseNav = () => {
     const navElement = navCollapseRef.current;
@@ -38,6 +40,16 @@ export default function Header({ logo, siteName, navigation }: HeaderProps) {
 
   const handleNavClick = () => {
     collapseNav();
+  };
+
+  const handleAnchorClick = (e: React.MouseEvent, targetId: string) => {
+    e.preventDefault();
+    collapseNav();
+    const target = document.getElementById(targetId);
+    if (target) {
+      target.scrollIntoView({ behavior: "smooth", block: "start" });
+      window.history.replaceState(null, "", `/#${targetId}`);
+    }
   };
 
   const renderNavItem = (item: NavItem) => {
@@ -69,12 +81,25 @@ export default function Header({ logo, siteName, navigation }: HeaderProps) {
       );
     }
 
+    const internalPath = item.internalPath || "/";
+    const anchorId = internalPath.startsWith("/#")
+      ? internalPath.split("#")[1]
+      : null;
+
+    if (anchorId && pathname === "/") {
+      return (
+        <a
+          href={internalPath}
+          className="nav-link"
+          onClick={(e) => handleAnchorClick(e, anchorId)}
+        >
+          {item.label}
+        </a>
+      );
+    }
+
     return (
-      <Link
-        href={item.internalPath || "/"}
-        className="nav-link"
-        onClick={handleNavClick}
-      >
+      <Link href={internalPath} className="nav-link" onClick={handleNavClick}>
         {item.label}
       </Link>
     );

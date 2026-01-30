@@ -1,9 +1,11 @@
 import { defineField, defineType } from "sanity";
+import { HomeIcon } from "@sanity/icons";
 
 export const propertyType = defineType({
   name: "property",
   title: "Propiedades",
   type: "document",
+  icon: HomeIcon,
   fields: [
     defineField({
       name: "slug",

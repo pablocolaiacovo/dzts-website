@@ -1,12 +1,22 @@
 import type { StructureResolver } from "sanity/structure";
-import { CogIcon } from "@sanity/icons";
+import { CogIcon, HomeIcon } from "@sanity/icons";
 
-const SINGLETONS = ["siteSettings"];
+const SINGLETONS = ["siteSettings", "homePage"];
 
 export const structure: StructureResolver = (S) =>
   S.list()
     .title("Contenido")
     .items([
+      S.listItem()
+        .title("Página de Inicio")
+        .icon(HomeIcon)
+        .child(
+          S.document()
+            .schemaType("homePage")
+            .documentId("homePage")
+            .title("Página de Inicio")
+        ),
+
       S.listItem()
         .title("Configuración del Sitio")
         .icon(CogIcon)
