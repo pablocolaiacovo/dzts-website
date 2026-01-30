@@ -7,6 +7,7 @@ import {
   getCachedPropertyTypes,
   getCachedRoomCounts,
 } from "@/sanity/queries/properties";
+import { getCachedHomeSections } from "@/sanity/queries/homePage";
 import FeaturedProperties from "@/components/FeaturedProperties";
 import SearchProperties from "@/components/SearchProperties";
 import TextImageSection from "@/components/TextImageSection";
@@ -31,12 +32,14 @@ async function getCachedMapAddress() {
 }
 
 export default async function Home() {
-  const [cities, propertyTypes, roomCounts, address] = await Promise.all([
-    getCachedCities(),
-    getCachedPropertyTypes(),
-    getCachedRoomCounts(),
-    getCachedMapAddress(),
-  ]);
+  const [cities, propertyTypes, roomCounts, address, sections] =
+    await Promise.all([
+      getCachedCities(),
+      getCachedPropertyTypes(),
+      getCachedRoomCounts(),
+      getCachedMapAddress(),
+      getCachedHomeSections(),
+    ]);
 
   const filterOptions = buildFilterOptions(cities, propertyTypes, roomCounts);
 
@@ -44,17 +47,9 @@ export default async function Home() {
     <>
       <SearchProperties filterOptions={filterOptions} />
       <FeaturedProperties />
-      <TextImageSection
-        title="Nosotros"
-        mainParagraph="Este es el párrafo principal que aparece debajo del título."
-        subtitle="dzts inmobiliaria"
-        paragraphs={[
-          "Lorem Ipsum is simply dummy text of the printing and typesetting industry.",
-          "Más texto de ejemplo para la sección.",
-        ]}
-        image="/Images/backgroun.jpg"
-        backgroundColor="var(--bs-primary)"
-      />
+      {sections?.map((section, index) => (
+        <TextImageSection key={index} index={index} {...section} />
+      ))}
       <MapSection address={address} />
     </>
   );

@@ -1,5 +1,5 @@
 import { defineType, defineField, defineArrayMember } from "sanity";
-import { CogIcon } from "@sanity/icons";
+import { CogIcon, LinkIcon, MenuIcon } from "@sanity/icons";
 
 export const siteSettingsType = defineType({
   name: "siteSettings",
@@ -48,11 +48,13 @@ export const siteSettingsType = defineType({
       title: "Navegación Principal",
       type: "array",
       group: "navigation",
+      icon: MenuIcon,
       of: [
         defineArrayMember({
           type: "object",
           name: "navItem",
           title: "Item de Navegación",
+          icon: MenuIcon,
           fields: [
             defineField({
               name: "label",
@@ -105,7 +107,7 @@ export const siteSettingsType = defineType({
                   : linkType === "external"
                     ? "Externo"
                     : "Acción";
-              return { title, subtitle: typeLabel };
+              return { title, subtitle: typeLabel, media: LinkIcon };
             },
           },
         }),

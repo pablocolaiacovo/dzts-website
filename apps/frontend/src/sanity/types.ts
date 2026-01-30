@@ -84,20 +84,14 @@ export type Property = {
   featured?: boolean;
 };
 
-export type SanityImageCrop = {
-  _type: "sanity.imageCrop";
-  top?: number;
-  bottom?: number;
-  left?: number;
-  right?: number;
-};
-
-export type SanityImageHotspot = {
-  _type: "sanity.imageHotspot";
-  x?: number;
-  y?: number;
-  height?: number;
-  width?: number;
+export type City = {
+  _id: string;
+  _type: "city";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  name?: string;
+  slug?: Slug;
 };
 
 export type Slug = {
@@ -116,14 +110,20 @@ export type PropertyTypeCategory = {
   slug?: Slug;
 };
 
-export type City = {
-  _id: string;
-  _type: "city";
-  _createdAt: string;
-  _updatedAt: string;
-  _rev: string;
-  name?: string;
-  slug?: Slug;
+export type SanityImageCrop = {
+  _type: "sanity.imageCrop";
+  top?: number;
+  bottom?: number;
+  left?: number;
+  right?: number;
+};
+
+export type SanityImageHotspot = {
+  _type: "sanity.imageHotspot";
+  x?: number;
+  y?: number;
+  height?: number;
+  width?: number;
 };
 
 export type SiteSettings = {
@@ -186,6 +186,49 @@ export type SiteSettings = {
     title?: string;
     url?: string;
     _type: "certificationLogo";
+    _key: string;
+  }>;
+};
+
+export type HomePage = {
+  _id: string;
+  _type: "homePage";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  sections?: Array<{
+    title?: string;
+    anchorId?: string;
+    content?: Array<{
+      children?: Array<{
+        marks?: Array<string>;
+        text?: string;
+        _type: "span";
+        _key: string;
+      }>;
+      style?: "normal" | "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "blockquote";
+      listItem?: "bullet" | "number";
+      markDefs?: Array<{
+        href?: string;
+        _type: "link";
+        _key: string;
+      }>;
+      level?: number;
+      _type: "block";
+      _key: string;
+    }>;
+    images?: Array<{
+      asset?: SanityImageAssetReference;
+      media?: unknown;
+      hotspot?: SanityImageHotspot;
+      crop?: SanityImageCrop;
+      alt?: string;
+      _type: "image";
+      _key: string;
+    }>;
+    imagePosition?: "left" | "right";
+    backgroundColor?: "primary" | "dark" | "light" | "white";
+    _type: "section";
     _key: string;
   }>;
 };
@@ -292,12 +335,13 @@ export type AllSanitySchemaTypes =
   | PropertyTypeCategoryReference
   | CityReference
   | Property
-  | SanityImageCrop
-  | SanityImageHotspot
+  | City
   | Slug
   | PropertyTypeCategory
-  | City
+  | SanityImageCrop
+  | SanityImageHotspot
   | SiteSettings
+  | HomePage
   | SanityImagePaletteSwatch
   | SanityImagePalette
   | SanityImageDimensions
@@ -431,6 +475,43 @@ export type FEATURED_QUERY_RESULT = Array<{
   } | null;
 }>;
 
+// Source: ../frontend/src/sanity/queries/homePage.ts
+// Variable: HOME_SECTIONS_QUERY
+// Query: *[_type == "homePage"][0].sections[]{    title,    anchorId,    content,    imagePosition,    backgroundColor,    images[]{ asset->{ url, metadata { lqip } }, alt }  }
+export type HOME_SECTIONS_QUERY_RESULT = Array<{
+  title: string | null;
+  anchorId: string | null;
+  content: Array<{
+    children?: Array<{
+      marks?: Array<string>;
+      text?: string;
+      _type: "span";
+      _key: string;
+    }>;
+    style?: "blockquote" | "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "normal";
+    listItem?: "bullet" | "number";
+    markDefs?: Array<{
+      href?: string;
+      _type: "link";
+      _key: string;
+    }>;
+    level?: number;
+    _type: "block";
+    _key: string;
+  }> | null;
+  imagePosition: "left" | "right" | null;
+  backgroundColor: "dark" | "light" | "primary" | "white" | null;
+  images: Array<{
+    asset: {
+      url: string | null;
+      metadata: {
+        lqip: string | null;
+      } | null;
+    } | null;
+    alt: string | null;
+  }> | null;
+}> | null;
+
 // Source: ../frontend/src/sanity/queries/properties.ts
 // Variable: CITIES_QUERY
 // Query: *[_type == "city"] | order(name asc) { name, "slug": slug.current }
@@ -531,6 +612,7 @@ declare module "@sanity/client" {
     '\n  *[_type == "property"\n    && ($operationType == "" || operationType == $operationType)\n    && (count($propertyTypeSlugs) == 0 || propertyType->slug.current in $propertyTypeSlugs)\n    && (count($citySlugs) == 0 || city->slug.current in $citySlugs)\n    && (count($roomsList) == 0 || rooms in $roomsList)\n  ] | order(publishedAt desc)[$start...$end] {\n    _id,\n    title,\n    "slug": slug.current,\n    subtitle,\n    price,\n    currency,\n    operationType,\n    "propertyType": propertyType->name,\n    "city": city->name,\n    rooms,\n    "image": images[0] { asset->{ _id, url, metadata { lqip } } }\n  }\n': PROPERTIES_QUERY_RESULT;
     '\n  count(*[_type == "property"\n    && ($operationType == "" || operationType == $operationType)\n    && (count($propertyTypeSlugs) == 0 || propertyType->slug.current in $propertyTypeSlugs)\n    && (count($citySlugs) == 0 || city->slug.current in $citySlugs)\n    && (count($roomsList) == 0 || rooms in $roomsList)\n  ])\n': COUNT_QUERY_RESULT;
     '*\n  [_type == "property" && featured == true]\n  | order(publishedAt desc)[0...6]\n  {\n    _id,\n    title,\n    "slug": slug.current,\n    subtitle,\n    price,\n    currency,\n    operationType,\n    rooms,\n    "city": city->name,\n    "image": images[0] { asset->{ _id, url, metadata { lqip } } }\n  }': FEATURED_QUERY_RESULT;
+    '\n  *[_type == "homePage"][0].sections[]{\n    title,\n    anchorId,\n    content,\n    imagePosition,\n    backgroundColor,\n    images[]{ asset->{ url, metadata { lqip } }, alt }\n  }\n': HOME_SECTIONS_QUERY_RESULT;
     '\n  *[_type == "city"] | order(name asc) { name, "slug": slug.current }\n': CITIES_QUERY_RESULT;
     '\n  *[_type == "propertyTypeCategory"] | order(name asc) { name, "slug": slug.current }\n': PROPERTY_TYPES_QUERY_RESULT;
     '\n  array::unique(*[_type == "property" && defined(rooms)].rooms) | order(@ asc)\n': ROOM_COUNTS_QUERY_RESULT;

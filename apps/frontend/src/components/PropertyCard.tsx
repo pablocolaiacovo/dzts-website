@@ -47,8 +47,8 @@ export default function PropertyCard({
             width={400}
             height={220}
             sizes="(min-width: 992px) 33vw, (min-width: 768px) 50vw, 100vw"
-            className="card-img-top rounded-top-4"
-            style={{ objectFit: "cover", height: 220 }}
+            className="card-img-top rounded-top-4 object-fit-cover"
+            style={{ objectFit: "cover" }}
             {...(lqip ? { placeholder: "blur" as const, blurDataURL: lqip } : {})}
           />
           {operationType && (
