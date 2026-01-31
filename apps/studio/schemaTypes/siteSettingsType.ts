@@ -11,6 +11,7 @@ export const siteSettingsType = defineType({
     { name: "navigation", title: "Navegación" },
     { name: "contact", title: "Contacto" },
     { name: "footer", title: "Pie de Página" },
+    { name: "seo", title: "SEO" },
   ],
   fields: [
     // Logo y Marca
@@ -258,6 +259,13 @@ export const siteSettingsType = defineType({
           },
         }),
       ],
+    }),
+
+    defineField({
+      name: "seo",
+      title: "SEO",
+      type: "seo",
+      group: "seo",
     }),
   ],
   preview: {

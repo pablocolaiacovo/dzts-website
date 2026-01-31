@@ -7,6 +7,8 @@ import { defineQuery } from "next-sanity";
 import type { SanityImageSource } from "@sanity/image-url";
 import { sanityFetch } from "@/sanity/lib/live";
 import { urlFor } from "@/sanity/lib/image";
+import { getCachedSiteSeo } from "@/sanity/queries/seo";
+import { resolveMetadata } from "@/lib/seo";
 
 import Breadcrumb from "@/components/Breadcrumb";
 import ContactButton from "@/components/ContactButton";
@@ -25,13 +27,15 @@ const PROPERTY_QUERY = defineQuery(`
     operationType,
     currency,
     "city": city->name,
-    "images": images[] { asset->{ _id, url, metadata { lqip } } }
+    "images": images[] { asset->{ _id, url, metadata { lqip } } },
+    "ogImage": images[0],
+    seo {
+      metaTitle,
+      metaDescription,
+      ogImage { asset->{ url } },
+      noIndex
+    }
   }
-`);
-
-const METADATA_QUERY = defineQuery(`
-  *[_type == "property" && slug.current == $slug][0]
-  { title, subtitle, "image": images[0] }
 `);
 
 interface PropertyImageAsset {
@@ -55,32 +59,13 @@ interface PropertyDetail {
   currency?: string | null;
   city?: string | null;
   images?: Array<PropertyImage | null> | null;
-}
-
-export async function generateMetadata({
-  params,
-}: {
-  params: Promise<{ slug: string }>;
-}): Promise<Metadata> {
-  const { slug } = await params;
-  const { data } = await sanityFetch({ query: METADATA_QUERY, params: { slug } });
-
-  if (!data) return {};
-
-  const title = data.title || "Propiedad";
-  const description = data.subtitle || "Propiedad en DZTS Inmobiliaria";
-
-  return {
-    title,
-    description,
-    openGraph: {
-      title,
-      description,
-      ...(data.image
-        ? { images: [{ url: urlFor(data.image).width(1200).height(630).url() }] }
-        : {}),
-    },
-  };
+  ogImage?: SanityImageSource | null;
+  seo?: {
+    metaTitle?: string | null;
+    metaDescription?: string | null;
+    ogImage?: { asset?: { url?: string | null } | null } | null;
+    noIndex?: boolean | null;
+  } | null;
 }
 
 async function getCachedProperty(slug: string) {
@@ -91,6 +76,30 @@ async function getCachedProperty(slug: string) {
     params: { slug },
   });
   return data as PropertyDetail | null;
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await params;
+  const [property, siteSeo] = await Promise.all([
+    getCachedProperty(slug),
+    getCachedSiteSeo(),
+  ]);
+
+  if (!property) return {};
+
+  const ogImageUrl = property.ogImage
+    ? urlFor(property.ogImage).width(1200).height(630).url()
+    : undefined;
+
+  return resolveMetadata(property.seo, siteSeo, {
+    title: property.title,
+    description: property.subtitle,
+    ogImageUrl,
+  });
 }
 
 export default async function PropertyPage({
