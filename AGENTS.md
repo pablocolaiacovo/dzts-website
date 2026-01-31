@@ -174,6 +174,7 @@ Frontend environment variables (in `apps/frontend/.env.local`):
 - Client-accessible vars prefixed with `NEXT_PUBLIC_`
 - Required: `NEXT_PUBLIC_SANITY_PROJECT_ID`, `NEXT_PUBLIC_SANITY_DATASET`
 - Optional: `NEXT_PUBLIC_SANITY_API_VERSION` (has default value)
+- Server-only: `SANITY_REVALIDATE_SECRET` (HMAC secret for Sanity webhook revalidation, no `NEXT_PUBLIC_` prefix)
 
 ### Next.js Specifics
 
@@ -186,10 +187,14 @@ Frontend environment variables (in `apps/frontend/.env.local`):
 
 ### Caching
 
-- Use `"use cache"` directive + `cacheLife()` from `next/cache` for server-side data caching
-- `cacheLife("hours")` for rarely-changing data (site settings, filter option lists)
-- `cacheLife("minutes")` for content that updates more often (featured properties, property detail)
-- Pattern: standalone `async function` with `"use cache"` as first line, wrapping `sanityFetch` calls
+- Use `"use cache"` directive + `cacheLife()` + `cacheTag()` from `next/cache` for server-side data caching.
+- `cacheLife("hours")` for rarely-changing data (site settings, SEO, page headings).
+- `cacheLife("minutes")` for content that updates more often (featured properties, property detail, home sections, filter lists).
+- Pattern: standalone `async function` with `"use cache"` as first line, then `cacheLife(...)`, then `cacheTag(...)`, wrapping `sanityFetch` calls.
+- Every cached function must include a `cacheTag("<sanity_type>")` call matching the Sanity document `_type` it queries (e.g., `cacheTag("property")`, `cacheTag("siteSettings")`).
+- On-demand revalidation: `POST /api/revalidate` receives Sanity webhook payloads, validates the HMAC signature via `parseBody` from `next-sanity/webhook`, and calls `revalidateTag(body._type, "max")`.
+- In Next.js 16, `revalidateTag()` requires a second argument (cache life profile). Use `"max"` to invalidate entries across all profiles.
+- Without the webhook, `cacheLife` TTLs still apply as a fallback.
 
 ### SEO
 
@@ -273,3 +278,6 @@ Frontend environment variables (in `apps/frontend/.env.local`):
 - `Header` smooth-scrolls when clicking `/#...` links on the home page and updates the hash without a full navigation.
 - `TextImageSection` handles single image vs carousel; prefer `asset.url` when present and fall back to `urlFor(...)` if needed.
 - Anchored sections use `scroll-margin-top: 60px` to account for the sticky header.
+- Webhook revalidation route: `src/app/api/revalidate/route.ts`. Uses `parseBody` from `next-sanity/webhook` for HMAC validation and `revalidateTag(type, "max")` from `next/cache`.
+- In Next.js 16, `revalidateTag()` requires two arguments: `(tag, profile)`. Pass `"max"` as the profile to revalidate all cache entries for a tag regardless of their original `cacheLife`.
+- The `/propiedades` listing page calls `sanityFetch` directly without `"use cache"` (dynamic `searchParams`), so it has no cache tag and is unaffected by revalidation.

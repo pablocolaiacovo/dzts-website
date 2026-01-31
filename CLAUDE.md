@@ -73,6 +73,7 @@ Each app has its own `.env.local` file with different prefixes (Next.js uses `NE
 | `NEXT_PUBLIC_SANITY_PROJECT_ID`  | Sanity project identifier         |
 | `NEXT_PUBLIC_SANITY_DATASET`     | Sanity dataset name               |
 | `NEXT_PUBLIC_WEB3FORMS_KEY`      | Web3Forms API key for contact form|
+| `SANITY_REVALIDATE_SECRET`       | HMAC secret for Sanity webhook (server-only, no `NEXT_PUBLIC_` prefix) |
 
 ### Studio (`apps/studio/.env.local`)
 
@@ -148,11 +149,30 @@ Sanity Studio project:
 
 ## Caching Strategy
 
-The frontend uses Next.js 16 cache components (`"use cache"` directive + `cacheLife()`):
+The frontend uses Next.js 16 cache components (`"use cache"` directive + `cacheLife()` + `cacheTag()`):
 
-- **`cacheLife("hours")`** - For rarely-changing data: site settings, filter option lists (cities, property types, room counts), map address.
-- **`cacheLife("minutes")`** - For content that updates more often: featured properties, individual property detail pages.
+- **`cacheLife("hours")`** - For rarely-changing data: site settings, SEO, page headings, map address.
+- **`cacheLife("minutes")`** - For content that updates more often: featured properties, individual property detail pages, home sections, filter option lists.
 - Cached functions are standalone `async function` with `"use cache"` as the first line, calling `sanityFetch` inside.
+- Every cached function includes a `cacheTag()` call matching the Sanity document `_type` it queries, enabling on-demand revalidation via webhook.
+
+### Cache Tags
+
+| Tag | Sanity `_type` | Cached functions |
+|-----|----------------|-----------------|
+| `"siteSettings"` | `siteSettings` | `getSiteSettings()`, `getCachedMapAddress()`, `getCachedSiteSeo()` |
+| `"property"` | `property` | `getCachedProperty()`, `FeaturedProperties`, `getCachedRoomCounts()` |
+| `"homePage"` | `homePage` | `getCachedHomeSections()`, `getCachedHomeContent()`, `getCachedHomeSeo()` |
+| `"propiedadesPage"` | `propiedadesPage` | `getCachedPropiedadesHeading()`, `getCachedPropiedadesSeo()` |
+| `"city"` | `city` | `getCachedCities()` |
+| `"propertyTypeCategory"` | `propertyTypeCategory` | `getCachedPropertyTypes()` |
+
+### On-Demand Revalidation
+
+- A webhook route at `POST /api/revalidate` (`src/app/api/revalidate/route.ts`) receives Sanity webhook payloads, validates the HMAC signature via `parseBody` from `next-sanity/webhook`, and calls `revalidateTag(body._type, "max")`.
+- The `"max"` second argument is required by Next.js 16 to invalidate cache entries across all cache life profiles.
+- The webhook must be configured in the Sanity dashboard (see README for setup instructions).
+- Without the webhook (e.g. local development), `cacheLife` TTLs still apply as a fallback.
 
 ## SEO
 
@@ -177,3 +197,6 @@ The frontend uses Next.js 16 cache components (`"use cache"` directive + `cacheL
 - Header smooth-scrolls to anchors when already on `/` and updates the hash without full navigation.
 - `TextImageSection` supports a carousel (multiple images) and uses `asset.url` directly when present (fallback to `urlFor`).
 - Anchored sections use `scroll-margin-top: 60px` to offset the sticky header.
+- Webhook revalidation route: `src/app/api/revalidate/route.ts`. Uses `parseBody` from `next-sanity/webhook` for HMAC validation and `revalidateTag(type, "max")` from `next/cache`.
+- In Next.js 16, `revalidateTag()` requires two arguments: `(tag, profile)`. Pass `"max"` as the profile to revalidate all cache entries for a tag regardless of their original `cacheLife`.
+- The `/propiedades` listing page calls `sanityFetch` directly without `"use cache"` (dynamic `searchParams`), so it has no cache tag and is unaffected by revalidation.

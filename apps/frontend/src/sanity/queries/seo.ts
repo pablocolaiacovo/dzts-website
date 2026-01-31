@@ -1,5 +1,5 @@
 import { defineQuery } from "next-sanity";
-import { cacheLife } from "next/cache";
+import { cacheLife, cacheTag } from "next/cache";
 import { sanityFetch } from "@/sanity/lib/live";
 import type { SeoFields } from "@/types/seo";
 
@@ -29,6 +29,7 @@ const PROPIEDADES_SEO_QUERY = defineQuery(`
 export async function getCachedSiteSeo(): Promise<SeoFields | null> {
   "use cache";
   cacheLife("hours");
+  cacheTag("siteSettings");
   const { data } = await sanityFetch({ query: SITE_SEO_QUERY });
   return data;
 }
@@ -36,6 +37,7 @@ export async function getCachedSiteSeo(): Promise<SeoFields | null> {
 export async function getCachedHomeSeo(): Promise<SeoFields | null> {
   "use cache";
   cacheLife("hours");
+  cacheTag("homePage");
   const { data } = await sanityFetch({ query: HOME_SEO_QUERY });
   return data;
 }
@@ -43,6 +45,7 @@ export async function getCachedHomeSeo(): Promise<SeoFields | null> {
 export async function getCachedPropiedadesSeo(): Promise<SeoFields | null> {
   "use cache";
   cacheLife("hours");
+  cacheTag("propiedadesPage");
   const { data } = await sanityFetch({ query: PROPIEDADES_SEO_QUERY });
   return data;
 }

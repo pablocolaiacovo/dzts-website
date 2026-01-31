@@ -1,5 +1,5 @@
 import { defineQuery } from "next-sanity";
-import { cacheLife } from "next/cache";
+import { cacheLife, cacheTag } from "next/cache";
 import { sanityFetch } from "@/sanity/lib/live";
 
 export const HOME_SECTIONS_QUERY = defineQuery(`
@@ -17,6 +17,7 @@ export const HOME_SECTIONS_QUERY = defineQuery(`
 export async function getCachedHomeSections() {
   "use cache";
   cacheLife("minutes");
+  cacheTag("homePage");
   const { data } = await sanityFetch({ query: HOME_SECTIONS_QUERY });
   return data;
 }
@@ -33,6 +34,7 @@ const HOME_CONTENT_QUERY = defineQuery(`
 export async function getCachedHomeContent() {
   "use cache";
   cacheLife("hours");
+  cacheTag("homePage");
   const { data } = await sanityFetch({ query: HOME_CONTENT_QUERY });
   return data;
 }

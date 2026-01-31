@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { cacheLife } from "next/cache";
+import { cacheLife, cacheTag } from "next/cache";
 import { defineQuery } from "next-sanity";
 import { sanityFetch } from "@/sanity/lib/live";
 import {
@@ -35,6 +35,7 @@ const MAP_ADDRESS_QUERY = defineQuery(`
 async function getCachedMapAddress() {
   "use cache";
   cacheLife("hours");
+  cacheTag("siteSettings");
   const { data } = await sanityFetch({ query: MAP_ADDRESS_QUERY });
   return data;
 }
