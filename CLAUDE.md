@@ -46,6 +46,12 @@ pnpm deploy   # Deploy to Sanity hosting
 pnpm typegen  # Generate TypeScript types from schema
 ```
 
+## Model Selection / Subagents
+
+  1. Use Haiku subagents for: file searches, simple edits, running commands, linting
+  2. Use Sonnet subagents for: multi-file refactors, component creation, moderate features
+  3. Handle directly (Opus) only: architecture decisions, complex debugging, planning
+
 ## Tech Stack
 
 ### Frontend (`apps/frontend/`)
