@@ -126,3 +126,13 @@ curl -s http://localhost:3000/api/revalidate \
 ```
 
 A successful response looks like: `{"revalidated":true,"tag":"property"}`
+
+## CI
+
+A GitHub Actions workflow (`.github/workflows/ci.yml`) runs on every pull request targeting `dev` or `main`. It performs:
+
+1. **Lint** the frontend (`pnpm --filter frontend lint`)
+2. **Build** the frontend (`pnpm --filter frontend build`)
+3. **Build** the studio (`pnpm --filter dzts-studio exec sanity build`)
+
+The workflow uses placeholder environment variables so builds can compile without real Sanity/Web3Forms credentials. The studio build uses `exec sanity build` to skip the `prebuild` hook (schema extraction + typegen), which requires a live Sanity API connection

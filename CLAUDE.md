@@ -112,6 +112,19 @@ Sanity Studio project:
 - Feature branches follow the naming convention: `feat/feature-name`
 - Push changes and create PRs using `gh pr create` command
 
+## CI
+
+GitHub Actions workflow at `.github/workflows/ci.yml` runs on PRs to `dev` and `main`:
+
+1. **Lint frontend**: `pnpm --filter frontend lint`
+2. **Build frontend**: `pnpm --filter frontend build`
+3. **Build studio**: `pnpm --filter dzts-studio exec sanity build`
+
+- Uses `ubuntu-latest`, Node 20, pnpm 10.
+- Placeholder env vars (`ci-placeholder`) satisfy build-time validation without real credentials.
+- Studio build uses `exec sanity build` instead of `pnpm build` to skip the `prebuild` hook (schema extraction + typegen require a live Sanity API connection).
+- `--frozen-lockfile` ensures lockfile stays in sync with `package.json`.
+
 ## Page Structure & Routes
 
 ### Frontend Routes

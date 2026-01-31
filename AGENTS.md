@@ -44,6 +44,16 @@ pnpm typegen          # Generate TypeScript types from schema
 
 **Note**: This project does not currently have a test suite configured. No test commands are available.
 
+### CI
+
+GitHub Actions (`.github/workflows/ci.yml`) runs on PRs to `dev` and `main`:
+
+1. Lint frontend: `pnpm --filter frontend lint`
+2. Build frontend: `pnpm --filter frontend build`
+3. Build studio: `pnpm --filter dzts-studio exec sanity build`
+
+Placeholder env vars are set at the job level so builds compile without real credentials. The studio build uses `exec sanity build` to skip the `prebuild` hook (which requires a live Sanity API).
+
 ## Project Stack
 
 ### Frontend (`apps/frontend/`)
