@@ -1,5 +1,5 @@
 import { defineQuery } from "next-sanity";
-import { cacheLife } from "next/cache";
+import { cacheLife, cacheTag } from "next/cache";
 import { sanityFetch } from "@/sanity/lib/live";
 
 export const CITIES_QUERY = defineQuery(`
@@ -17,6 +17,7 @@ export const ROOM_COUNTS_QUERY = defineQuery(`
 export async function getCachedCities() {
   "use cache";
   cacheLife("minutes");
+  cacheTag("city");
   const { data } = await sanityFetch({ query: CITIES_QUERY });
   return data;
 }
@@ -24,6 +25,7 @@ export async function getCachedCities() {
 export async function getCachedPropertyTypes() {
   "use cache";
   cacheLife("minutes");
+  cacheTag("propertyTypeCategory");
   const { data } = await sanityFetch({ query: PROPERTY_TYPES_QUERY });
   return data;
 }
@@ -31,6 +33,7 @@ export async function getCachedPropertyTypes() {
 export async function getCachedRoomCounts() {
   "use cache";
   cacheLife("minutes");
+  cacheTag("property");
   const { data } = await sanityFetch({ query: ROOM_COUNTS_QUERY });
   return data;
 }

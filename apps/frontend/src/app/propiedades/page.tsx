@@ -8,6 +8,7 @@ import {
   getCachedRoomCounts,
 } from "@/sanity/queries/properties";
 import { getCachedPropiedadesSeo, getCachedSiteSeo } from "@/sanity/queries/seo";
+import { getCachedPropiedadesHeading } from "@/sanity/queries/propiedadesPage";
 import { resolveMetadata } from "@/lib/seo";
 import Breadcrumb from "@/components/Breadcrumb";
 import PropertiesLayout from "@/components/PropertiesLayout";
@@ -101,6 +102,7 @@ export default async function PropiedadesPage({ searchParams }: PageProps) {
     cities,
     propertyTypes,
     roomCounts,
+    heading,
   ] = await Promise.all([
     sanityFetch({
       query: PROPERTIES_QUERY,
@@ -125,6 +127,7 @@ export default async function PropiedadesPage({ searchParams }: PageProps) {
     getCachedCities(),
     getCachedPropertyTypes(),
     getCachedRoomCounts(),
+    getCachedPropiedadesHeading(),
   ]);
 
   const totalPages = Math.ceil((totalCount || 0) / PAGE_SIZE);
@@ -147,7 +150,7 @@ export default async function PropiedadesPage({ searchParams }: PageProps) {
           { label: "Propiedades" },
         ]}
       />
-      <h1 className="text-center mb-4 fw-bold">Propiedades</h1>
+      <h1 className="text-center mb-4 fw-bold">{heading}</h1>
 
       <PropertiesLayout filterOptions={filterOptions} totalCount={totalCount || 0}>
         <PropertiesGrid

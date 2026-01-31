@@ -212,6 +212,7 @@ export type PropiedadesPage = {
   _createdAt: string;
   _updatedAt: string;
   _rev: string;
+  heading?: string;
   seo?: Seo;
 };
 
@@ -221,6 +222,23 @@ export type HomePage = {
   _createdAt: string;
   _updatedAt: string;
   _rev: string;
+  heroHeading?: string;
+  heroImage?: {
+    asset?: SanityImageAssetReference;
+    media?: unknown;
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    _type: "image";
+  };
+  heroLogo?: {
+    asset?: SanityImageAssetReference;
+    media?: unknown;
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    alt?: string;
+    _type: "image";
+  };
+  featuredPropertiesHeading?: string;
   sections?: Array<{
     title?: string;
     anchorId?: string;
@@ -543,6 +561,32 @@ export type HOME_SECTIONS_QUERY_RESULT = Array<{
   }> | null;
 }> | null;
 
+// Source: ../frontend/src/sanity/queries/homePage.ts
+// Variable: HOME_CONTENT_QUERY
+// Query: *[_type == "homePage"][0] {    heroHeading,    heroImage { asset->{ url, metadata { lqip } } },    heroLogo { asset->{ url, metadata { lqip, dimensions } }, alt },    featuredPropertiesHeading  }
+export type HOME_CONTENT_QUERY_RESULT = {
+  heroHeading: string | null;
+  heroImage: {
+    asset: {
+      url: string | null;
+      metadata: {
+        lqip: string | null;
+      } | null;
+    } | null;
+  } | null;
+  heroLogo: {
+    asset: {
+      url: string | null;
+      metadata: {
+        lqip: string | null;
+        dimensions: SanityImageDimensions | null;
+      } | null;
+    } | null;
+    alt: string | null;
+  } | null;
+  featuredPropertiesHeading: string | null;
+} | null;
+
 // Source: ../frontend/src/sanity/queries/properties.ts
 // Variable: CITIES_QUERY
 // Query: *[_type == "city"] | order(name asc) { name, "slug": slug.current }
@@ -563,6 +607,11 @@ export type PROPERTY_TYPES_QUERY_RESULT = Array<{
 // Variable: ROOM_COUNTS_QUERY
 // Query: array::unique(*[_type == "property" && defined(rooms)].rooms) | order(@ asc)
 export type ROOM_COUNTS_QUERY_RESULT = Array<number>;
+
+// Source: ../frontend/src/sanity/queries/propiedadesPage.ts
+// Variable: PROPIEDADES_HEADING_QUERY
+// Query: *[_type == "propiedadesPage"][0].heading
+export type PROPIEDADES_HEADING_QUERY_RESULT = string | null;
 
 // Source: ../frontend/src/sanity/queries/seo.ts
 // Variable: SITE_SEO_QUERY
@@ -684,9 +733,11 @@ declare module "@sanity/client" {
     '\n  count(*[_type == "property"\n    && ($operationType == "" || operationType == $operationType)\n    && (count($propertyTypeSlugs) == 0 || propertyType->slug.current in $propertyTypeSlugs)\n    && (count($citySlugs) == 0 || city->slug.current in $citySlugs)\n    && (count($roomsList) == 0 || rooms in $roomsList)\n  ])\n': COUNT_QUERY_RESULT;
     '*\n  [_type == "property" && featured == true]\n  | order(publishedAt desc)[0...6]\n  {\n    _id,\n    title,\n    "slug": slug.current,\n    subtitle,\n    price,\n    currency,\n    operationType,\n    rooms,\n    "city": city->name,\n    "image": images[0] { asset->{ _id, url, metadata { lqip } } }\n  }': FEATURED_QUERY_RESULT;
     '\n  *[_type == "homePage"][0].sections[]{\n    _key,\n    title,\n    anchorId,\n    content,\n    imagePosition,\n    backgroundColor,\n    images[]{ asset->{ url, metadata { lqip } }, alt }\n  }\n': HOME_SECTIONS_QUERY_RESULT;
+    '\n  *[_type == "homePage"][0] {\n    heroHeading,\n    heroImage { asset->{ url, metadata { lqip } } },\n    heroLogo { asset->{ url, metadata { lqip, dimensions } }, alt },\n    featuredPropertiesHeading\n  }\n': HOME_CONTENT_QUERY_RESULT;
     '\n  *[_type == "city"] | order(name asc) { name, "slug": slug.current }\n': CITIES_QUERY_RESULT;
     '\n  *[_type == "propertyTypeCategory"] | order(name asc) { name, "slug": slug.current }\n': PROPERTY_TYPES_QUERY_RESULT;
     '\n  array::unique(*[_type == "property" && defined(rooms)].rooms) | order(@ asc)\n': ROOM_COUNTS_QUERY_RESULT;
+    '\n  *[_type == "propiedadesPage"][0].heading\n': PROPIEDADES_HEADING_QUERY_RESULT;
     '\n  *[_type == "siteSettings"][0].seo {\n    metaTitle,\n    metaDescription,\n    ogImage { asset->{ url } }\n  }\n': SITE_SEO_QUERY_RESULT;
     '\n  *[_type == "homePage"][0].seo {\n  metaTitle,\n  metaDescription,\n  ogImage { asset->{ url } },\n  noIndex\n}\n': HOME_SEO_QUERY_RESULT;
     '\n  *[_type == "propiedadesPage"][0].seo {\n  metaTitle,\n  metaDescription,\n  ogImage { asset->{ url } },\n  noIndex\n}\n': PROPIEDADES_SEO_QUERY_RESULT;

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
-import { cacheLife } from "next/cache";
+import { cacheLife, cacheTag } from "next/cache";
 import { Inter } from "next/font/google";
 import BootstrapClient from "@/components/BootstrapClient";
 import Header from "@/components/Header";
@@ -29,6 +29,7 @@ export const metadata: Metadata = {
 async function getSiteSettings() {
   "use cache";
   cacheLife("hours");
+  cacheTag("siteSettings");
   const { data } = await sanityFetch({ query: SITE_SETTINGS_QUERY });
   return data;
 }

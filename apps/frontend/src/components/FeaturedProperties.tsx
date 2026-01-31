@@ -1,5 +1,5 @@
 import { defineQuery } from "next-sanity";
-import { cacheLife } from "next/cache";
+import { cacheLife, cacheTag } from "next/cache";
 import type { SanityImageSource } from "@sanity/image-url";
 import { sanityFetch } from "@/sanity/lib/live";
 import PropertyCard from "./PropertyCard";
@@ -33,14 +33,19 @@ interface FeaturedProperty {
   image: { asset: { _id: string; url: string; metadata: { lqip: string } } | null } | null;
 }
 
-export default async function FeaturedProperties() {
+export default async function FeaturedProperties({
+  heading,
+}: {
+  heading: string;
+}) {
   "use cache";
   cacheLife("minutes");
+  cacheTag("property");
   const { data: properties } = await sanityFetch({ query: FEATURED_QUERY }) as { data: FeaturedProperty[] };
 
   return (
     <div className="container py-4">
-      <h2 className="text-center mb-5 fw-bold">Propiedades Destacadas</h2>
+      <h2 className="text-center mb-5 fw-bold">{heading}</h2>
       <div className="row justify-content-center g-4">
         {properties.length > 0 ? (
           properties.map((property) => (

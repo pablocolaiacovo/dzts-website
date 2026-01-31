@@ -6,11 +6,24 @@ export const propiedadesPageType = defineType({
   title: "Página de Propiedades",
   type: "document",
   icon: DocumentsIcon,
+  groups: [
+    { name: "content", title: "Contenido", default: true },
+    { name: "seo", title: "SEO" },
+  ],
   fields: [
+    defineField({
+      name: "heading",
+      title: "Título de la página",
+      type: "string",
+      group: "content",
+      initialValue: "Propiedades",
+      validation: (rule) => rule.required(),
+    }),
     defineField({
       name: "seo",
       title: "SEO",
       type: "seo",
+      group: "seo",
     }),
   ],
   preview: {
