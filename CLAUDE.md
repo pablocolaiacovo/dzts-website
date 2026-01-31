@@ -46,11 +46,43 @@ pnpm deploy   # Deploy to Sanity hosting
 pnpm typegen  # Generate TypeScript types from schema
 ```
 
-## Model Selection / Subagents
+## Model Delegation
 
-  1. Use Haiku subagents for: file searches, simple edits, running commands, linting
-  2. Use Sonnet subagents for: multi-file refactors, component creation, moderate features
-  3. Handle directly (Opus) only: architecture decisions, complex debugging, planning
+The main Opus agent delegates coding tasks to lighter models via custom agents in `.claude/agents/`. The Explore subagent (built-in, Haiku) handles codebase search and file discovery automatically.
+
+| Tier | Agent | Model | Use For |
+|------|-------|-------|---------|
+| **Quick Fix** | `quick-fix` | Haiku | Typos, import changes, renames, toggling a flag, single constant changes |
+| **Implement** | `implementer` | Sonnet | Components, bug fixes, schema changes, CSS, lint fixes, new routes, caching updates |
+| **Architect** | _(main agent)_ | Opus | Multi-system debugging, architecture decisions, planning, PR reviews, new patterns |
+
+### Delegate to `implementer` (Sonnet) when:
+
+- Creating or modifying a component + its CSS
+- Fixing a bug isolated to 1-2 files
+- Adding/modifying a Sanity schema type
+- Fixing lint or TypeScript errors
+- Writing CSS/styling changes
+- Adding a new route/page with straightforward requirements
+- Updating caching (`cacheLife`/`cacheTag`) on existing functions
+
+### Delegate to `quick-fix` (Haiku) when:
+
+- Fixing typos or wording
+- Adding/removing an import
+- Renaming a variable or file
+- Changing a single constant value
+- Toggling a boolean flag
+
+### Keep on Opus (handle directly) when:
+
+- Task touches 3+ files with interdependencies
+- Architecture or design decisions are needed
+- Debugging complex issues that require reasoning across multiple systems
+- Planning mode
+- PR reviews or code audits
+- Tasks where the user is asking for opinions/recommendations
+- New patterns not yet established in the codebase
 
 ## Tech Stack
 
