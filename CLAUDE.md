@@ -176,6 +176,12 @@ Two GitHub Actions workflows run on PRs to `dev` and `main`:
 - Uploads `playwright-report/` and `test-results/` as artifacts on failure.
 - The pnpm filter name for the frontend is `dzts-website` (the `name` field in `package.json`), not `frontend`.
 
+### Dependabot (`.github/dependabot.yml`)
+
+- Opens weekly PRs (Mondays) for outdated npm dependencies and GitHub Actions versions.
+- npm updates are grouped by ecosystem (`next-ecosystem`, `react`, `sanity`, `eslint`, `bootstrap`) to reduce PR noise. Ungrouped packages get individual PRs.
+- Dependabot PRs target the default branch and trigger the CI workflow, so lint + build are validated before merge.
+
 ## Page Structure & Routes
 
 ### Frontend Routes

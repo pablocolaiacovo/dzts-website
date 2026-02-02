@@ -192,3 +192,17 @@ Required GitHub Secrets (Settings > Secrets and variables > Actions):
 | `NEXT_PUBLIC_SANITY_DATASET` | Sanity dataset name (same as `.env.local`) |
 
 On failure, the HTML report and test results are uploaded as workflow artifacts for debugging.
+
+### Dependabot
+
+Dependabot (`.github/dependabot.yml`) opens weekly PRs for outdated dependencies, grouped by ecosystem:
+
+| Group | Packages |
+|-------|----------|
+| `next-ecosystem` | `next`, `next-*`, `@next/*`, `eslint-config-next` |
+| `react` | `react`, `react-dom`, `@types/react`, `@types/react-dom` |
+| `sanity` | `sanity`, `@sanity/*`, `next-sanity` |
+| `eslint` | `eslint`, `eslint-*`, `@eslint/*`, `@typescript-eslint/*` |
+| `bootstrap` | `bootstrap`, `bootstrap-icons`, `@popperjs/*` |
+
+GitHub Actions versions (`actions/checkout`, `actions/setup-node`, etc.) are also tracked separately.
