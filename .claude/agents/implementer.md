@@ -46,10 +46,23 @@ Path alias: `@/*` maps to `./src/*` within the frontend app.
 
 - Frontend lint: `pnpm --filter frontend lint`
 - Frontend build: `pnpm --filter frontend build`
+- Frontend e2e tests: `pnpm build && pnpm test:e2e` (from `apps/frontend/`)
 - Studio typegen: `pnpm --filter dzts-studio typegen`
+- pnpm filter name for frontend is `dzts-website` (from `package.json` `name`), not `frontend`
 
 ## Key Patterns
 
 - `ContactButton` pattern: thin client component wrapping a dynamically imported modal, used from server components
 - `TextImageSection`: renders Portable Text + images, supports carousel and anchor IDs
 - Filter types in `src/types/filters.ts`, helpers in `src/lib/filters.ts`
+
+## E2E Tests
+
+Playwright e2e tests live in `apps/frontend/e2e/`. Config at `apps/frontend/playwright.config.ts`.
+
+- Tests assert **page structure and navigation**, not CMS content text.
+- When modifying components, check CLAUDE.md's "Key Selectors Used by Tests" table — changing IDs, class names, or aria labels used by tests will break them.
+- Write new e2e tests following the same structural assertion pattern. Use element selectors (IDs, classes, aria labels) over text content.
+- Tests need a production build: `pnpm build && pnpm test:e2e`
+- `e2e/` is excluded from `tsconfig.json` (Playwright compiles its own TS).
+- Chromium only. Use `@playwright/test` imports (`test`, `expect`).
