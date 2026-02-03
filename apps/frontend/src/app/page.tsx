@@ -25,7 +25,15 @@ export async function generateMetadata(): Promise<Metadata> {
     getCachedSiteSeo(),
   ]);
 
-  return resolveMetadata(pageSeo, siteSeo);
+  // For the home page, don't set a title - use the layout's default "DZTS Inmobiliaria".
+  // The title.template from layout.tsx only applies to child route segments,
+  // not to the root page.tsx which is at the same level as layout.tsx.
+  const metadata = resolveMetadata(pageSeo, siteSeo);
+  delete metadata.title;
+  if (metadata.openGraph) {
+    delete metadata.openGraph.title;
+  }
+  return metadata;
 }
 
 const MAP_ADDRESS_QUERY = defineQuery(`

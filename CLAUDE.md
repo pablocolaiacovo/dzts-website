@@ -31,10 +31,12 @@ pnpm build    # Production build for both apps
 Frontend-specific (from `apps/frontend/`):
 
 ```bash
-pnpm dev      # Start Next.js dev server with Turbopack
-pnpm build    # Production build
-pnpm start    # Run production server
-pnpm lint     # Run ESLint
+pnpm dev          # Start Next.js dev server with Turbopack
+pnpm build        # Production build
+pnpm start        # Run production server
+pnpm lint         # Run ESLint
+pnpm test:e2e     # Run Playwright e2e tests (requires build first)
+pnpm test:e2e:ui  # Run e2e tests with Playwright UI
 ```
 
 Studio-specific (from `apps/studio/`):
@@ -45,6 +47,45 @@ pnpm build    # Build for deployment
 pnpm deploy   # Deploy to Sanity hosting
 pnpm typegen  # Generate TypeScript types from schema
 ```
+
+## Model Delegation
+
+The main Opus agent delegates coding tasks to lighter models via custom agents in `.claude/agents/`. The Explore subagent (built-in, Haiku) handles codebase search and file discovery automatically.
+
+| Tier | Agent | Model | Use For |
+|------|-------|-------|---------|
+| **Quick Fix** | `quick-fix` | Haiku | Typos, import changes, renames, toggling a flag, single constant changes |
+| **Implement** | `implementer` | Sonnet | Components, bug fixes, schema changes, CSS, lint fixes, new routes, caching updates |
+| **Architect** | _(main agent)_ | Opus | Multi-system debugging, architecture decisions, planning, PR reviews, new patterns |
+
+### Delegate to `implementer` (Sonnet) when:
+
+- Creating or modifying a component + its CSS
+- Fixing a bug isolated to 1-2 files
+- Adding/modifying a Sanity schema type
+- Fixing lint or TypeScript errors
+- Writing CSS/styling changes
+- Adding a new route/page with straightforward requirements
+- Updating caching (`cacheLife`/`cacheTag`) on existing functions
+- Writing or updating e2e tests in `apps/frontend/e2e/`
+
+### Delegate to `quick-fix` (Haiku) when:
+
+- Fixing typos or wording
+- Adding/removing an import
+- Renaming a variable or file
+- Changing a single constant value
+- Toggling a boolean flag
+
+### Keep on Opus (handle directly) when:
+
+- Task touches 3+ files with interdependencies
+- Architecture or design decisions are needed
+- Debugging complex issues that require reasoning across multiple systems
+- Planning mode
+- PR reviews or code audits
+- Tasks where the user is asking for opinions/recommendations
+- New patterns not yet established in the codebase
 
 ## Tech Stack
 
@@ -111,6 +152,35 @@ Sanity Studio project:
 - **Default PR Target**: Create PRs against the `dev` branch, not `main`
 - Feature branches follow the naming convention: `feat/feature-name`
 - Push changes and create PRs using `gh pr create` command
+
+## CI
+
+Two GitHub Actions workflows run on PRs to `dev` and `main`:
+
+### Lint & Build (`.github/workflows/ci.yml`)
+
+1. **Lint frontend**: `pnpm --filter frontend lint`
+2. **Build frontend**: `pnpm --filter frontend build`
+3. **Build studio**: `pnpm --filter dzts-studio exec sanity build`
+
+- Uses `ubuntu-latest`, Node 20, pnpm 10.
+- Placeholder env vars (`ci-placeholder`) satisfy build-time validation without real credentials.
+- Studio build uses `exec sanity build` instead of `pnpm build` to skip the `prebuild` hook (schema extraction + typegen require a live Sanity API connection).
+- `--frozen-lockfile` ensures lockfile stays in sync with `package.json`.
+
+### E2E Tests (`.github/workflows/e2e.yml`)
+
+- Runs Playwright e2e tests against a production build of the frontend.
+- Only triggers when `apps/frontend/` or the workflow file changes (path filter).
+- Uses real Sanity credentials from GitHub Secrets (`NEXT_PUBLIC_SANITY_PROJECT_ID`, `NEXT_PUBLIC_SANITY_DATASET`) — required for the app to render content.
+- Uploads `playwright-report/` and `test-results/` as artifacts on failure.
+- The pnpm filter name for the frontend is `dzts-website` (the `name` field in `package.json`), not `frontend`.
+
+### Dependabot (`.github/dependabot.yml`)
+
+- Opens weekly PRs (Mondays) for outdated npm dependencies and GitHub Actions versions.
+- npm updates are grouped by ecosystem (`next-ecosystem`, `react`, `sanity`, `eslint`, `bootstrap`) to reduce PR noise. Ungrouped packages get individual PRs.
+- Dependabot PRs target the default branch and trigger the CI workflow, so lint + build are validated before merge.
 
 ## Page Structure & Routes
 
@@ -180,6 +250,51 @@ The frontend uses Next.js 16 cache components (`"use cache"` directive + `cacheL
 - Property detail pages include `<script type="application/ld+json">` with Schema.org `RealEstateListing` data (name, price, address, images).
 - Property detail pages generate OpenGraph metadata via `generateMetadata()`.
 - Ensure only one `<h1>` per page. Section headings within page content should use `<h2>` or lower.
+
+## E2E Tests
+
+Playwright e2e smoke tests live in `apps/frontend/e2e/`. Config is at `apps/frontend/playwright.config.ts`.
+
+### Test Design Principles
+
+- Tests assert **page structure** (element existence, selectors, navigation URLs) rather than CMS content text, making them resilient to Sanity content changes.
+- Static UI labels hardcoded in source code (e.g., "Buscar", "Aplicar filtros", "404", "contactate con") are safe to assert.
+- Tests navigate from the listing page to discover property detail slugs dynamically — no hardcoded slugs.
+- **When a test fails, fix the feature/bug first** — don't make the test more permissive just to pass. Investigate the root cause before adjusting test expectations.
+
+### Running Tests
+
+Tests require a production build (Playwright's `webServer` starts `pnpm start`):
+
+```bash
+pnpm build && pnpm test:e2e     # from apps/frontend/
+```
+
+### Key Selectors Used by Tests
+
+When modifying components, be aware these selectors are used by e2e tests:
+
+| Selector | Component | Tests |
+|----------|-----------|-------|
+| `#operacion`, `#propiedad`, `#localidad`, `#dormitorios` | `SearchProperties` | `home.spec.ts` |
+| `button.btn-custom` | `SearchProperties` (search button) | `home.spec.ts` |
+| `#filters-form` | `PropertiesFilters` | `propiedades.spec.ts` |
+| `label[for='operacion-venta']` | `PropertiesFilters` (radio) | `propiedades.spec.ts` |
+| `a[href^="/propiedades/"]` | `PropertyCard` (card links) | `propiedades.spec.ts`, `property-detail.spec.ts` |
+| `.badge .btn-close` | `ActiveFilterBadges` | `propiedades.spec.ts` |
+| `#propertyCarousel` | `ImageCarousel` | `property-detail.spec.ts` |
+| `button:has-text('contactate con')` | `ContactButton` | `property-detail.spec.ts` |
+| `.modal.show`, `#contactName`, `#contactEmail`, `#contactPhone`, `#contactComments` | `ContactModal` | `property-detail.spec.ts` |
+| `nav[aria-label="Breadcrumb"]` | `Breadcrumb` | `navigation.spec.ts`, `propiedades.spec.ts`, `property-detail.spec.ts` |
+| `.navbar-brand` | `Header` | `navigation.spec.ts` |
+| `footer.site-footer` | `Footer` | `navigation.spec.ts` |
+| `script[type="application/ld+json"]` | Property detail page | `property-detail.spec.ts` |
+
+### Configuration Notes
+
+- The `e2e/` directory is excluded from `tsconfig.json` — Playwright handles its own TypeScript compilation.
+- Playwright artifact directories (`test-results/`, `playwright-report/`, `blob-report/`, `playwright/.cache/`) are in `.gitignore`.
+- Chromium only (single project). Retries: 2 in CI, 0 locally. Workers: 1 in CI.
 
 ## Recent Implementation Notes
 
