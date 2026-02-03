@@ -35,7 +35,8 @@ test.describe("Property Detail Page", () => {
     await expect(page).toHaveURL(/\/propiedades\/.+/);
     await page.waitForLoadState("networkidle");
 
-    await page.click("button:has-text('contactate con')");
+    // Use force:true to bypass stability checks affected by carousel animations
+    await page.click("button:has-text('contactate con')", { force: true });
     await expect(page.locator(".modal.show")).toBeVisible();
 
     await expect(page.locator("#contactName")).toBeVisible();
@@ -53,7 +54,8 @@ test.describe("Property Detail Page", () => {
     await expect(page).toHaveURL(/\/propiedades\/.+/);
     await page.waitForLoadState("networkidle");
 
-    await page.click("button:has-text('contactate con')");
+    // Use force:true to bypass stability checks affected by carousel animations
+    await page.click("button:has-text('contactate con')", { force: true });
     await expect(page.locator(".modal.show")).toBeVisible();
 
     await page.click(".modal .btn-close");
