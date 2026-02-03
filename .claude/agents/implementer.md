@@ -63,6 +63,7 @@ Playwright e2e tests live in `apps/frontend/e2e/`. Config at `apps/frontend/play
 - Tests assert **page structure and navigation**, not CMS content text.
 - When modifying components, check CLAUDE.md's "Key Selectors Used by Tests" table — changing IDs, class names, or aria labels used by tests will break them.
 - Write new e2e tests following the same structural assertion pattern. Use element selectors (IDs, classes, aria labels) over text content.
+- **When a test fails, fix the feature/bug first** — don't make the test more permissive just to pass. Investigate the root cause before adjusting test expectations.
 - Tests need a production build: `pnpm build && pnpm test:e2e`
 - `e2e/` is excluded from `tsconfig.json` (Playwright compiles its own TS).
 - Chromium only. Use `@playwright/test` imports (`test`, `expect`).

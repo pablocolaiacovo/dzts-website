@@ -260,6 +260,7 @@ Playwright e2e smoke tests live in `apps/frontend/e2e/`. Config is at `apps/fron
 - Tests assert **page structure** (element existence, selectors, navigation URLs) rather than CMS content text, making them resilient to Sanity content changes.
 - Static UI labels hardcoded in source code (e.g., "Buscar", "Aplicar filtros", "404", "contactate con") are safe to assert.
 - Tests navigate from the listing page to discover property detail slugs dynamically — no hardcoded slugs.
+- **When a test fails, fix the feature/bug first** — don't make the test more permissive just to pass. Investigate the root cause before adjusting test expectations.
 
 ### Running Tests
 
