@@ -255,6 +255,7 @@ The frontend uses Next.js 16 cache components (`"use cache"` directive + `cacheL
 - Ensure only one `<h1>` per page. Section headings within page content should use `<h2>` or lower.
 - **robots.txt** (`src/app/robots.ts`): Environment-aware. Blocks all bots in non-production (`VERCEL_ENV !== "production"`), allows indexing in production.
 - **sitemap.xml** (`src/app/sitemap.ts`): Dynamically generated. Includes home, `/propiedades`, and all property detail pages fetched from Sanity.
+- **llms.txt** (`src/app/llms.txt/route.ts`): Markdown file for AI agents/LLMs ([spec](https://llmstxt.org/)). Lists main pages and all properties to help LLMs understand site content.
 
 ## E2E Tests
 
