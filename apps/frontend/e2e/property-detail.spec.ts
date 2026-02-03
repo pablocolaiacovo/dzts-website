@@ -7,6 +7,7 @@ test.describe("Property Detail Page", () => {
     await expect(firstCard).toBeVisible();
     await firstCard.click();
     await expect(page).toHaveURL(/\/propiedades\/.+/);
+    await page.waitForLoadState("networkidle");
   });
 
   test("detail page has heading, breadcrumb, image area, and contact button", async ({
@@ -15,6 +16,7 @@ test.describe("Property Detail Page", () => {
     await page.goto("/propiedades");
     await page.locator('a[href^="/propiedades/"]').first().click();
     await expect(page).toHaveURL(/\/propiedades\/.+/);
+    await page.waitForLoadState("networkidle");
 
     await expect(page.locator("h1")).toBeVisible();
 
@@ -31,6 +33,7 @@ test.describe("Property Detail Page", () => {
     await page.goto("/propiedades");
     await page.locator('a[href^="/propiedades/"]').first().click();
     await expect(page).toHaveURL(/\/propiedades\/.+/);
+    await page.waitForLoadState("networkidle");
 
     await page.click("button:has-text('contactate con')");
     await expect(page.locator(".modal.show")).toBeVisible();
@@ -48,6 +51,7 @@ test.describe("Property Detail Page", () => {
     await page.goto("/propiedades");
     await page.locator('a[href^="/propiedades/"]').first().click();
     await expect(page).toHaveURL(/\/propiedades\/.+/);
+    await page.waitForLoadState("networkidle");
 
     await page.click("button:has-text('contactate con')");
     await expect(page.locator(".modal.show")).toBeVisible();
@@ -65,6 +69,7 @@ test.describe("Property Detail Page", () => {
     await page.goto("/propiedades");
     await page.locator('a[href^="/propiedades/"]').first().click();
     await expect(page).toHaveURL(/\/propiedades\/.+/);
+    await page.waitForLoadState("networkidle");
 
     const jsonLd = page.locator('script[type="application/ld+json"]');
     await expect(jsonLd).toBeAttached();
