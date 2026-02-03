@@ -114,6 +114,7 @@ Each app has its own `.env.local` file with different prefixes (Next.js uses `NE
 | `NEXT_PUBLIC_SANITY_PROJECT_ID`  | Sanity project identifier         |
 | `NEXT_PUBLIC_SANITY_DATASET`     | Sanity dataset name               |
 | `NEXT_PUBLIC_WEB3FORMS_KEY`      | Web3Forms API key for contact form|
+| `NEXT_PUBLIC_SITE_URL`           | Production site URL (for sitemap.xml and robots.txt) |
 | `SANITY_REVALIDATE_SECRET`       | HMAC secret for Sanity webhook (server-only, no `NEXT_PUBLIC_` prefix) |
 
 ### Studio (`apps/studio/.env.local`)
@@ -149,6 +150,8 @@ Sanity Studio project:
 
 ## Git Workflow
 
+- **Always create a feature branch** from `dev` before starting new work: `git checkout dev && git pull && git checkout -b feat/feature-name`
+- **Never commit directly to `dev` or `main`** unless explicitly asked
 - **Default PR Target**: Create PRs against the `dev` branch, not `main`
 - Feature branches follow the naming convention: `feat/feature-name`
 - Push changes and create PRs using `gh pr create` command
@@ -250,6 +253,8 @@ The frontend uses Next.js 16 cache components (`"use cache"` directive + `cacheL
 - Property detail pages include `<script type="application/ld+json">` with Schema.org `RealEstateListing` data (name, price, address, images).
 - Property detail pages generate OpenGraph metadata via `generateMetadata()`.
 - Ensure only one `<h1>` per page. Section headings within page content should use `<h2>` or lower.
+- **robots.txt** (`src/app/robots.ts`): Environment-aware. Blocks all bots in non-production (`VERCEL_ENV !== "production"`), allows indexing in production.
+- **sitemap.xml** (`src/app/sitemap.ts`): Dynamically generated. Includes home, `/propiedades`, and all property detail pages fetched from Sanity.
 
 ## E2E Tests
 
