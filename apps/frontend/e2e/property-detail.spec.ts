@@ -18,14 +18,19 @@ test.describe("Property Detail Page", () => {
     await expect(page).toHaveURL(/\/propiedades\/.+/);
     await page.waitForLoadState("networkidle");
 
-    await expect(page.locator("h1")).toBeVisible();
-
-    const breadcrumbItems = page.locator(
-      'nav[aria-label="Breadcrumb"] .breadcrumb-item'
-    );
-    await expect(breadcrumbItems).toHaveCount(3);
-
+    // Wait for carousel first (unique to detail page) to ensure page is fully rendered
     await expect(page.locator("#propertyCarousel")).toBeVisible();
+
+    // Use .first() as React streaming may briefly keep previous page content in DOM
+    await expect(page.locator("h1").first()).toBeVisible();
+
+    // Verify breadcrumb exists - detail page has 3 items (Home, Propiedades, Property title)
+    // The detail page breadcrumb links to /propiedades in the 2nd item
+    const detailBreadcrumb = page.locator('nav[aria-label="Breadcrumb"]').filter({
+      has: page.locator('a[href="/propiedades"]')
+    }).first();
+    await expect(detailBreadcrumb.locator(".breadcrumb-item")).toHaveCount(3);
+
     await expect(page.locator("button:has-text('contactate con')")).toBeVisible();
   });
 
