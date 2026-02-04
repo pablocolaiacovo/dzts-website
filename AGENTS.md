@@ -288,6 +288,13 @@ Frontend environment variables (in `apps/frontend/.env.local`):
 - `Header` smooth-scrolls when clicking `/#...` links on the home page and updates the hash without a full navigation.
 - `TextImageSection` handles single image vs carousel; prefer `asset.url` when present and fall back to `urlFor(...)` if needed.
 - Anchored sections use `scroll-margin-top: 60px` to account for the sticky header.
+- Canonical URLs are set through `resolveMetadata()` using `ContentDefaults.canonicalUrl`; `metadataBase` in `apps/frontend/src/app/layout.tsx` is only set when `NEXT_PUBLIC_SITE_URL` is defined (no fallback URL).
+- For site URLs and SEO metadata, rely on environment variables or Sanity-managed content only; avoid hardcoded fallback domains.
+- Avoid hardcoded content when possible; prefer environment variables or Sanity-managed content.
+- Breadcrumb JSON-LD is generated inside `apps/frontend/src/components/Breadcrumb.tsx`; pass `href` for all breadcrumb items (including the current page) to populate the schema.
+- Home page streams below-the-fold content with `<Suspense>` fallbacks; featured properties, home sections, and map load progressively.
+- LCP image priority lives on the home hero background, not on the header logo.
+- Reduced motion: smooth scroll falls back to `behavior: "auto"`, carousel auto-advance is disabled, and global CSS reduces animations when `prefers-reduced-motion` is set.
 - Webhook revalidation route: `src/app/api/revalidate/route.ts`. Uses `parseBody` from `next-sanity/webhook` for HMAC validation and `revalidateTag(type, "max")` from `next/cache`.
 - In Next.js 16, `revalidateTag()` requires two arguments: `(tag, profile)`. Pass `"max"` as the profile to revalidate all cache entries for a tag regardless of their original `cacheLife`.
 - The `/propiedades` listing page calls `sanityFetch` directly without `"use cache"` (dynamic `searchParams`), so it has no cache tag and is unaffected by revalidation.

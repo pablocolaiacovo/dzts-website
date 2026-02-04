@@ -100,6 +100,7 @@ export async function generateMetadata({
     title: property.title,
     description: property.subtitle,
     ogImageUrl,
+    canonicalUrl: `/propiedades/${slug}`,
   });
 }
 
@@ -156,7 +157,10 @@ export default async function PropertyPage({
               items={[
                 { label: "Inicio", href: "/", isHome: true },
                 { label: "Propiedades", href: "/propiedades" },
-                { label: property.title || "Propiedad" },
+                {
+                  label: property.title || "Propiedad",
+                  href: `/propiedades/${slug}`,
+                },
               ]}
             />
             <h1 className="text-secondary mb-2" style={{ fontSize: "2.5rem" }}>

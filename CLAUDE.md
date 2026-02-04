@@ -200,6 +200,16 @@ Two GitHub Actions workflows run on PRs to `dev` and `main`:
 - Site Settings singleton in Sanity stores office address for home page map display
 - All property and site data is fetched server-side via `sanityFetch` for optimal performance
 
+## Recent Implementation Notes
+
+- Canonical URLs are set via `resolveMetadata()` using `ContentDefaults.canonicalUrl`; `metadataBase` in `apps/frontend/src/app/layout.tsx` is only set when `NEXT_PUBLIC_SITE_URL` is defined (no fallback URL).
+- For site URLs and SEO metadata, rely on environment variables or Sanity-managed content only; avoid hardcoded fallback domains.
+- Avoid hardcoded content when possible; prefer environment variables or Sanity-managed content.
+- Breadcrumb JSON-LD is generated in `apps/frontend/src/components/Breadcrumb.tsx`; pass `href` for all breadcrumb items (including the current page) to populate the schema.
+- Home page uses `<Suspense>` to stream featured properties, home sections, and map with skeleton fallbacks.
+- LCP image priority is on the home hero background (`SearchProperties`), not on the header logo.
+- Reduced motion: smooth scroll falls back to `behavior: "auto"`, carousel auto-advance is disabled, and global CSS reduces animations when `prefers-reduced-motion` is set.
+
 ## Components
 
 - **MapSection** - Reusable component for displaying embedded Google Maps. Renders full-width iframe (450px height) when address is provided, returns null if no address exists.

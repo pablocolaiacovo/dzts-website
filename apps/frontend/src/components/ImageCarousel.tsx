@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import { urlFor } from '@/sanity/lib/image';
 import type { SanityImageSource } from '@sanity/image-url';
 import Image from 'next/image';
@@ -16,6 +17,20 @@ interface ImageCarouselProps {
 }
 
 export default function ImageCarousel({ images, title }: ImageCarouselProps) {
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const updatePreference = () => setPrefersReducedMotion(mediaQuery.matches);
+    updatePreference();
+    if (mediaQuery.addEventListener) {
+      mediaQuery.addEventListener('change', updatePreference);
+      return () => mediaQuery.removeEventListener('change', updatePreference);
+    }
+    mediaQuery.addListener(updatePreference);
+    return () => mediaQuery.removeListener(updatePreference);
+  }, []);
+
   if (images.length === 0) {
     return (
       <div className="mb-4">
@@ -33,7 +48,11 @@ export default function ImageCarousel({ images, title }: ImageCarouselProps) {
   }
 
   return (
-    <div id="propertyCarousel" className="carousel slide mb-4" data-bs-ride="carousel">
+    <div
+      id="propertyCarousel"
+      className="carousel slide mb-4"
+      {...(!prefersReducedMotion ? { 'data-bs-ride': 'carousel' } : {})}
+    >
       <div className="carousel-indicators">
         {images.map((_, index) => (
           <button

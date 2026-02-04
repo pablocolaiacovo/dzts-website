@@ -24,6 +24,8 @@ export function resolveMetadata(
     siteSeo?.ogImage?.asset?.url ||
     undefined;
 
+  const canonicalUrl = contentDefaults?.canonicalUrl || undefined;
+
   const metadata: Metadata = {};
 
   if (title) metadata.title = title;
@@ -39,6 +41,10 @@ export function resolveMetadata(
 
   if (pageSeo?.noIndex) {
     metadata.robots = { index: false, follow: false };
+  }
+
+  if (canonicalUrl) {
+    metadata.alternates = { canonical: canonicalUrl };
   }
 
   return metadata;

@@ -12,8 +12,31 @@ interface Props {
 }
 
 export default function Breadcrumb({ items }: Props) {
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "";
+  const canRenderJsonLd = baseUrl && items.every((item) => item.href);
+  const breadcrumbJsonLd = canRenderJsonLd
+    ? {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        itemListElement: items.map((item, index) => ({
+          "@type": "ListItem",
+          position: index + 1,
+          name: item.label,
+          item: new URL(item.href!, baseUrl).toString(),
+        })),
+      }
+    : null;
+
   return (
     <nav aria-label="Breadcrumb">
+      {breadcrumbJsonLd && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(breadcrumbJsonLd),
+          }}
+        />
+      )}
       <ol className="breadcrumb mb-3">
         {items.map((item, index) => {
           const isLast = index === items.length - 1;
