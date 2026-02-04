@@ -12,6 +12,10 @@ import {
   getCachedHomeContent,
 } from "@/sanity/queries/homePage";
 import { getCachedHomeSeo, getCachedSiteSeo } from "@/sanity/queries/seo";
+import {
+  getCachedOrganization,
+  buildOrganizationJsonLd,
+} from "@/sanity/queries/siteSettings";
 import { resolveMetadata } from "@/lib/seo";
 import FeaturedProperties from "@/components/FeaturedProperties";
 import SearchProperties from "@/components/SearchProperties";
@@ -49,20 +53,41 @@ async function getCachedMapAddress() {
 }
 
 export default async function Home() {
-  const [cities, propertyTypes, roomCounts, address, sections, homeContent] =
-    await Promise.all([
-      getCachedCities(),
-      getCachedPropertyTypes(),
-      getCachedRoomCounts(),
-      getCachedMapAddress(),
-      getCachedHomeSections(),
-      getCachedHomeContent(),
-    ]);
+  const [
+    cities,
+    propertyTypes,
+    roomCounts,
+    address,
+    sections,
+    homeContent,
+    organization,
+  ] = await Promise.all([
+    getCachedCities(),
+    getCachedPropertyTypes(),
+    getCachedRoomCounts(),
+    getCachedMapAddress(),
+    getCachedHomeSections(),
+    getCachedHomeContent(),
+    getCachedOrganization(),
+  ]);
 
   const filterOptions = buildFilterOptions(cities, propertyTypes, roomCounts);
 
+  const jsonLd = organization
+    ? {
+        "@context": "https://schema.org",
+        ...buildOrganizationJsonLd(organization),
+      }
+    : null;
+
   return (
     <>
+      {jsonLd && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
+      )}
       <SearchProperties
         filterOptions={filterOptions}
         heroHeading={homeContent!.heroHeading!}

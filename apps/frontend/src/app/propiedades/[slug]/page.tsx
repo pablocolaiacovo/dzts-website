@@ -8,6 +8,10 @@ import type { SanityImageSource } from "@sanity/image-url";
 import { sanityFetch } from "@/sanity/lib/live";
 import { urlFor } from "@/sanity/lib/image";
 import { getCachedSiteSeo } from "@/sanity/queries/seo";
+import {
+  getCachedOrganization,
+  buildOrganizationJsonLd,
+} from "@/sanity/queries/siteSettings";
 import { resolveMetadata } from "@/lib/seo";
 
 import Breadcrumb from "@/components/Breadcrumb";
@@ -111,7 +115,10 @@ export default async function PropertyPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const property = await getCachedProperty(slug);
+  const [property, organization] = await Promise.all([
+    getCachedProperty(slug),
+    getCachedOrganization(),
+  ]);
 
   if (!property) {
     notFound();
@@ -143,6 +150,9 @@ export default async function PropertyPage({
       },
     }),
     ...(imageUrls.length > 0 && { image: imageUrls }),
+    ...(organization && {
+      offeredBy: buildOrganizationJsonLd(organization),
+    }),
   };
 
   return (
