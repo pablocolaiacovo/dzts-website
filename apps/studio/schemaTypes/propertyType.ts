@@ -60,6 +60,20 @@ export const propertyType = defineType({
       },
     }),
     defineField({
+      name: "status",
+      title: "Estado",
+      type: "string",
+      options: {
+        list: [
+          { title: "Disponible", value: "disponible" },
+          { title: "Vendido", value: "vendido" },
+          { title: "Alquilado", value: "alquilado" },
+        ],
+        layout: "radio",
+      },
+      initialValue: "disponible",
+    }),
+    defineField({
       name: "propertyType",
       title: "Tipo de propiedad",
       type: "reference",
