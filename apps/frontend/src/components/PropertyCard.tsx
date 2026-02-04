@@ -60,7 +60,7 @@ export default function PropertyCard({
           )}
         </div>
         <div className="w-100 bg-primary" style={{ height: 4 }}></div>
-        <div className="card-body text-center pb-2">
+        <div className="card-body text-center pb-2 bg-light rounded-bottom-4">
           <h5 className="fw-bold text-primary mb-2 fs-5">{title}</h5>
           {(city || rooms) && (
             <p className="mb-2 text-muted small">

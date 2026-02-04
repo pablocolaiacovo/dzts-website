@@ -5,6 +5,7 @@ import { Inter } from "next/font/google";
 import BootstrapClient from "@/components/BootstrapClient";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import WhatsAppButton from "@/components/WhatsAppButton";
 import { sanityFetch } from "@/sanity/lib/live";
 import { SITE_SETTINGS_QUERY } from "@/sanity/queries/siteSettings";
 import "bootstrap-icons/font/bootstrap-icons.css";
@@ -48,11 +49,19 @@ async function SiteShell({ children }: { children: React.ReactNode }) {
       <Footer
         logo={siteSettings?.logo}
         siteName={siteSettings?.siteName}
-        copyrightText={siteSettings?.copyrightText}
         footerLinks={siteSettings?.footerLinks}
         certificationLogos={siteSettings?.certificationLogos}
         socialLinks={siteSettings?.socialLinks}
+        phone={siteSettings?.phone}
+        email={siteSettings?.email}
+        address={siteSettings?.address}
       />
+      {siteSettings?.whatsappNumber && (
+        <WhatsAppButton
+          whatsappNumber={siteSettings.whatsappNumber}
+          whatsappMessage={siteSettings.whatsappMessage}
+        />
+      )}
     </>
   );
 }
