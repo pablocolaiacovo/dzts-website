@@ -143,6 +143,14 @@ export const siteSettingsType = defineType({
       description: "Número con código de país (ej: 5491155667788)",
     }),
     defineField({
+      name: "whatsappMessage",
+      title: "Mensaje predeterminado de WhatsApp",
+      type: "text",
+      group: "contact",
+      rows: 3,
+      description: "Mensaje que se pre-carga al abrir WhatsApp desde el botón flotante.",
+    }),
+    defineField({
       name: "socialLinks",
       title: "Redes Sociales",
       type: "array",
@@ -185,12 +193,6 @@ export const siteSettingsType = defineType({
     }),
 
     // Pie de Página
-    defineField({
-      name: "copyrightText",
-      title: "Texto Footer",
-      type: "string",
-      group: "footer"
-    }),
     defineField({
       name: "footerLinks",
       title: "Enlaces del Footer",

@@ -13,7 +13,10 @@ import {
   getCachedHomeContent,
 } from "@/sanity/queries/homePage";
 import { getCachedHomeSeo, getCachedSiteSeo } from "@/sanity/queries/seo";
-import { SITE_SETTINGS_QUERY } from "@/sanity/queries/siteSettings";
+import {
+  getCachedOrganization,
+  buildOrganizationJsonLd,
+} from "@/sanity/queries/siteSettings";
 import { resolveMetadata } from "@/lib/seo";
 import FeaturedProperties from "@/components/FeaturedProperties";
 import SearchProperties from "@/components/SearchProperties";
@@ -47,14 +50,6 @@ async function getCachedMapAddress() {
   cacheLife("hours");
   cacheTag("siteSettings");
   const { data } = await sanityFetch({ query: MAP_ADDRESS_QUERY });
-  return data;
-}
-
-async function getCachedSiteSettings() {
-  "use cache";
-  cacheLife("hours");
-  cacheTag("siteSettings");
-  const { data } = await sanityFetch({ query: SITE_SETTINGS_QUERY });
   return data;
 }
 
@@ -139,47 +134,20 @@ function MapSectionFallback() {
 }
 
 export default async function Home() {
-  const [cities, propertyTypes, roomCounts, homeContent, siteSettings] =
+  const [cities, propertyTypes, roomCounts, homeContent, organization] =
     await Promise.all([
       getCachedCities(),
       getCachedPropertyTypes(),
       getCachedRoomCounts(),
       getCachedHomeContent(),
-      getCachedSiteSettings(),
+      getCachedOrganization(),
     ]);
 
   const filterOptions = buildFilterOptions(cities, propertyTypes, roomCounts);
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL;
-  const organizationJsonLd = siteSettings?.siteName
+  const organizationJsonLd = organization
     ? {
         "@context": "https://schema.org",
-        "@type": "Organization",
-        name: siteSettings.siteName,
-        url: baseUrl,
-        ...(siteSettings.logo?.asset?.url && {
-          logo: siteSettings.logo.asset.url,
-        }),
-        ...(siteSettings.phone && {
-          contactPoint: {
-            "@type": "ContactPoint",
-            telephone: siteSettings.phone,
-            contactType: "customer service",
-          },
-        }),
-        ...(siteSettings.address && {
-          address: {
-            "@type": "PostalAddress",
-            streetAddress: siteSettings.address,
-            addressCountry: "AR",
-          },
-        }),
-        ...(siteSettings.socialLinks?.length
-          ? {
-              sameAs: siteSettings.socialLinks
-                .map((link: { url?: string | null }) => link.url)
-                .filter(Boolean),
-            }
-          : {}),
+        ...buildOrganizationJsonLd(organization),
       }
     : null;
 
@@ -188,7 +156,9 @@ export default async function Home() {
       {organizationJsonLd && (
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(organizationJsonLd),
+          }}
         />
       )}
       <SearchProperties

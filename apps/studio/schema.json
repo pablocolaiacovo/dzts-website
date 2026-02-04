@@ -1065,6 +1065,13 @@
         },
         "optional": true
       },
+      "whatsappMessage": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "string"
+        },
+        "optional": true
+      },
       "socialLinks": {
         "type": "objectAttribute",
         "value": {
@@ -1128,13 +1135,6 @@
               }
             }
           }
-        },
-        "optional": true
-      },
-      "copyrightText": {
-        "type": "objectAttribute",
-        "value": {
-          "type": "string"
         },
         "optional": true
       },

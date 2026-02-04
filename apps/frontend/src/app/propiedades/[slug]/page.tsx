@@ -8,6 +8,10 @@ import type { SanityImageSource } from "@sanity/image-url";
 import { sanityFetch } from "@/sanity/lib/live";
 import { urlFor } from "@/sanity/lib/image";
 import { getCachedSiteSeo } from "@/sanity/queries/seo";
+import {
+  getCachedOrganization,
+  buildOrganizationJsonLd,
+} from "@/sanity/queries/siteSettings";
 import { resolveMetadata } from "@/lib/seo";
 
 import Breadcrumb from "@/components/Breadcrumb";
@@ -25,6 +29,7 @@ const PROPERTY_QUERY = defineQuery(`
     price,
     "propertyType": propertyType->name,
     operationType,
+    status,
     currency,
     "city": city->name,
     "images": images[] { asset->{ _id, url, metadata { lqip } } },
@@ -56,6 +61,7 @@ interface PropertyDetail {
   price?: number | null;
   propertyType?: string | null;
   operationType?: string | null;
+  status?: string | null;
   currency?: string | null;
   city?: string | null;
   images?: Array<PropertyImage | null> | null;
@@ -110,7 +116,10 @@ export default async function PropertyPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const property = await getCachedProperty(slug);
+  const [property, organization] = await Promise.all([
+    getCachedProperty(slug),
+    getCachedOrganization(),
+  ]);
 
   if (!property) {
     notFound();
@@ -142,6 +151,9 @@ export default async function PropertyPage({
       },
     }),
     ...(imageUrls.length > 0 && { image: imageUrls }),
+    ...(organization && {
+      offeredBy: buildOrganizationJsonLd(organization),
+    }),
   };
 
   return (
@@ -177,6 +189,11 @@ export default async function PropertyPage({
               {property.propertyType && (
                 <span className="badge rounded-pill bg-info text-white fs-6">
                   {property.propertyType}
+                </span>
+              )}
+              {property.status && property.status !== "disponible" && (
+                <span className="badge rounded-pill bg-danger text-white fs-6">
+                  {property.status === "vendido" ? "Vendido" : "Alquilado"}
                 </span>
               )}
             </div>

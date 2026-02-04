@@ -9,24 +9,68 @@ type SiteSettings = NonNullable<SITE_SETTINGS_QUERY_RESULT>;
 type FooterProps = {
   logo?: SiteSettings["logo"];
   siteName?: SiteSettings["siteName"];
-  copyrightText?: SiteSettings["copyrightText"];
   footerLinks?: SiteSettings["footerLinks"];
   certificationLogos?: SiteSettings["certificationLogos"];
   socialLinks?: SiteSettings["socialLinks"];
+  phone?: SiteSettings["phone"];
+  email?: SiteSettings["email"];
+  address?: SiteSettings["address"];
+};
+
+const platformIcons: Record<string, string> = {
+  facebook: "bi-facebook",
+  instagram: "bi-instagram",
+  twitter: "bi-twitter-x",
+  linkedin: "bi-linkedin",
+  youtube: "bi-youtube",
 };
 
 export default function Footer({
   logo,
   siteName,
-  copyrightText,
   certificationLogos,
+  socialLinks,
+  phone,
+  email,
+  address,
 }: FooterProps) {
   const logoUrl = logo?.asset ? urlFor(logo).width(300).url() : null;
   const logoAlt = logo?.alt || siteName || "";
+  const socialLinksWithUrl = socialLinks?.filter(
+    (link): link is NonNullable<typeof link> & { url: string } =>
+      Boolean(link?.url),
+  );
 
   return (
     <footer className="site-footer">
       <div className="container">
+        {(phone || email || address) && (
+          <div className="footer-contact">
+            {address && (
+              <a
+                href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="footer-contact-item"
+              >
+                <i className="bi bi-geo-alt"></i>
+                {address}
+              </a>
+            )}
+            {phone && (
+              <a href={`tel:${phone}`} className="footer-contact-item">
+                <i className="bi bi-telephone"></i>
+                {phone}
+              </a>
+            )}
+            {email && (
+              <a href={`mailto:${email}`} className="footer-contact-item">
+                <i className="bi bi-envelope"></i>
+                {email}
+              </a>
+            )}
+          </div>
+        )}
         <div className="footer-content">
           {/* Left: Logo */}
           <div className="footer-logo">
@@ -43,8 +87,20 @@ export default function Footer({
           {/* Center: Back to top + Copyright */}
           <div className="footer-center">
             <ScrollToTopButton />
-            {copyrightText && (
-              <p className="copyright">{copyrightText}</p>
+            {socialLinksWithUrl && socialLinksWithUrl.length > 0 && (
+              <div className="footer-social">
+                {socialLinksWithUrl.map((link) => (
+                  <a
+                    key={link._key}
+                    href={link.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={link.platform || ""}
+                  >
+                    <i className={`bi ${platformIcons[link.platform || ""] || ""}`}></i>
+                  </a>
+                ))}
+              </div>
             )}
           </div>
 
