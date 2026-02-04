@@ -1,9 +1,10 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState, useTransition } from "react";
 import type { FilterOption } from "@/types/filters";
 import { parseMultiple } from "@/lib/filters";
+import "./PropertiesFilters.css";
 
 interface PropertiesFiltersProps {
   cities: FilterOption[];
@@ -11,6 +12,7 @@ interface PropertiesFiltersProps {
   roomCounts: number[];
   isCollapsed: boolean;
   onToggleCollapse: () => void;
+  onFilteringChange?: (isFiltering: boolean) => void;
 }
 
 type SearchParams = ReturnType<typeof useSearchParams>;
@@ -25,18 +27,46 @@ function PropertiesFiltersInner({
   roomCounts,
   isCollapsed,
   onToggleCollapse,
+  onFilteringChange,
   searchParams,
 }: PropertiesFiltersInnerProps) {
   const router = useRouter();
   const [isOpenMobile, setIsOpenMobile] = useState(false);
+  const [isPending, startTransition] = useTransition();
+  const initialOperacion = searchParams.get("operacion") || "";
+  const initialPropiedad = parseMultiple(searchParams.get("propiedad"));
+  const initialLocalidad = parseMultiple(searchParams.get("localidad"));
+  const initialDormitorios = parseMultiple(searchParams.get("dormitorios"));
 
-  const [operacion, setOperacion] = useState(() => searchParams.get("operacion") || "");
-  const [propiedad, setPropiedad] = useState<string[]>(() => parseMultiple(searchParams.get("propiedad")));
-  const [localidad, setLocalidad] = useState<string[]>(() => parseMultiple(searchParams.get("localidad")));
-  const [dormitorios, setDormitorios] = useState<string[]>(() => parseMultiple(searchParams.get("dormitorios")));
+  const [expandedSections, setExpandedSections] = useState(() => ({
+    operacion: Boolean(initialOperacion),
+    propiedad: initialPropiedad.length > 0,
+    localidad: initialLocalidad.length > 0,
+    dormitorios: initialDormitorios.length > 0,
+  }));
+
+  const [operacion, setOperacion] = useState(initialOperacion);
+  const [propiedad, setPropiedad] = useState<string[]>(initialPropiedad);
+  const [localidad, setLocalidad] = useState<string[]>(initialLocalidad);
+  const [dormitorios, setDormitorios] = useState<string[]>(initialDormitorios);
 
   const activeFilterCount =
     (operacion ? 1 : 0) + propiedad.length + localidad.length + dormitorios.length;
+
+
+  const toggleSection = (key: keyof typeof expandedSections) => {
+    setExpandedSections((prev) => ({
+      ...prev,
+      [key]: !prev[key],
+    }));
+  };
+
+  useEffect(() => {
+    if (onFilteringChange) {
+      onFilteringChange(isPending);
+    }
+  }, [isPending, onFilteringChange]);
+
 
   const toggleArrayValue = (
     arr: string[],
@@ -59,7 +89,9 @@ function PropertiesFiltersInner({
     if (dormitorios.length > 0) params.set("dormitorios", dormitorios.join(","));
 
     const queryString = params.toString();
-    router.push(queryString ? `/propiedades?${queryString}` : "/propiedades");
+    startTransition(() => {
+      router.push(queryString ? `/propiedades?${queryString}` : "/propiedades");
+    });
     setIsOpenMobile(false);
   };
 
@@ -68,7 +100,9 @@ function PropertiesFiltersInner({
     setPropiedad([]);
     setLocalidad([]);
     setDormitorios([]);
-    router.push("/propiedades");
+    startTransition(() => {
+      router.push("/propiedades");
+    });
     setIsOpenMobile(false);
   };
 
@@ -76,8 +110,20 @@ function PropertiesFiltersInner({
     <>
       {/* Operación - Radio buttons */}
       <div className="mb-4">
-        <div className="fw-semibold mb-2 small text-uppercase text-muted">Operación</div>
-        <div className="d-flex flex-column gap-2">
+        <button
+          type="button"
+          className="btn btn-link p-0 d-flex align-items-center justify-content-between w-100 text-decoration-none"
+          onClick={() => toggleSection("operacion")}
+          aria-expanded={expandedSections.operacion}
+          aria-controls="filters-operacion"
+        >
+          <span className="fw-semibold small text-uppercase text-muted">Operación</span>
+          <i className={`bi bi-chevron-${expandedSections.operacion ? "up" : "down"}`}></i>
+        </button>
+        <div
+          id="filters-operacion"
+          className={`filters-section ${expandedSections.operacion ? "filters-section--expanded mt-2" : "filters-section--collapsed"}`}
+        >
           <div className="form-check">
             <input
               className="form-check-input"
@@ -122,8 +168,20 @@ function PropertiesFiltersInner({
 
       {/* Tipo de propiedad - Checkboxes */}
       <div className="mb-4">
-        <div className="fw-semibold mb-2 small text-uppercase text-muted">Tipo de propiedad</div>
-        <div className="d-flex flex-column gap-2">
+        <button
+          type="button"
+          className="btn btn-link p-0 d-flex align-items-center justify-content-between w-100 text-decoration-none"
+          onClick={() => toggleSection("propiedad")}
+          aria-expanded={expandedSections.propiedad}
+          aria-controls="filters-propiedad"
+        >
+          <span className="fw-semibold small text-uppercase text-muted">Tipo de propiedad</span>
+          <i className={`bi bi-chevron-${expandedSections.propiedad ? "up" : "down"}`}></i>
+        </button>
+        <div
+          id="filters-propiedad"
+          className={`filters-section ${expandedSections.propiedad ? "filters-section--expanded mt-2" : "filters-section--collapsed"}`}
+        >
           {propertyTypes.map((type) => (
             <div key={type.slug} className="form-check">
               <input
@@ -146,8 +204,21 @@ function PropertiesFiltersInner({
 
       {/* Localidad - Checkboxes */}
       <div className="mb-4">
-        <div className="fw-semibold mb-2 small text-uppercase text-muted">Localidad</div>
-        <div className="d-flex flex-column gap-2" style={{ maxHeight: 200, overflowY: "auto" }}>
+        <button
+          type="button"
+          className="btn btn-link p-0 d-flex align-items-center justify-content-between w-100 text-decoration-none"
+          onClick={() => toggleSection("localidad")}
+          aria-expanded={expandedSections.localidad}
+          aria-controls="filters-localidad"
+        >
+          <span className="fw-semibold small text-uppercase text-muted">Localidad</span>
+          <i className={`bi bi-chevron-${expandedSections.localidad ? "up" : "down"}`}></i>
+        </button>
+        <div
+          id="filters-localidad"
+          className={`filters-section ${expandedSections.localidad ? "filters-section--expanded mt-2" : "filters-section--collapsed"}`}
+          style={{ maxHeight: 200, overflowY: "auto" }}
+        >
           {cities.map((city) => (
             <div key={city.slug} className="form-check">
               <input
@@ -170,8 +241,20 @@ function PropertiesFiltersInner({
 
       {/* Dormitorios - Checkboxes */}
       <div className="mb-4">
-        <div className="fw-semibold mb-2 small text-uppercase text-muted">Dormitorios</div>
-        <div className="d-flex flex-column gap-2">
+        <button
+          type="button"
+          className="btn btn-link p-0 d-flex align-items-center justify-content-between w-100 text-decoration-none"
+          onClick={() => toggleSection("dormitorios")}
+          aria-expanded={expandedSections.dormitorios}
+          aria-controls="filters-dormitorios"
+        >
+          <span className="fw-semibold small text-uppercase text-muted">Dormitorios</span>
+          <i className={`bi bi-chevron-${expandedSections.dormitorios ? "up" : "down"}`}></i>
+        </button>
+        <div
+          id="filters-dormitorios"
+          className={`filters-section ${expandedSections.dormitorios ? "filters-section--expanded mt-2" : "filters-section--collapsed"}`}
+        >
           {roomCounts.map((count) => (
             <div key={count} className="form-check">
               <input
@@ -196,7 +279,13 @@ function PropertiesFiltersInner({
 
       {/* Action buttons */}
       <div className="d-flex flex-column gap-2 pt-2 border-top">
-        <button type="button" className="btn btn-primary" onClick={applyFilters}>
+        <button
+          type="button"
+          className="btn btn-primary"
+          onClick={applyFilters}
+          disabled={isPending}
+          aria-busy={isPending}
+        >
           Aplicar filtros
         </button>
         {activeFilterCount > 0 && (
@@ -204,6 +293,8 @@ function PropertiesFiltersInner({
             type="button"
             className="btn btn-outline-secondary"
             onClick={clearFilters}
+            disabled={isPending}
+            aria-busy={isPending}
           >
             Limpiar filtros
           </button>

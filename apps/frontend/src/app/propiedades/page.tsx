@@ -43,6 +43,7 @@ interface PropertyListItem {
 
 const PROPERTIES_QUERY = defineQuery(`
   *[_type == "property"
+    && defined(slug.current)
     && !(status in ["vendido", "alquilado"])
     && ($operationType == "" || operationType == $operationType)
     && (count($propertyTypeSlugs) == 0 || propertyType->slug.current in $propertyTypeSlugs)
@@ -65,6 +66,7 @@ const PROPERTIES_QUERY = defineQuery(`
 
 const COUNT_QUERY = defineQuery(`
   count(*[_type == "property"
+    && defined(slug.current)
     && !(status in ["vendido", "alquilado"])
     && ($operationType == "" || operationType == $operationType)
     && (count($propertyTypeSlugs) == 0 || propertyType->slug.current in $propertyTypeSlugs)
