@@ -64,15 +64,19 @@ export default function Pagination({
     <nav aria-label="Paginación de propiedades" className="mt-5">
       <ul className="pagination justify-content-center flex-wrap gap-1">
         <li className={`page-item ${currentPage === 1 ? "disabled" : ""}`}>
-          <Link
-            href={currentPage > 1 ? createPageUrl(currentPage - 1) : "#"}
-            className="page-link"
-            aria-label="Página anterior"
-            aria-disabled={currentPage === 1}
-            tabIndex={currentPage === 1 ? -1 : undefined}
-          >
-            <span aria-hidden="true">&laquo;</span>
-          </Link>
+          {currentPage > 1 ? (
+            <Link
+              href={createPageUrl(currentPage - 1)}
+              className="page-link"
+              aria-label="Página anterior"
+            >
+              <span aria-hidden="true">&laquo;</span>
+            </Link>
+          ) : (
+            <span className="page-link" aria-label="Página anterior">
+              <span aria-hidden="true">&laquo;</span>
+            </span>
+          )}
         </li>
 
         {visiblePages.map((page, index) =>
@@ -97,20 +101,20 @@ export default function Pagination({
           )
         )}
 
-        <li
-          className={`page-item ${currentPage === totalPages ? "disabled" : ""}`}
-        >
-          <Link
-            href={
-              currentPage < totalPages ? createPageUrl(currentPage + 1) : "#"
-            }
-            className="page-link"
-            aria-label="Página siguiente"
-            aria-disabled={currentPage === totalPages}
-            tabIndex={currentPage === totalPages ? -1 : undefined}
-          >
-            <span aria-hidden="true">&raquo;</span>
-          </Link>
+        <li className={`page-item ${currentPage === totalPages ? "disabled" : ""}`}>
+          {currentPage < totalPages ? (
+            <Link
+              href={createPageUrl(currentPage + 1)}
+              className="page-link"
+              aria-label="Página siguiente"
+            >
+              <span aria-hidden="true">&raquo;</span>
+            </Link>
+          ) : (
+            <span className="page-link" aria-label="Página siguiente">
+              <span aria-hidden="true">&raquo;</span>
+            </span>
+          )}
         </li>
       </ul>
     </nav>

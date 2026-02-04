@@ -30,13 +30,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   return [
     {
       url: baseUrl,
-      lastModified: new Date(),
       changeFrequency: "daily",
       priority: 1,
     },
     {
       url: `${baseUrl}/propiedades`,
-      lastModified: new Date(),
       changeFrequency: "daily",
       priority: 0.9,
     },

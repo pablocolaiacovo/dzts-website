@@ -299,6 +299,10 @@ Frontend environment variables (in `apps/frontend/.env.local`):
 - Map iframe titles are passed via the `MapSection` `title` prop for contextual SEO.
 - Sanity CDN preconnect is included in `apps/frontend/src/app/layout.tsx`.
 - `global-error.tsx` exists as a root error boundary with its own `<html>` and `<body>`.
+- Sitemap static entries omit `lastModified` to avoid `new Date()` on every build.
+- Disabled pagination controls render as `<span>` instead of `<a>`.
+- Footer certification images are set to `loading="lazy"`.
+- Inter font no longer sets an unused CSS variable.
 - Webhook revalidation route: `src/app/api/revalidate/route.ts`. Uses `parseBody` from `next-sanity/webhook` for HMAC validation and `revalidateTag(type, "max")` from `next/cache`.
 - In Next.js 16, `revalidateTag()` requires two arguments: `(tag, profile)`. Pass `"max"` as the profile to revalidate all cache entries for a tag regardless of their original `cacheLife`.
 - The `/propiedades` listing page calls `sanityFetch` directly without `"use cache"` (dynamic `searchParams`), so it has no cache tag and is unaffected by revalidation.

@@ -103,12 +103,12 @@ If the root layout throws, there's no error boundary. Add `global-error.tsx` wit
 
 ## Low Priority
 
-### 18. [SEO] Sitemap static entries use `new Date()`
+### 18. [SEO] Sitemap static entries use `new Date()` (Done)
 **File:** `src/app/sitemap.ts`
 
 The static entries (home, /propiedades) use `new Date()` which changes on every build. Consider a fixed date or fetching from CMS.
 
-### 19. [Accessibility] Pagination disabled links use `href="#"`
+### 19. [Accessibility] Pagination disabled links use `href="#"` (Done)
 **File:** `src/components/Pagination.tsx:68`
 
 Disabled pagination links with `href="#"` cause scroll-to-top on click. Use `<span>` instead of `<Link>` for disabled states.
@@ -118,12 +118,12 @@ Disabled pagination links with `href="#"` cause scroll-to-top on click. Use `<sp
 
 Bootstrap's JS bundle loads on every page but is only needed for carousel and navbar collapse. Consider lazy loading.
 
-### 21. [Accessibility] Footer certification images load eagerly
+### 21. [Accessibility] Footer certification images load eagerly (Done)
 **File:** `src/components/Footer.tsx`
 
 Below-the-fold footer images could benefit from `loading="lazy"` on the `<Image>` components.
 
-### 22. [Next.js] Unused font CSS variable
+### 22. [Next.js] Unused font CSS variable (Done)
 **File:** `src/app/layout.tsx:14-18`
 
 Inter is configured with `variable: "--font-inter"` but only `inter.className` is used. The CSS variable is never referenced. Either use it in CSS or remove the `variable` config.

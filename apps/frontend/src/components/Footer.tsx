@@ -120,6 +120,7 @@ export default function Footer({
                   width={50}
                   height={50}
                   className="cert-image"
+                  loading="lazy"
                 />
               );
 

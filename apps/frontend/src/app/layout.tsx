@@ -15,7 +15,6 @@ import "@/styles/variables.css";
 const inter = Inter({
   subsets: ["latin"],
   display: "swap",
-  variable: "--font-inter",
 });
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL;

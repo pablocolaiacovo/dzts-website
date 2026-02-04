@@ -213,6 +213,10 @@ Two GitHub Actions workflows run on PRs to `dev` and `main`:
 - Map iframe titles are passed via the `MapSection` `title` prop for contextual SEO.
 - Sanity CDN preconnect is included in `apps/frontend/src/app/layout.tsx`.
 - `global-error.tsx` exists as a root error boundary with its own `<html>` and `<body>`.
+- Sitemap static entries omit `lastModified` to avoid `new Date()` on every build.
+- Disabled pagination controls render as `<span>` instead of `<a>`.
+- Footer certification images are set to `loading="lazy"`.
+- Inter font no longer sets an unused CSS variable.
 
 ## Components
 
