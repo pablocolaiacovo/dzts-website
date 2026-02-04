@@ -6,6 +6,7 @@ import { notFound } from "next/navigation";
 import { defineQuery } from "next-sanity";
 import type { SanityImageSource } from "@sanity/image-url";
 import { sanityFetch } from "@/sanity/lib/live";
+import { client } from "@/sanity/lib/client";
 import { urlFor } from "@/sanity/lib/image";
 import { getCachedSiteSeo } from "@/sanity/queries/seo";
 import {
@@ -43,6 +44,12 @@ const PROPERTY_QUERY = defineQuery(`
   }
 `);
 
+const PROPERTY_SLUGS_QUERY = defineQuery(`
+  *[_type == "property" && defined(slug.current)]{
+    "slug": slug.current
+  }
+`);
+
 interface PropertyImageAsset {
   _id: string;
   url?: string | null;
@@ -72,6 +79,10 @@ interface PropertyDetail {
     ogImage?: { asset?: { url?: string | null } | null } | null;
     noIndex?: boolean | null;
   } | null;
+}
+
+interface PropertySlugEntry {
+  slug: string;
 }
 
 async function getCachedProperty(slug: string) {
@@ -108,6 +119,11 @@ export async function generateMetadata({
     ogImageUrl,
     canonicalUrl: `/propiedades/${slug}`,
   });
+}
+
+export async function generateStaticParams() {
+  const slugs = await client.fetch<PropertySlugEntry[]>(PROPERTY_SLUGS_QUERY);
+  return slugs.map((entry) => ({ slug: entry.slug }));
 }
 
 export default async function PropertyPage({
