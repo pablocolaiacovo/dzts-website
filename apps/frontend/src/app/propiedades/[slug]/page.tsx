@@ -25,6 +25,7 @@ const PROPERTY_QUERY = defineQuery(`
     price,
     "propertyType": propertyType->name,
     operationType,
+    status,
     currency,
     "city": city->name,
     "images": images[] { asset->{ _id, url, metadata { lqip } } },
@@ -56,6 +57,7 @@ interface PropertyDetail {
   price?: number | null;
   propertyType?: string | null;
   operationType?: string | null;
+  status?: string | null;
   currency?: string | null;
   city?: string | null;
   images?: Array<PropertyImage | null> | null;
@@ -173,6 +175,11 @@ export default async function PropertyPage({
               {property.propertyType && (
                 <span className="badge rounded-pill bg-info text-white fs-6">
                   {property.propertyType}
+                </span>
+              )}
+              {property.status && property.status !== "disponible" && (
+                <span className="badge rounded-pill bg-danger text-white fs-6">
+                  {property.status === "vendido" ? "Vendido" : "Alquilado"}
                 </span>
               )}
             </div>

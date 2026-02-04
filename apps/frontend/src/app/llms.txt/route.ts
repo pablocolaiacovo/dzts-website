@@ -9,7 +9,7 @@ export async function GET() {
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://example.com";
 
   const properties = await client.fetch<PropertySlug[]>(`
-    *[_type == "property" && defined(slug.current)] | order(title asc) {
+    *[_type == "property" && defined(slug.current) && !(status in ["vendido", "alquilado"])] | order(title asc) {
       "slug": slug.current,
       title
     }
