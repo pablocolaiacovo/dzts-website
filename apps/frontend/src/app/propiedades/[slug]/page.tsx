@@ -242,7 +242,10 @@ export default async function PropertyPage({
           </div>
         </div>
       </div>
-      <MapSection address={property.address} />
+      <MapSection
+        address={property.address}
+        title={`Ubicación de ${property.title || "la propiedad"}`}
+      />
     </>
   );
 }

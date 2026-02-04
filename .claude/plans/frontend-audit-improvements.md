@@ -12,6 +12,13 @@ Audit performed on 2026-02-04 against `apps/frontend/`.
 - [x] Home page streaming with `<Suspense>` fallbacks
 - [x] Organization + BreadcrumbList JSON-LD
 - [x] Reduced motion behavior for scroll + carousel + CSS
+- [x] Header nav background uses CSS variable
+- [x] Carousel controls in Spanish
+- [x] PropertyCard cleaned up (object-fit + decorative icon)
+- [x] MapSection supports contextual iframe title
+- [x] Sanity CDN preconnect added
+- [x] Verified metadata/robots/sitemap setup
+- [x] Global error boundary added
 
 ## High Priority
 
@@ -49,27 +56,27 @@ Carousel auto-advances, smooth scrolling is used in Header and ScrollToTopButton
 
 ## Medium Priority
 
-### 10. [Performance] Hardcoded inline color in Header nav
+### 10. [Performance] Hardcoded inline color in Header nav (Done)
 **File:** `src/components/Header.tsx:116`
 
 `style={{ backgroundColor: "#3d3d3d" }}` should use a CSS variable.
 
-### 11. [Accessibility] Carousel labels are in English
+### 11. [Accessibility] Carousel labels are in English (Done)
 **File:** `src/components/ImageCarousel.tsx:82,92`
 
 "Previous" and "Next" should be "Anterior" and "Siguiente" since the site is `lang="es"`.
 
-### 12. [Performance] Redundant object-fit in PropertyCard
+### 12. [Performance] Redundant object-fit in PropertyCard (Done)
 **File:** `src/components/PropertyCard.tsx:50-51`
 
 Both CSS class `object-fit-cover` and inline `style={{ objectFit: "cover" }}` are applied. Remove the inline style.
 
-### 13. [Accessibility] Share icon not marked decorative
+### 13. [Accessibility] Share icon not marked decorative (Done)
 **File:** `src/components/PropertyCard.tsx:75`
 
 `<i className="bi bi-share">` needs `aria-hidden="true"`.
 
-### 14. [SEO] MapSection iframe title is always the same
+### 14. [SEO] MapSection iframe title is always the same (Done)
 **File:** `src/components/MapSection.tsx:19`
 
 Title is always "Ubicación de la oficina" even on property detail pages. Accept a `title` prop for contextual titles.
@@ -79,17 +86,17 @@ Title is always "Ubicación de la oficina" even on property detail pages. Accept
 
 ~~Error message div needs `role="alert"`.~~ **Fixed** as part of critical ContactModal work.
 
-### 16. [Performance] Missing preconnect for Sanity CDN
+### 16. [Performance] Missing preconnect for Sanity CDN (Done)
 **File:** `src/app/layout.tsx`
 
 Add `<link rel="preconnect" href="https://cdn.sanity.io" />` in the `<head>` to speed up image loading.
 
-### 16a. [SEO] Verify metadata base + robots/sitemap basics
+### 16a. [SEO] Verify metadata base + robots/sitemap basics (Done)
 **Files:** `src/app/layout.tsx`, `src/app/robots.ts`, `src/app/sitemap.ts`
 
 Confirm `metadataBase` is defined, `robots` allows indexing for public pages, and `sitemap` includes only canonical, indexable URLs.
 
-### 17. [Next.js] Missing `global-error.tsx`
+### 17. [Next.js] Missing `global-error.tsx` (Done)
 **File:** `src/app/global-error.tsx` (new)
 
 If the root layout throws, there's no error boundary. Add `global-error.tsx` with its own `<html>` and `<body>` tags.

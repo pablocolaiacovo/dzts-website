@@ -7,7 +7,11 @@ interface PropertySlug {
 }
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://example.com";
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL;
+
+  if (!baseUrl) {
+    return [];
+  }
 
   const properties = await client.fetch<PropertySlug[]>(`
     *[_type == "property" && defined(slug.current) && !(status in ["vendido", "alquilado"])] {

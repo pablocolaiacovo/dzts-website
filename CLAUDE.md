@@ -209,6 +209,10 @@ Two GitHub Actions workflows run on PRs to `dev` and `main`:
 - Home page uses `<Suspense>` to stream featured properties, home sections, and map with skeleton fallbacks.
 - LCP image priority is on the home hero background (`SearchProperties`), not on the header logo.
 - Reduced motion: smooth scroll falls back to `behavior: "auto"`, carousel auto-advance is disabled, and global CSS reduces animations when `prefers-reduced-motion` is set.
+- Header nav background uses `--header-nav-bg` from `apps/frontend/src/styles/variables.css` (no inline style).
+- Map iframe titles are passed via the `MapSection` `title` prop for contextual SEO.
+- Sanity CDN preconnect is included in `apps/frontend/src/app/layout.tsx`.
+- `global-error.tsx` exists as a root error boundary with its own `<html>` and `<body>`.
 
 ## Components
 

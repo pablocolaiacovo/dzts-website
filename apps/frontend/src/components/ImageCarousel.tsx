@@ -98,7 +98,7 @@ export default function ImageCarousel({ images, title }: ImageCarouselProps) {
             style={{ background: 'linear-gradient(to right, rgba(0,0,0,0.4), transparent)' }}
           >
             <span className="carousel-control-prev-icon" aria-hidden="true" />
-            <span className="visually-hidden">Previous</span>
+            <span className="visually-hidden">Anterior</span>
           </button>
           <button
             className="carousel-control-next"
@@ -108,7 +108,7 @@ export default function ImageCarousel({ images, title }: ImageCarouselProps) {
             style={{ background: 'linear-gradient(to left, rgba(0,0,0,0.4), transparent)' }}
           >
             <span className="carousel-control-next-icon" aria-hidden="true" />
-            <span className="visually-hidden">Next</span>
+            <span className="visually-hidden">Siguiente</span>
           </button>
         </>
       )}

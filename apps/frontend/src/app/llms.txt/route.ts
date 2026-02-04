@@ -6,7 +6,11 @@ interface PropertySlug {
 }
 
 export async function GET() {
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://example.com";
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL;
+
+  if (!baseUrl) {
+    return new Response("Missing NEXT_PUBLIC_SITE_URL", { status: 500 });
+  }
 
   const properties = await client.fetch<PropertySlug[]>(`
     *[_type == "property" && defined(slug.current) && !(status in ["vendido", "alquilado"])] | order(title asc) {

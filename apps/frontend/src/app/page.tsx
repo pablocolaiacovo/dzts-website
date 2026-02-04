@@ -70,7 +70,7 @@ async function HomeSections() {
 
 async function MapSectionWrapper() {
   const address = await getCachedMapAddress();
-  return <MapSection address={address} />;
+  return <MapSection address={address} title="Ubicación de la oficina" />;
 }
 
 function FeaturedPropertiesFallback({ heading }: { heading?: string | null }) {

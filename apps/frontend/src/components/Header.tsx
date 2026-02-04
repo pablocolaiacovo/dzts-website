@@ -118,7 +118,6 @@ export default function Header({ logo, siteName, navigation }: HeaderProps) {
       <header className="sticky-header">
         <nav
           className="navbar navbar-expand-lg navbar-dark"
-          style={{ backgroundColor: "#3d3d3d" }}
           aria-label="Main navigation"
         >
           <div className="container">

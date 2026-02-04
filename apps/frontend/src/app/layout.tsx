@@ -76,6 +76,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="es">
+      <head>
+        <link rel="preconnect" href="https://cdn.sanity.io" />
+      </head>
       <body className={inter.className}>
         <a href="#main-content" className="visually-hidden-focusable position-absolute top-0 start-0 p-2 bg-primary text-white z-3">
           Saltar al contenido principal
