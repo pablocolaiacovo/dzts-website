@@ -36,6 +36,10 @@ export default function Footer({
 }: FooterProps) {
   const logoUrl = logo?.asset ? urlFor(logo).width(300).url() : null;
   const logoAlt = logo?.alt || siteName || "";
+  const socialLinksWithUrl = socialLinks?.filter(
+    (link): link is NonNullable<typeof link> & { url: string } =>
+      Boolean(link?.url),
+  );
 
   return (
     <footer className="site-footer">
@@ -83,9 +87,9 @@ export default function Footer({
           {/* Center: Back to top + Copyright */}
           <div className="footer-center">
             <ScrollToTopButton />
-            {socialLinks && socialLinks.length > 0 && (
+            {socialLinksWithUrl && socialLinksWithUrl.length > 0 && (
               <div className="footer-social">
-                {socialLinks.map((link) => (
+                {socialLinksWithUrl.map((link) => (
                   <a
                     key={link._key}
                     href={link.url}

@@ -24,7 +24,7 @@ export async function getCachedOrganization() {
 export function buildOrganizationJsonLd(
   org: NonNullable<Awaited<ReturnType<typeof getCachedOrganization>>>,
 ) {
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "";
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL;
 
   return {
     "@type": "RealEstateAgent",
@@ -42,7 +42,9 @@ export function buildOrganizationJsonLd(
     }),
     ...(org.socialLinks &&
       org.socialLinks.length > 0 && {
-        sameAs: org.socialLinks.map((link) => link.url).filter(Boolean),
+        sameAs: org.socialLinks
+          .map((link: { url?: string | null } | null) => link?.url)
+          .filter((url: string | null | undefined): url is string => Boolean(url)),
       }),
   };
 }
