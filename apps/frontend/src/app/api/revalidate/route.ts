@@ -29,8 +29,6 @@ export async function POST(req: NextRequest) {
       return new Response("Invalid signature", { status: 401 });
     }
 
-    console.log("Revalidating tag:", body);
-
     if (!body?._type) {
       return new Response("Bad request", { status: 400 });
     }
