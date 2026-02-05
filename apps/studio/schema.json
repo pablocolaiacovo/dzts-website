@@ -410,6 +410,27 @@
         },
         "optional": true
       },
+      "status": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "union",
+          "of": [
+            {
+              "type": "string",
+              "value": "disponible"
+            },
+            {
+              "type": "string",
+              "value": "vendido"
+            },
+            {
+              "type": "string",
+              "value": "alquilado"
+            }
+          ]
+        },
+        "optional": true
+      },
       "propertyType": {
         "type": "objectAttribute",
         "value": {

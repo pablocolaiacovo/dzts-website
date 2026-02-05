@@ -217,6 +217,7 @@ Two GitHub Actions workflows run on PRs to `dev` and `main`:
 - Disabled pagination controls render as `<span>` instead of `<a>`.
 - Footer certification images are set to `loading="lazy"`.
 - Inter font no longer sets an unused CSS variable.
+- Property detail pages export `generateStaticParams()` to pre-render available property slugs at build time.
 
 ## Components
 

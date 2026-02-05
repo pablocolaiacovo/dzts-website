@@ -303,6 +303,7 @@ Frontend environment variables (in `apps/frontend/.env.local`):
 - Disabled pagination controls render as `<span>` instead of `<a>`.
 - Footer certification images are set to `loading="lazy"`.
 - Inter font no longer sets an unused CSS variable.
+- Property detail pages export `generateStaticParams()` to pre-render available property slugs at build time.
 - Webhook revalidation route: `src/app/api/revalidate/route.ts`. Uses `parseBody` from `next-sanity/webhook` for HMAC validation and `revalidateTag(type, "max")` from `next/cache`.
 - In Next.js 16, `revalidateTag()` requires two arguments: `(tag, profile)`. Pass `"max"` as the profile to revalidate all cache entries for a tag regardless of their original `cacheLife`.
 - The `/propiedades` listing page calls `sanityFetch` directly without `"use cache"` (dynamic `searchParams`), so it has no cache tag and is unaffected by revalidation.

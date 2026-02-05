@@ -14,7 +14,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   }
 
   const properties = await client.fetch<PropertySlug[]>(`
-    *[_type == "property" && defined(slug.current) && !(status in ["vendido", "alquilado"])] {
+    *[_type == "property" && defined(slug.current)] {
       "slug": slug.current,
       _updatedAt
     }

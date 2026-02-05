@@ -1,25 +1,35 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useTransition } from "react";
 import type { FilterOption } from "@/types/filters";
 import { parseMultiple } from "@/lib/filters";
 
 interface ActiveFilterBadgesProps {
   cities: FilterOption[];
   propertyTypes: FilterOption[];
+  onFilteringChange?: (isFiltering: boolean) => void;
 }
 
 export default function ActiveFilterBadges({
   cities,
   propertyTypes,
+  onFilteringChange,
 }: ActiveFilterBadgesProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const [isPending, startTransition] = useTransition();
 
   const appliedOperacion = searchParams.get("operacion") || "";
   const appliedPropiedad = parseMultiple(searchParams.get("propiedad"));
   const appliedLocalidad = parseMultiple(searchParams.get("localidad"));
   const appliedDormitorios = parseMultiple(searchParams.get("dormitorios"));
+
+  useEffect(() => {
+    if (onFilteringChange) {
+      onFilteringChange(isPending);
+    }
+  }, [isPending, onFilteringChange]);
 
   const getOperacionLabel = (value: string) => {
     if (value === "venta") return "Venta";
@@ -93,11 +103,15 @@ export default function ActiveFilterBadges({
 
     params.delete("pagina");
     const queryString = params.toString();
-    router.push(queryString ? `/propiedades?${queryString}` : "/propiedades");
+    startTransition(() => {
+      router.push(queryString ? `/propiedades?${queryString}` : "/propiedades");
+    });
   };
 
   const clearAllFilters = () => {
-    router.push("/propiedades");
+    startTransition(() => {
+      router.push("/propiedades");
+    });
   };
 
   if (appliedFilters.length === 0) {

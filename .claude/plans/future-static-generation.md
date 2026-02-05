@@ -14,7 +14,7 @@ Pre-render all property detail pages at build time and keep them fresh on publis
 
 ## Implementation Steps
 
-### 1) Add `generateStaticParams()` for property detail pages
+### 1) Add `generateStaticParams()` for property detail pages (Done)
 **File:** `apps/frontend/src/app/propiedades/[slug]/page.tsx`
 
 - Query all published property slugs from Sanity
