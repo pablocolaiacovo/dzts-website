@@ -42,12 +42,17 @@ export default function Header({ logo, siteName, navigation }: HeaderProps) {
     collapseNav();
   };
 
+  const getScrollBehavior = () =>
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches
+      ? "auto"
+      : "smooth";
+
   const handleAnchorClick = (e: React.MouseEvent, targetId: string) => {
     e.preventDefault();
     collapseNav();
     const target = document.getElementById(targetId);
     if (target) {
-      target.scrollIntoView({ behavior: "smooth", block: "start" });
+      target.scrollIntoView({ behavior: getScrollBehavior(), block: "start" });
       window.history.replaceState(null, "", `/#${targetId}`);
     }
   };
@@ -113,7 +118,6 @@ export default function Header({ logo, siteName, navigation }: HeaderProps) {
       <header className="sticky-header">
         <nav
           className="navbar navbar-expand-lg navbar-dark"
-          style={{ backgroundColor: "#3d3d3d" }}
           aria-label="Main navigation"
         >
           <div className="container">
@@ -124,7 +128,6 @@ export default function Header({ logo, siteName, navigation }: HeaderProps) {
                   alt={logoAlt}
                   width={150}
                   height={60}
-                  priority
                 />
               )}
             </Link>

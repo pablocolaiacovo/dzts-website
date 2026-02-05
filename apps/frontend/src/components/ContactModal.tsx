@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useEffect, FormEvent } from "react";
+import type { SyntheticEvent } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import "./ContactModal.css";
 
 interface ContactModalProps {
@@ -8,10 +9,19 @@ interface ContactModalProps {
   onHide: () => void;
 }
 
+const FOCUSABLE_SELECTOR =
+  'button:not([disabled]), input:not([disabled]):not([type="hidden"]):not([tabindex="-1"]), textarea:not([disabled]), select:not([disabled]), [href], [tabindex]:not([tabindex="-1"])';
+
 export default function ContactModal({ show, onHide }: ContactModalProps) {
   const [status, setStatus] = useState<
     "idle" | "submitting" | "success" | "error"
   >("idle");
+  const dialogRef = useRef<HTMLDivElement>(null);
+
+  const handleClose = useCallback(() => {
+    setStatus("idle");
+    onHide();
+  }, [onHide]);
 
   useEffect(() => {
     if (show) {
@@ -24,7 +34,45 @@ export default function ContactModal({ show, onHide }: ContactModalProps) {
     };
   }, [show]);
 
-  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+  useEffect(() => {
+    if (!show) return;
+
+    const dialog = dialogRef.current;
+    if (!dialog) return;
+
+    requestAnimationFrame(() => {
+      const first = dialog.querySelector<HTMLElement>(FOCUSABLE_SELECTOR);
+      first?.focus();
+    });
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        handleClose();
+        return;
+      }
+
+      if (e.key !== "Tab") return;
+
+      const focusable = dialog.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR);
+      if (focusable.length === 0) return;
+
+      const firstEl = focusable[0];
+      const lastEl = focusable[focusable.length - 1];
+
+      if (e.shiftKey && document.activeElement === firstEl) {
+        e.preventDefault();
+        lastEl.focus();
+      } else if (!e.shiftKey && document.activeElement === lastEl) {
+        e.preventDefault();
+        firstEl.focus();
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [show, handleClose]);
+
+  const handleSubmit = async (e: SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
     setStatus("submitting");
 
@@ -53,11 +101,6 @@ export default function ContactModal({ show, onHide }: ContactModalProps) {
     }
   };
 
-  const handleClose = () => {
-    setStatus("idle");
-    onHide();
-  };
-
   if (!show) return null;
 
   return (
@@ -77,6 +120,7 @@ export default function ContactModal({ show, onHide }: ContactModalProps) {
         onClick={handleClose}
       >
         <div
+          ref={dialogRef}
           className="modal-dialog modal-dialog-centered"
           onClick={(e) => e.stopPropagation()}
         >
@@ -176,7 +220,7 @@ export default function ContactModal({ show, onHide }: ContactModalProps) {
                   </div>
 
                   {status === "error" && (
-                    <div className="contact-error mb-3">
+                    <div className="contact-error mb-3" role="alert">
                       Hubo un error al enviar el mensaje. Por favor, intente
                       nuevamente.
                     </div>

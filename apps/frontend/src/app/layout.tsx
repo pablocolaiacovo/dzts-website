@@ -15,10 +15,12 @@ import "@/styles/variables.css";
 const inter = Inter({
   subsets: ["latin"],
   display: "swap",
-  variable: "--font-inter",
 });
 
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL;
+
 export const metadata: Metadata = {
+  ...(siteUrl ? { metadataBase: new URL(siteUrl) } : {}),
   title: {
     default: "DZTS Inmobiliaria",
     template: "%s | DZTS Inmobiliaria",
@@ -45,7 +47,7 @@ async function SiteShell({ children }: { children: React.ReactNode }) {
         siteName={siteSettings?.siteName}
         navigation={siteSettings?.mainNavigation}
       />
-      <main>{children}</main>
+      <main id="main-content">{children}</main>
       <Footer
         logo={siteSettings?.logo}
         siteName={siteSettings?.siteName}
@@ -73,7 +75,13 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="es">
+      <head>
+        <link rel="preconnect" href="https://cdn.sanity.io" />
+      </head>
       <body className={inter.className}>
+        <a href="#main-content" className="visually-hidden-focusable position-absolute top-0 start-0 p-2 bg-primary text-white z-3">
+          Saltar al contenido principal
+        </a>
         <Suspense>
           <SiteShell>{children}</SiteShell>
         </Suspense>

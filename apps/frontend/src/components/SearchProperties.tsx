@@ -49,6 +49,7 @@ export default function SearchProperties({
         fill
         className="object-cover negative-z"
         sizes="100vw"
+        priority
         {...(heroImageLqip
           ? { placeholder: "blur" as const, blurDataURL: heroImageLqip }
           : {})}
@@ -64,6 +65,7 @@ export default function SearchProperties({
               alt={heroLogoAlt ?? ""}
               fill
               className="logo-image"
+              sizes="(max-width: 767.98px) 200px, 400px"
             />
           </div>
           <h1 className="text-center">{heroHeading}</h1>

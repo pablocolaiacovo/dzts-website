@@ -48,7 +48,6 @@ export default function PropertyCard({
             height={220}
             sizes="(min-width: 992px) 33vw, (min-width: 768px) 50vw, 100vw"
             className="card-img-top rounded-top-4 object-fit-cover"
-            style={{ objectFit: "cover" }}
             {...(lqip ? { placeholder: "blur" as const, blurDataURL: lqip } : {})}
           />
           {operationType && (
@@ -72,7 +71,7 @@ export default function PropertyCard({
           {subtitle && <p className="mb-3 text-body small">{subtitle}</p>}
           <div className="d-flex align-items-center justify-content-between border-top pt-3">
             <span className="text-primary fs-5">
-              <i className="bi bi-share"></i>
+              <i className="bi bi-share" aria-hidden="true"></i>
             </span>
             <span className="fw-bold text-primary fs-5">
               {price != null

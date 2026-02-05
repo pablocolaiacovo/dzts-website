@@ -1,8 +1,9 @@
 interface MapSectionProps {
   address?: string | null;
+  title: string;
 }
 
-export default function MapSection({ address }: MapSectionProps) {
+export default function MapSection({ address, title }: MapSectionProps) {
   if (!address) return null;
 
   const mapSrc = `https://www.google.com/maps?q=${encodeURIComponent(address)}&output=embed`;
@@ -16,7 +17,7 @@ export default function MapSection({ address }: MapSectionProps) {
           allowFullScreen
           loading="lazy"
           referrerPolicy="no-referrer-when-downgrade"
-          title="Ubicación de la oficina"
+          title={title}
         />
       </div>
     </div>

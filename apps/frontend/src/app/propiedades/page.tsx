@@ -22,7 +22,7 @@ export async function generateMetadata(): Promise<Metadata> {
     getCachedSiteSeo(),
   ]);
 
-  return resolveMetadata(pageSeo, siteSeo);
+  return resolveMetadata(pageSeo, siteSeo, { canonicalUrl: "/propiedades" });
 }
 
 const PAGE_SIZE = 12;
@@ -149,7 +149,7 @@ export default async function PropiedadesPage({ searchParams }: PageProps) {
       <Breadcrumb
         items={[
           { label: "Inicio", href: "/", isHome: true },
-          { label: "Propiedades" },
+          { label: "Propiedades", href: "/propiedades" },
         ]}
       />
       <h1 className="text-center mb-4 fw-bold">{heading}</h1>
