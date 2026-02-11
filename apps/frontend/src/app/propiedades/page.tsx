@@ -147,7 +147,7 @@ export default async function PropiedadesPage({ searchParams }: PageProps) {
   };
 
   return (
-    <main className="container-fluid px-3 px-lg-4 py-4 py-md-5">
+    <main className="container-fluid px-4 py-4 py-md-5">
       <Breadcrumb
         items={[
           { label: "Inicio", href: "/", isHome: true },
