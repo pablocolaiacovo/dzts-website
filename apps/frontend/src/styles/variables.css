@@ -52,13 +52,16 @@
   --letter-spacing-wide: 0.025em;
 }
 
+html {
+  overflow-x: hidden;
+}
+
 body {
   font-family: var(--bs-font-family-base);
   font-size: var(--font-size-base);
   line-height: var(--line-height-normal);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  overflow-x: hidden;
 }
 
 h1 {
