@@ -1,6 +1,6 @@
 export default function PropiedadesLoading() {
   return (
-    <main className="container-fluid px-4 py-4 py-md-5">
+    <main className="container-fluid px-3 px-lg-4 py-4 py-md-5">
       <nav aria-label="breadcrumb" className="mb-3">
         <div className="placeholder-glow">
           <span className="placeholder col-3"></span>
