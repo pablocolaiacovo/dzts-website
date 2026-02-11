@@ -37,9 +37,9 @@ export default function PropertyCard({
   const currencySymbol = currency === "ARS" ? "AR$" : "US$";
 
   return (
-    <Link href={`/propiedades/${slug}`} className="text-decoration-none">
+    <Link href={`/propiedades/${slug}`} className="text-decoration-none mw-100">
       <div
-        className="card shadow-sm rounded-4 border-0 h-100 w-100"
+        className="card shadow-sm rounded-4 border-0 h-100"
         style={{ maxWidth: 400 }}
       >
         <div className="position-relative" style={{ aspectRatio: "400/220" }}>
