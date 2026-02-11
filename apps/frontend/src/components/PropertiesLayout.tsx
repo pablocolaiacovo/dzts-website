@@ -48,7 +48,7 @@ export default function PropertiesLayout({
             </div>
           </div>
 
-          <div style={{ gridArea: "main", minWidth: 0, overflowX: "hidden" }}>
+          <div style={{ gridArea: "main", minWidth: 0 }}>
           <ActiveFilterBadges
             cities={filterOptions.cities}
             propertyTypes={filterOptions.propertyTypes}
