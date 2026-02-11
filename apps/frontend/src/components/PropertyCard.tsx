@@ -39,15 +39,14 @@ export default function PropertyCard({
   return (
     <Link href={`/propiedades/${slug}`} className="text-decoration-none w-100">
       <div
-        className="card shadow-sm rounded-4 border-0 h-100 mx-auto overflow-hidden"
+        className="card shadow-sm rounded-4 border-0 h-100 mx-auto"
         style={{ maxWidth: 400 }}
       >
         <div className="position-relative" style={{ aspectRatio: "400/220" }}>
           <Image
             src={imageUrl}
             alt={title || "Property Image"}
-            width={400}
-            height={220}
+            fill
             sizes="(min-width: 992px) 33vw, (min-width: 768px) 50vw, 100vw"
             className="card-img-top rounded-top-4 object-fit-cover"
             priority={priority}
