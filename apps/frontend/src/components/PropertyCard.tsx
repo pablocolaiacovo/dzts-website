@@ -39,7 +39,7 @@ export default function PropertyCard({
   return (
     <Link href={`/propiedades/${slug}`} className="text-decoration-none w-100">
       <div
-        className="card shadow-sm rounded-4 border-0 h-100 mx-auto"
+        className="card shadow-sm rounded-4 border-0 h-100 mx-auto overflow-hidden"
         style={{ maxWidth: 400 }}
       >
         <div className="position-relative" style={{ aspectRatio: "400/220" }}>
