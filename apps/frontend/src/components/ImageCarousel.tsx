@@ -1,10 +1,14 @@
 "use client";
 
+import { useState } from "react";
+import dynamic from "next/dynamic";
 import { urlFor } from "@/sanity/lib/image";
 import type { SanityImageSource } from "@sanity/image-url";
 import Image from "next/image";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
 import "./ImageCarousel.css";
+
+const ImageLightbox = dynamic(() => import("./ImageLightbox"), { ssr: false });
 
 interface CarouselImage {
   asset?: SanityImageSource | null;
@@ -18,6 +22,8 @@ interface ImageCarouselProps {
 
 export default function ImageCarousel({ images, title }: ImageCarouselProps) {
   const prefersReducedMotion = useReducedMotion();
+  const [lightboxOpen, setLightboxOpen] = useState(false);
+  const [lightboxIndex, setLightboxIndex] = useState(0);
 
   if (images.length === 0) {
     return (
@@ -61,7 +67,22 @@ export default function ImageCarousel({ images, title }: ImageCarouselProps) {
 
           return (
             <div key={index} className={`carousel-item ${index === 0 ? 'active' : ''}`}>
-              <div className="carousel-image-container position-relative">
+              <div
+                className="carousel-image-container position-relative"
+                role="button"
+                tabIndex={0}
+                onClick={() => {
+                  setLightboxIndex(index);
+                  setLightboxOpen(true);
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    setLightboxIndex(index);
+                    setLightboxOpen(true);
+                  }
+                }}
+              >
                 <Image
                   src={url}
                   alt={`${title} - Imagen ${index + 1}`}
@@ -100,6 +121,13 @@ export default function ImageCarousel({ images, title }: ImageCarouselProps) {
           </button>
         </>
       )}
+      <ImageLightbox
+        show={lightboxOpen}
+        onHide={() => setLightboxOpen(false)}
+        images={images}
+        title={title}
+        initialIndex={lightboxIndex}
+      />
     </div>
   );
 }
