@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
+import { createPortal } from "react-dom";
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 import type { ReactZoomPanPinchRef } from "react-zoom-pan-pinch";
 import { urlFor } from "@/sanity/lib/image";
@@ -157,7 +158,7 @@ export default function ImageLightbox({
     ? urlFor(currentImage.asset).width(1920).auto("format").quality(85).url()
     : null;
 
-  return (
+  return createPortal(
     <>
       <div
         className="modal-backdrop fade show"
@@ -282,6 +283,7 @@ export default function ImageLightbox({
           </div>
         </div>
       </div>
-    </>
+    </>,
+    document.body
   );
 }

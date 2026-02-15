@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import dynamic from "next/dynamic";
 import { urlFor } from "@/sanity/lib/image";
 import type { SanityImageSource } from "@sanity/image-url";
@@ -24,6 +24,7 @@ export default function ImageCarousel({ images, title }: ImageCarouselProps) {
   const prefersReducedMotion = useReducedMotion();
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState(0);
+  const hideLightbox = useCallback(() => setLightboxOpen(false), []);
 
   if (images.length === 0) {
     return (
@@ -121,13 +122,15 @@ export default function ImageCarousel({ images, title }: ImageCarouselProps) {
           </button>
         </>
       )}
-      <ImageLightbox
-        show={lightboxOpen}
-        onHide={() => setLightboxOpen(false)}
-        images={images}
-        title={title}
-        initialIndex={lightboxIndex}
-      />
+      {lightboxOpen && (
+        <ImageLightbox
+          show={lightboxOpen}
+          onHide={hideLightbox}
+          images={images}
+          title={title}
+          initialIndex={lightboxIndex}
+        />
+      )}
     </div>
   );
 }
