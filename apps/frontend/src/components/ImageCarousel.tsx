@@ -72,6 +72,7 @@ export default function ImageCarousel({ images, title }: ImageCarouselProps) {
                 className="carousel-image-container position-relative"
                 role="button"
                 tabIndex={0}
+                aria-label="Ver imagen en pantalla completa"
                 onClick={() => {
                   setLightboxIndex(index);
                   setLightboxOpen(true);
