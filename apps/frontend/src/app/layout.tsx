@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 import { cacheLife, cacheTag } from "next/cache";
 import { Inter } from "next/font/google";
-import { Analytics } from "@vercel/analytics/next";
 import { GoogleAnalytics } from "@next/third-parties/google";
 import BootstrapClient from "@/components/BootstrapClient";
 import Header from "@/components/Header";
@@ -90,7 +89,6 @@ export default function RootLayout({
           <SiteShell>{children}</SiteShell>
         </Suspense>
         <BootstrapClient />
-        <Analytics />
         {gaId && <GoogleAnalytics gaId={gaId} />}
       </body>
     </html>

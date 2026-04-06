@@ -5,6 +5,9 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "build:cloudflare": "opennextjs-cloudflare build",
+    "deploy": "opennextjs-cloudflare build && wrangler deploy",
+    "preview": "opennextjs-cloudflare build && wrangler dev",
     "start": "next start",
     "lint": "eslint .",
     "test:e2e": "playwright test",
@@ -18,7 +21,6 @@
     "@portabletext/types": "^2.0.15",
     "@sanity/client": "^7.14.1",
     "@sanity/image-url": "^2.0.3",
-    "@vercel/analytics": "^1.6.1",
     "bootstrap": "^5.3.8",
     "bootstrap-icons": "^1.13.1",
     "next": "16.2.2",
@@ -30,6 +32,7 @@
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.3",
     "@next/eslint-plugin-next": "16.2.2",
+    "@opennextjs/cloudflare": "^1.18.0",
     "@playwright/test": "^1.52.0",
     "@types/node": "^25.1.0",
     "@types/react": "19.2.14",
@@ -40,7 +43,8 @@
     "eslint": "^9.39.2",
     "eslint-config-next": "16.2.2",
     "eslint-plugin-react": "^7.37.5",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "wrangler": "^4.80.0"
   },
   "pnpm": {
     "overrides": {
