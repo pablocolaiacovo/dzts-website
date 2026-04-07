@@ -4,16 +4,27 @@ import { visionTool } from "@sanity/vision";
 import { schemaTypes } from "./schemaTypes/index";
 import { structure } from "./structure";
 
-export default defineConfig({
-  name: "default",
-  title: "DZTS Studio",
+const projectId = process.env.SANITY_STUDIO_PROJECT_ID!;
+const plugins = [structureTool({ structure }), visionTool()];
+const schema = { types: schemaTypes };
 
-  projectId: process.env.SANITY_STUDIO_PROJECT_ID!,
-  dataset: process.env.SANITY_STUDIO_DATASET!,
-
-  plugins: [structureTool({ structure }), visionTool()],
-
-  schema: {
-    types: schemaTypes,
+export default defineConfig([
+  {
+    name: "production",
+    title: "DZTS Studio (Production)",
+    projectId,
+    dataset: "production",
+    basePath: "/production",
+    plugins,
+    schema,
   },
-});
+  {
+    name: "development",
+    title: "DZTS Studio (Development)",
+    projectId,
+    dataset: "development",
+    basePath: "/development",
+    plugins,
+    schema,
+  },
+]);
