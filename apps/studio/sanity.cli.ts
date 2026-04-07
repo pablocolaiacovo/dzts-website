@@ -9,6 +9,7 @@ export default defineCliConfig({
     dataset: dataset || 'production',
   },
   deployment: {
+    appId: 'sc293jr0om051i0svxbktau1',
     autoUpdates: true,
   },
   typegen: {
