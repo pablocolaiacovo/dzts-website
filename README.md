@@ -2,23 +2,42 @@
 
 A real estate website built as a pnpm monorepo.
 
+## Architecture
+
+```text
+your-domain.workers.dev (or custom domain)
+    Cloudflare Worker
+    Next.js 16 via @opennextjs/cloudflare
+         |
+         |--- Sanity CDN (content and images)
+         |--- Cloudflare KV (Next.js cache)
+         
+your-project-id.sanity.studio
+    Sanity Hosting
+    Sanity Studio (content management)
+```
+
+The frontend runs on **Cloudflare Workers** using [OpenNext for Cloudflare](https://opennext.js.org/cloudflare), which adapts Next.js to the Workers runtime. Next.js `"use cache"` data is persisted in **Cloudflare KV**.
+
+The Sanity Studio is deployed separately to **Sanity Hosting** (free, managed by Sanity).
+
 ## Structure
 
 ```text
 apps/
-  frontend/   # Next.js website
-  studio/     # Sanity Studio CMS
+  frontend/   # Next.js website (deployed to Cloudflare Workers)
+  studio/     # Sanity Studio CMS (deployed to Sanity Hosting)
 ```
 
 ## Apps
 
 ### Frontend
 
-Public-facing website built with Next.js 16 and React 19. Displays property listings for rent and sale, fetching content from Sanity CMS. Styled with Bootstrap 5.
+Public-facing website built with Next.js 16 and React 19. Displays property listings for rent and sale, fetching content from Sanity CMS. Styled with Bootstrap 5. Deployed to Cloudflare Workers.
 
 ### Studio
 
-Sanity Studio for content management. Used to create and edit properties, images, and other site content.
+Sanity Studio for content management. Used to create and edit properties, images, and other site content. Deployed to Sanity Hosting.
 
 ## Requirements
 
@@ -54,7 +73,10 @@ pnpm dev
 | Command             | Description                          |
 |---------------------|--------------------------------------|
 | `pnpm dev`          | Start Next.js dev server             |
-| `pnpm build`        | Production build                     |
+| `pnpm build`        | Production build (standard Next.js)  |
+| `pnpm build:cloudflare` | Build for Cloudflare Workers    |
+| `pnpm preview`      | Build and run locally via Wrangler   |
+| `pnpm deploy`       | Build and deploy to Cloudflare Workers |
 | `pnpm lint`         | Run ESLint                           |
 | `pnpm test:e2e`     | Run Playwright e2e tests (headless)  |
 | `pnpm test:e2e:ui`  | Run e2e tests with Playwright UI     |
@@ -132,22 +154,6 @@ A successful response looks like: `{"revalidated":true,"tag":"property"}`
 
 ## Analytics
 
-The site supports two analytics providers, both optional and independent of each other.
-
-### Vercel Analytics
-
-Tracks page views and real Core Web Vitals from actual users. No cookies, privacy-friendly, ~1KB script.
-
-**Setup:**
-
-1. Go to your [Vercel project dashboard](https://vercel.com/dashboard)
-2. Click the **Analytics** tab
-3. Click **Enable**
-
-That's it — the `<Analytics />` component is already in the code. It only sends data in production Vercel deployments.
-
-**Free tier:** 2,500 events/month.
-
 ### Google Analytics (GA4)
 
 Provides detailed visitor insights, traffic sources, user flows, and property page engagement.
@@ -166,11 +172,9 @@ Provides detailed visitor insights, traffic sources, user flows, and property pa
 NEXT_PUBLIC_GA_MEASUREMENT_ID=G-XXXXXXXXXX
 ```
 
-For Vercel deployments, add the same variable in **Vercel project settings → Environment Variables**.
+For Cloudflare deployments, add it as a variable in `wrangler.jsonc` or set it as a secret via `wrangler secret put`.
 
 Google Analytics is conditionally loaded — if the env var is not set, no GA script is included.
-
-**Free tier:** Unlimited for most sites.
 
 ## E2E Tests
 
@@ -210,6 +214,51 @@ pnpm test:e2e:ui
 | `e2e/not-found.spec.ts` | 404 page heading, navigation links |
 | `e2e/navigation.spec.ts` | Header, footer, brand link, breadcrumbs |
 
+## Deployment
+
+### Frontend (Cloudflare Workers)
+
+The frontend is deployed to Cloudflare Workers using `@opennextjs/cloudflare`. Deployments are automated via GitHub Actions:
+
+- **Production** (`.github/workflows/deploy.yml`): Deploys on push to `main`.
+- **Preview** (`.github/workflows/preview.yml`): Deploys a preview Worker for each PR, with a unique URL commented on the PR.
+- **Preview Cleanup** (`.github/workflows/preview-cleanup.yml`): Deletes the preview Worker when the PR is closed.
+
+#### Manual deploy
+
+```bash
+cd apps/frontend
+pnpm deploy
+```
+
+#### Cloudflare resources
+
+| Resource | Purpose |
+|----------|---------|
+| Worker (`dzts-website`) | Runs the Next.js application |
+| KV namespace (`NEXT_INC_CACHE_KV`, `NEXT_TAG_CACHE_KV`) | Stores Next.js `"use cache"` data |
+
+#### Environment variables
+
+Server-only secrets are set via Wrangler:
+
+```bash
+wrangler secret put SANITY_REVALIDATE_SECRET
+```
+
+Public variables (`NEXT_PUBLIC_*`) are set in `wrangler.jsonc` under `vars`, or as GitHub Secrets for CI workflows.
+
+### Studio (Sanity Hosting)
+
+The studio is deployed to Sanity's free hosting:
+
+```bash
+cd apps/studio
+pnpm deploy
+```
+
+This deploys to `https://<project-id>.sanity.studio`. Make sure your Cloudflare Workers domain is added to the CORS origins in [sanity.io/manage](https://www.sanity.io/manage) → API → CORS origins.
+
 ## CI
 
 ### Lint & Build
@@ -226,14 +275,18 @@ The workflow uses placeholder environment variables so builds can compile withou
 
 A separate workflow (`.github/workflows/e2e.yml`) runs Playwright tests on PRs to `dev` or `main` when `apps/frontend/` or the workflow file changes. It builds the frontend with real Sanity credentials (from GitHub Secrets) and runs the full e2e suite.
 
-Required GitHub Secrets (Settings > Secrets and variables > Actions):
+### Required GitHub Secrets
 
-| Secret | Description |
-|--------|-------------|
-| `NEXT_PUBLIC_SANITY_PROJECT_ID` | Sanity project ID (same as `.env.local`) |
-| `NEXT_PUBLIC_SANITY_DATASET` | Sanity dataset name (same as `.env.local`) |
+| Secret | Used by | Description |
+|--------|---------|-------------|
+| `NEXT_PUBLIC_SANITY_PROJECT_ID` | E2E, Deploy, Preview | Sanity project ID |
+| `NEXT_PUBLIC_SANITY_DATASET` | E2E, Deploy, Preview | Sanity dataset name |
+| `NEXT_PUBLIC_SITE_URL` | Deploy | Production site URL |
+| `NEXT_PUBLIC_GA_MEASUREMENT_ID` | Deploy | Google Analytics ID (optional) |
+| `CLOUDFLARE_API_TOKEN` | Deploy, Preview | Cloudflare API token with Workers permissions |
+| `CLOUDFLARE_ACCOUNT_ID` | Deploy, Preview | Cloudflare account ID |
 
-On failure, the HTML report and test results are uploaded as workflow artifacts for debugging.
+On E2E failure, the HTML report and test results are uploaded as workflow artifacts for debugging.
 
 ### Dependabot
 
