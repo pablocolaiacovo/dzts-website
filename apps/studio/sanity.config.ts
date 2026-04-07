@@ -20,7 +20,7 @@ export default defineConfig([
   },
   {
     name: "development",
-    title: "DZTS Studio (Development)",
+    title: "DZTS Studio (Sandbox)",
     projectId,
     dataset: "development",
     basePath: "/development",
