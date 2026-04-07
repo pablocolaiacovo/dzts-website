@@ -14,7 +14,7 @@ const PATHS_BY_TYPE: Record<string, string[]> = {
   propiedadesPage: ["/propiedades"],
   siteSettings: ["/", "/propiedades"],
   seo: ["/", "/propiedades"],
-  property: ["/propiedades"],
+  property: ["/", "/propiedades"],
 };
 
 export async function POST(req: NextRequest) {
