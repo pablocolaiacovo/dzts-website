@@ -76,7 +76,7 @@ pnpm dev
 | `pnpm build`        | Production build (standard Next.js)  |
 | `pnpm build:cloudflare` | Build for Cloudflare Workers    |
 | `pnpm preview`      | Build and run locally via Wrangler   |
-| `pnpm deploy`       | Build and deploy to Cloudflare Workers |
+| `pnpm deploy:cloudflare` | Build and deploy to Cloudflare Workers |
 | `pnpm lint`         | Run ESLint                           |
 | `pnpm test:e2e`     | Run Playwright e2e tests (headless)  |
 | `pnpm test:e2e:ui`  | Run e2e tests with Playwright UI     |
@@ -228,7 +228,7 @@ The frontend is deployed to Cloudflare Workers using `@opennextjs/cloudflare`. D
 
 ```bash
 cd apps/frontend
-pnpm deploy
+pnpm deploy:cloudflare
 ```
 
 #### Cloudflare resources
