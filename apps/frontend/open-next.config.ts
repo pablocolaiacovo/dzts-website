@@ -6,14 +6,8 @@ const config: OpenNextConfig = {
       wrapper: "cloudflare-node",
       converter: "edge",
       proxyExternalRequest: "fetch",
-      incrementalCache: () =>
-        import(
-          "@opennextjs/cloudflare/overrides/incremental-cache/kv-incremental-cache"
-        ).then((m) => m.default),
-      tagCache: () =>
-        import(
-          "@opennextjs/cloudflare/overrides/tag-cache/kv-next-tag-cache"
-        ).then((m) => m.default),
+      incrementalCache: "dummy",
+      tagCache: "dummy",
       queue: "direct",
     },
   },
