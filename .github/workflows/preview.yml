@@ -3,7 +3,7 @@ name: Preview Deployment
 on:
   pull_request:
     branches: [dev, main]
-    types: [opened, synchronize, reopened, closed]
+    types: [opened, synchronize, reopened]
 
 env:
   NEXT_PUBLIC_SANITY_PROJECT_ID: ${{ secrets.NEXT_PUBLIC_SANITY_PROJECT_ID }}
@@ -74,14 +74,3 @@ jobs:
                 body,
               });
             }
-
-  cleanup:
-    runs-on: ubuntu-latest
-    if: github.event.action == 'closed'
-    steps:
-      - name: Delete preview Worker
-        uses: cloudflare/wrangler-action@v3
-        with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: delete --name dzts-website-pr-${{ github.event.pull_request.number }} --force
