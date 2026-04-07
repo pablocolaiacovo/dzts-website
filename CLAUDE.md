@@ -12,8 +12,8 @@ This is a **pnpm workspace monorepo** with two apps:
 
 ```text
 apps/
-  frontend/   # Next.js 16 website (public-facing)
-  studio/     # Sanity Studio CMS (content management)
+  frontend/   # Next.js 16 website → Cloudflare Workers (via @opennextjs/cloudflare)
+  studio/     # Sanity Studio CMS → Sanity Hosting
 ```
 
 **Note**: The monorepo uses simple pnpm workspaces without Turborepo. This was a deliberate decision to keep the setup simple for a two-app monorepo without shared packages.
@@ -31,12 +31,15 @@ pnpm build    # Production build for both apps
 Frontend-specific (from `apps/frontend/`):
 
 ```bash
-pnpm dev          # Start Next.js dev server with Turbopack
-pnpm build        # Production build
-pnpm start        # Run production server
-pnpm lint         # Run ESLint
-pnpm test:e2e     # Run Playwright e2e tests (requires build first)
-pnpm test:e2e:ui  # Run e2e tests with Playwright UI
+pnpm dev              # Start Next.js dev server with Turbopack
+pnpm build            # Standard Next.js production build
+pnpm build:cloudflare # Build for Cloudflare Workers (via OpenNext)
+pnpm deploy:cloudflare # Build and deploy to Cloudflare Workers
+pnpm preview          # Build and run locally via Wrangler
+pnpm start            # Run production server (standard Next.js)
+pnpm lint             # Run ESLint
+pnpm test:e2e         # Run Playwright e2e tests (requires build first)
+pnpm test:e2e:ui      # Run e2e tests with Playwright UI
 ```
 
 Studio-specific (from `apps/studio/`):
@@ -44,7 +47,7 @@ Studio-specific (from `apps/studio/`):
 ```bash
 pnpm dev      # Start Sanity Studio
 pnpm build    # Build for deployment
-pnpm deploy   # Deploy to Sanity hosting
+pnpm run deploy # Deploy to Sanity hosting (use `run` to avoid pnpm built-in)
 pnpm typegen  # Generate TypeScript types from schema
 ```
 
@@ -96,12 +99,15 @@ The main Opus agent delegates coding tasks to lighter models via custom agents i
 - **TypeScript** with strict mode
 - **Bootstrap 5.x** for styling
 - **next-sanity** for CMS integration
+- **@opennextjs/cloudflare** for Cloudflare Workers deployment
+- **Wrangler** for Cloudflare CLI tooling
 
 ### Studio (`apps/studio/`)
 
 - **Sanity Studio v5** for content management
 - **React 19**
 - **TypeScript**
+- Two workspaces (production and development datasets) with workspace selector in the UI
 
 ## Environment Variables
 
@@ -157,14 +163,43 @@ Sanity Studio project:
 - Feature branches follow the naming convention: `feat/feature-name`
 - Push changes and create PRs using `gh pr create` command
 
+## Deployment
+
+### Frontend → Cloudflare Workers
+
+The frontend runs on Cloudflare Workers via `@opennextjs/cloudflare` (OpenNext). Configuration files:
+
+- `apps/frontend/wrangler.jsonc` — Cloudflare Worker configuration
+- `apps/frontend/open-next.config.ts` — OpenNext configuration (cache set to `dummy`, no KV persistence)
+
+Deployments are automated via GitHub Actions:
+
+- **Production** (`.github/workflows/deploy.yml`): Auto-deploys on push to `main`.
+- **Preview** (`.github/workflows/preview.yml`): Deploys a preview Worker per PR (uses `development` dataset). URL is commented on the PR.
+- **Preview Cleanup** (`.github/workflows/preview-cleanup.yml`): Deletes preview Worker when PR closes.
+
+Next.js image optimization is disabled (`unoptimized: true`) — Sanity CDN handles image optimization via `urlFor()`.
+
+Server-only secrets (e.g., `SANITY_REVALIDATE_SECRET`) are set via `wrangler secret put`, not in `wrangler.jsonc`.
+
+### Studio → Sanity Hosting
+
+Deployed via `pnpm run deploy` from `apps/studio/`. Hosted at `<project-id>.sanity.studio`.
+
+### Cache on Cloudflare
+
+The `"use cache"` directives in the code still exist but are configured with `dummy` cache backend (no persistence between requests). This means every request fetches fresh data from Sanity CDN. This was a deliberate choice because Cloudflare KV's tag cache (experimental) did not reliably invalidate all cache entries on `revalidateTag`, causing stale data. The webhook revalidation route still works but is effectively redundant with dummy cache.
+
+If KV tag cache support matures in `@opennextjs/cloudflare`, cache persistence can be re-enabled by changing `open-next.config.ts` back to KV handlers and adding KV namespace bindings to `wrangler.jsonc`.
+
 ## CI
 
-Two GitHub Actions workflows run on PRs to `dev` and `main`:
+GitHub Actions workflows run on PRs to `dev` and `main`:
 
 ### Lint & Build (`.github/workflows/ci.yml`)
 
 1. **Lint frontend**: `pnpm --filter frontend lint`
-2. **Build frontend**: `pnpm --filter frontend build`
+2. **Build frontend (Cloudflare)**: `pnpm --filter frontend build:cloudflare`
 3. **Build studio**: `pnpm --filter dzts-studio exec sanity build`
 
 - Uses `ubuntu-latest`, Node 20, pnpm 10.
@@ -242,12 +277,11 @@ Two GitHub Actions workflows run on PRs to `dev` and `main`:
 
 ## Caching Strategy
 
-The frontend uses Next.js 16 cache components (`"use cache"` directive + `cacheLife()` + `cacheTag()`):
+The frontend code uses Next.js 16 cache directives (`"use cache"` + `cacheLife()` + `cacheTag()`), but **on Cloudflare the cache backend is set to `dummy`** (no persistence between requests). Every request fetches fresh data from Sanity CDN. See the "Cache on Cloudflare" section under Deployment for context.
 
-- **`cacheLife("hours")`** - For rarely-changing data: site settings, SEO, page headings, map address.
-- **`cacheLife("minutes")`** - For content that updates more often: featured properties, individual property detail pages, home sections, filter option lists.
-- Cached functions are standalone `async function` with `"use cache"` as the first line, calling `sanityFetch` inside.
-- Every cached function includes a `cacheTag()` call matching the Sanity document `_type` it queries, enabling on-demand revalidation via webhook.
+The cache directives remain in the code for two reasons:
+1. They work normally in local development (`pnpm dev` / `pnpm start`)
+2. They can be re-enabled on Cloudflare if KV tag cache support matures
 
 ### Cache Tags
 
@@ -262,10 +296,10 @@ The frontend uses Next.js 16 cache components (`"use cache"` directive + `cacheL
 
 ### On-Demand Revalidation
 
-- A webhook route at `POST /api/revalidate` (`src/app/api/revalidate/route.ts`) receives Sanity webhook payloads, validates the HMAC signature via `parseBody` from `next-sanity/webhook`, and calls `revalidateTag(body._type, "max")`.
+- A webhook route at `POST /api/revalidate` (`src/app/api/revalidate/route.ts`) receives Sanity webhook payloads, validates the HMAC signature via `parseBody` from `next-sanity/webhook`, and calls `revalidateTag(body._type, "max")` and `revalidatePath()` for affected routes.
 - The `"max"` second argument is required by Next.js 16 to invalidate cache entries across all cache life profiles.
 - The webhook must be configured in the Sanity dashboard (see README for setup instructions).
-- Without the webhook (e.g. local development), `cacheLife` TTLs still apply as a fallback.
+- With dummy cache on Cloudflare, the webhook is effectively redundant (data is always fresh), but it remains functional for when cache persistence is re-enabled.
 
 ## SEO
 
@@ -273,7 +307,7 @@ The frontend uses Next.js 16 cache components (`"use cache"` directive + `cacheL
 - Property detail pages include `<script type="application/ld+json">` with Schema.org `RealEstateListing` data (name, price, address, images).
 - Property detail pages generate OpenGraph metadata via `generateMetadata()`.
 - Ensure only one `<h1>` per page. Section headings within page content should use `<h2>` or lower.
-- **robots.txt** (`src/app/robots.ts`): Environment-aware. Blocks all bots in non-production (`VERCEL_ENV !== "production"`), allows indexing in production.
+- **robots.txt** (`src/app/robots.ts`): Environment-aware. Blocks all bots when `NEXT_PUBLIC_SITE_URL` is not set, allows indexing in production.
 - **sitemap.xml** (`src/app/sitemap.ts`): Dynamically generated. Includes home, `/propiedades`, and all property detail pages fetched from Sanity.
 - **llms.txt** (`src/app/llms.txt/route.ts`): Markdown file for AI agents/LLMs ([spec](https://llmstxt.org/)). Lists main pages and all properties to help LLMs understand site content.
 
