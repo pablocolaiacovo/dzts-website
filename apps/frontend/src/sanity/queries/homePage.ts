@@ -10,7 +10,7 @@ export const HOME_SECTIONS_QUERY = defineQuery(`
     content,
     imagePosition,
     backgroundColor,
-    images[]{ asset->{ url, metadata { lqip } }, alt }
+    images[]{ asset->{ _id, url, metadata { lqip } }, alt }
   }
 `);
 

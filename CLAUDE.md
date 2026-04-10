@@ -113,7 +113,6 @@ Each app has its own `.env.local` file with different prefixes (Next.js uses `NE
 | -------------------------------- | --------------------------------- |
 | `NEXT_PUBLIC_SANITY_PROJECT_ID`  | Sanity project identifier         |
 | `NEXT_PUBLIC_SANITY_DATASET`     | Sanity dataset name               |
-| `NEXT_PUBLIC_WEB3FORMS_KEY`      | Web3Forms API key for contact form|
 | `NEXT_PUBLIC_SITE_URL`           | Production site URL (for sitemap.xml and robots.txt) |
 | `NEXT_PUBLIC_GA_MEASUREMENT_ID`  | Google Analytics 4 measurement ID (optional, e.g. `G-XXXXXXXXXX`) |
 | `SANITY_REVALIDATE_SECRET`       | HMAC secret for Sanity webhook (server-only, no `NEXT_PUBLIC_` prefix) |
@@ -223,8 +222,8 @@ Two GitHub Actions workflows run on PRs to `dev` and `main`:
 ## Components
 
 - **MapSection** - Reusable component for displaying embedded Google Maps. Renders full-width iframe (450px height) when address is provided, returns null if no address exists.
-- **ContactButton** - Client component that wraps a button + dynamically imported `ContactModal`. Used on the property detail page (server component) to open the contact form without making the entire page a client component.
-- **ContactModal** - Client component with Web3Forms integration for the contact form. Dynamically imported (`next/dynamic`, `ssr: false`) wherever used.
+- **ShareButton** - Client component with Web Share API (mobile) / clipboard copy with "Link copiado" feedback (desktop). Used on the property detail page.
+- **FichaActions** - Client component with "Imprimir Ficha" (`window.print()`) and "Compartir" (same share logic as ShareButton) buttons. Used on the print-optimized ficha page.
 
 ## Conventions
 
@@ -284,7 +283,7 @@ Playwright e2e smoke tests live in `apps/frontend/e2e/`. Config is at `apps/fron
 ### Test Design Principles
 
 - Tests assert **page structure** (element existence, selectors, navigation URLs) rather than CMS content text, making them resilient to Sanity content changes.
-- Static UI labels hardcoded in source code (e.g., "Buscar", "Aplicar filtros", "404", "contactate con") are safe to assert.
+- Static UI labels hardcoded in source code (e.g., "Buscar", "Aplicar filtros", "404", "Generar Ficha", "Compartir") are safe to assert.
 - Tests navigate from the listing page to discover property detail slugs dynamically — no hardcoded slugs.
 - **When a test fails, fix the feature/bug first** — don't make the test more permissive just to pass. Investigate the root cause before adjusting test expectations.
 
@@ -309,8 +308,8 @@ When modifying components, be aware these selectors are used by e2e tests:
 | `a[href^="/propiedades/"]` | `PropertyCard` (card links) | `propiedades.spec.ts`, `property-detail.spec.ts` |
 | `.badge .btn-close` | `ActiveFilterBadges` | `propiedades.spec.ts` |
 | `#propertyCarousel` | `ImageCarousel` | `property-detail.spec.ts` |
-| `button:has-text('contactate con')` | `ContactButton` | `property-detail.spec.ts` |
-| `.modal.show`, `#contactName`, `#contactEmail`, `#contactPhone`, `#contactComments` | `ContactModal` | `property-detail.spec.ts` |
+| `a:has-text('Generar Ficha')` | Property detail (ficha link) | `property-detail.spec.ts` |
+| `button:has-text('Compartir')` | `ShareButton` | `property-detail.spec.ts` |
 | `nav[aria-label="Breadcrumb"]` | `Breadcrumb` | `navigation.spec.ts`, `propiedades.spec.ts`, `property-detail.spec.ts` |
 | `.navbar-brand` | `Header` | `navigation.spec.ts` |
 | `footer.site-footer` | `Footer` | `navigation.spec.ts` |
@@ -330,7 +329,8 @@ When modifying components, be aware these selectors are used by e2e tests:
 - `ImageCarousel` accepts `asset?: SanityImageSource | null` and `lqip?: string | null`. Uses `.quality(80)` for consistent compression.
 - Property detail `description` is Portable Text; use `PortableTextBlock[] | null` and import `@portabletext/types` (dependency added to frontend).
 - `FilterOption` and `FilterOptions` types live in `src/types/filters.ts`. The `parseMultiple()` and `buildFilterOptions()` helpers live in `src/lib/filters.ts`. Both pages and multiple components import from these shared modules.
-- `ContactButton` is the pattern for triggering the contact modal from server components — a thin client component that manages modal state and dynamically imports `ContactModal`.
+- `ShareButton` uses Web Share API on mobile (native share sheet) and clipboard copy with "Link copiado" feedback badge on desktop.
+- Property detail and ficha share query/types via `src/sanity/queries/propertyDetail.ts`.
 - Only one image per page should have `priority` (the LCP candidate). Do not mark logos or secondary images as priority.
 - The `html` element uses `lang="es"` (Spanish site targeting Argentine audience).
 - Home page sections come from the `homePage` singleton (`apps/frontend/src/sanity/queries/homePage.ts`) and render via `TextImageSection` with Portable Text and images.

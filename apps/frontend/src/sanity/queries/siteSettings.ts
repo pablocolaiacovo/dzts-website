@@ -9,6 +9,7 @@ const ORGANIZATION_QUERY = defineQuery(`
     phone,
     email,
     address,
+    whatsappNumber,
     socialLinks[] { url }
   }
 `);
