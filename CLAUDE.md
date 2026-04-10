@@ -130,9 +130,11 @@ See `.env.example` files in each app for templates.
 
 ### Frontend
 
-Next.js App Router project:
+Next.js App Router project with route groups:
 
-- `apps/frontend/src/app/` - Routes and layouts (file-based routing)
+- `apps/frontend/src/app/` - Root layout (html/body/fonts/bootstrap)
+- `apps/frontend/src/app/(site)/` - Site layout (header/footer/WhatsApp button) for public pages
+- `apps/frontend/src/app/(print)/` - Minimal layout (no chrome) for print-optimized pages
 - `apps/frontend/src/components/` - React components
 - `apps/frontend/src/lib/` - Shared utility functions (e.g., `filters.ts`)
 - `apps/frontend/src/types/` - Shared TypeScript type definitions (e.g., `filters.ts`)
@@ -192,7 +194,8 @@ Two GitHub Actions workflows run on PRs to `dev` and `main`:
 - `/` - Home page with search, featured properties, and location map
 - `/propiedades` - Properties listing page with filters, pagination, and active filter badges
 - `/propiedades/[slug]` - Property detail page with images, description, JSON-LD structured data, and location map
-- Custom `not-found.tsx` (branded 404 page) and `error.tsx` (error boundary with retry) at app root
+- `/propiedades/[slug]/ficha` - Print-optimized property sheet (no header/footer, `(print)` route group)
+- Custom `not-found.tsx` (branded 404 page) and `error.tsx` (error boundary with retry) at app root and `(site)` route group
 
 ### Content Integration
 
@@ -323,8 +326,8 @@ When modifying components, be aware these selectors are used by e2e tests:
 
 ## Recent Implementation Notes
 
-- Listing skeleton: `apps/frontend/src/app/propiedades/loading.tsx` mirrors `PropertiesLayout` (filters sidebar + badges/count + grid).
-- Property detail skeleton: `apps/frontend/src/app/propiedades/[slug]/loading.tsx` includes carousel-sized media + 450px map placeholder.
+- Listing skeleton: `apps/frontend/src/app/(site)/propiedades/loading.tsx` mirrors `PropertiesLayout` (filters sidebar + badges/count + grid).
+- Property detail skeleton: `apps/frontend/src/app/(site)/propiedades/[slug]/loading.tsx` includes carousel-sized media + 450px map placeholder.
 - Sanity property images can have `url`/`metadata` as `null`; normalize before passing to `ImageCarousel` and only cast to `SanityImageSource` when `url` is present.
 - `ImageCarousel` accepts `asset?: SanityImageSource | null` and `lqip?: string | null`. Uses `.quality(80)` for consistent compression.
 - Property detail `description` is Portable Text; use `PortableTextBlock[] | null` and import `@portabletext/types` (dependency added to frontend).
@@ -336,8 +339,15 @@ When modifying components, be aware these selectors are used by e2e tests:
 - Home page sections come from the `homePage` singleton (`apps/frontend/src/sanity/queries/homePage.ts`) and render via `TextImageSection` with Portable Text and images.
 - `homePage.sections[]` includes optional `anchorId` for header anchors (e.g., `/#servicios`, `/#nosotros`).
 - Header smooth-scrolls to anchors when already on `/` and updates the hash without full navigation.
-- `TextImageSection` supports a carousel (multiple images) and uses `asset.url` directly when present (fallback to `urlFor`).
+- `TextImageSection` supports a carousel (multiple images) via `SectionCarousel` component. Always uses `urlFor()` for images (requires `_id` in GROQ query).
 - Anchored sections use `scroll-margin-top: 60px` to offset the sticky header.
 - Webhook revalidation route: `src/app/api/revalidate/route.ts`. Uses `parseBody` from `next-sanity/webhook` for HMAC validation and `revalidateTag(type, "max")` from `next/cache`.
 - In Next.js 16, `revalidateTag()` requires two arguments: `(tag, profile)`. Pass `"max"` as the profile to revalidate all cache entries for a tag regardless of their original `cacheLife`.
 - The `/propiedades` listing page calls `sanityFetch` directly without `"use cache"` (dynamic `searchParams`), so it has no cache tag and is unaffected by revalidation.
+- Route groups: `(site)` wraps pages with header/footer/WhatsApp button via its own layout; `(print)` provides a minimal layout for the ficha page. Root layout only has html/body/fonts/bootstrap.
+- The ficha page (`/propiedades/[slug]/ficha`) uses raw `<img>` tags (not `next/image`) for print reliability. It has `robots: { index: false, follow: false }`.
+- Property detail and ficha pages share Sanity queries/types via `src/sanity/queries/propertyDetail.ts`.
+- Property detail page includes: "Ficha" button (opens ficha in new tab), "Compartir" (ShareButton), WhatsApp share icon, and "Consultar por WhatsApp" full-width button.
+- WhatsApp consultation URL is built from `siteSettings.whatsappNumber` with a pre-filled message including the property name.
+- Sold/rented properties display a status banner ribbon (CSS-only, positioned absolute) overlaying the image carousel.
+- `TextImageSection` displays images in large circles (full column width, `border-radius: 50%`, `aspect-ratio: 1/1`).
