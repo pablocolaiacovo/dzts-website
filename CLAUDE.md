@@ -286,7 +286,7 @@ Playwright e2e smoke tests live in `apps/frontend/e2e/`. Config is at `apps/fron
 ### Test Design Principles
 
 - Tests assert **page structure** (element existence, selectors, navigation URLs) rather than CMS content text, making them resilient to Sanity content changes.
-- Static UI labels hardcoded in source code (e.g., "Buscar", "Aplicar filtros", "404", "Generar Ficha", "Compartir") are safe to assert.
+- Static UI labels hardcoded in source code (e.g., "Buscar", "Aplicar filtros", "404", "Ficha", "Compartir") are safe to assert.
 - Tests navigate from the listing page to discover property detail slugs dynamically — no hardcoded slugs.
 - **When a test fails, fix the feature/bug first** — don't make the test more permissive just to pass. Investigate the root cause before adjusting test expectations.
 
@@ -311,7 +311,7 @@ When modifying components, be aware these selectors are used by e2e tests:
 | `a[href^="/propiedades/"]` | `PropertyCard` (card links) | `propiedades.spec.ts`, `property-detail.spec.ts` |
 | `.badge .btn-close` | `ActiveFilterBadges` | `propiedades.spec.ts` |
 | `#propertyCarousel` | `ImageCarousel` | `property-detail.spec.ts` |
-| `a:has-text('Generar Ficha')` | Property detail (ficha link) | `property-detail.spec.ts` |
+| `a:has-text('Ficha')` | Property detail (ficha link) | `property-detail.spec.ts` |
 | `button:has-text('Compartir')` | `ShareButton` | `property-detail.spec.ts` |
 | `nav[aria-label="Breadcrumb"]` | `Breadcrumb` | `navigation.spec.ts`, `propiedades.spec.ts`, `property-detail.spec.ts` |
 | `.navbar-brand` | `Header` | `navigation.spec.ts` |

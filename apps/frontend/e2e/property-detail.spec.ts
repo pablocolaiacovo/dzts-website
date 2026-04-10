@@ -31,7 +31,7 @@ test.describe("Property Detail Page", () => {
     }).first();
     await expect(detailBreadcrumb.locator(".breadcrumb-item")).toHaveCount(3);
 
-    await expect(page.locator("a:has-text('Generar Ficha')")).toBeVisible();
+    await expect(page.locator("a:has-text('Ficha')")).toBeVisible();
     await expect(page.locator("button:has-text('Compartir')")).toBeVisible();
   });
 
