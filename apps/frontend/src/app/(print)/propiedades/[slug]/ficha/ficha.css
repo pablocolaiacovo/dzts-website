@@ -18,6 +18,13 @@
   color: #000;
 }
 
+.ficha-reference {
+  font-size: 0.85rem;
+  color: #666;
+  margin-bottom: 0.25rem;
+  letter-spacing: 0.05em;
+}
+
 .ficha-meta {
   display: flex;
   gap: 0.5rem;

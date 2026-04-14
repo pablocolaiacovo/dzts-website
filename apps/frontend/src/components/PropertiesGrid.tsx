@@ -41,6 +41,7 @@ export default function PropertiesGrid({ properties }: PropertiesGridProps) {
             lqip={property.lqip}
             rooms={property.rooms}
             city={property.city}
+            reference={property.reference}
             priority={index === 0}
           />
         </div>

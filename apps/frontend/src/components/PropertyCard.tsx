@@ -14,6 +14,7 @@ interface PropertyCardProps {
   lqip?: string | null;
   rooms?: number | null;
   city?: string | null;
+  reference?: string | null;
   priority?: boolean;
 }
 
@@ -28,6 +29,7 @@ export default function PropertyCard({
   lqip,
   rooms,
   city,
+  reference,
   priority,
 }: PropertyCardProps) {
   const imageUrl = image
@@ -62,6 +64,11 @@ export default function PropertyCard({
         </div>
         <div className="w-100 bg-primary" style={{ height: 4 }}></div>
         <div className="card-body text-center pb-2 bg-light rounded-bottom-4">
+          {reference && (
+            <div className="text-muted small mb-1" style={{ fontSize: "0.75rem" }}>
+              Ref: {reference}
+            </div>
+          )}
           <h5 className="fw-bold text-primary mb-2 fs-5">{title}</h5>
           {(city || rooms) && (
             <p className="mb-2 text-muted small">

@@ -10,6 +10,7 @@ export const PROPERTY_QUERY = defineQuery(`
   {
     title,
     subtitle,
+    reference,
     address,
     description,
     price,
@@ -48,6 +49,7 @@ export interface PropertyImage {
 export interface PropertyDetail {
   title: string | null;
   subtitle?: string | null;
+  reference?: string | null;
   address?: string | null;
   description?: PortableTextBlock[] | null;
   price?: number | null;
