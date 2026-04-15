@@ -78,10 +78,7 @@ export default function PropertyCard({
             </p>
           )}
           {subtitle && <p className="mb-3 text-body small">{subtitle}</p>}
-          <div className="d-flex align-items-center justify-content-between border-top pt-3">
-            <span className="text-primary fs-5">
-              <i className="bi bi-share" aria-hidden="true"></i>
-            </span>
+          <div className="d-flex align-items-center justify-content-end border-top pt-3">
             <span className="fw-bold text-primary fs-5">
               {price != null
                 ? `${currencySymbol}${price.toLocaleString("es-AR")}`
