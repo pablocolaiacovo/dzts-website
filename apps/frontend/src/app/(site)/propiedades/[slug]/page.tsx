@@ -129,6 +129,11 @@ export default async function PropertyPage({
                 },
               ]}
             />
+            {property.reference && (
+              <div className="text-muted small mb-1">
+                Ref: {property.reference}
+              </div>
+            )}
             <h1 className="text-secondary mb-2" style={{ fontSize: "2.5rem" }}>
               {property.title}
             </h1>

@@ -25,6 +25,19 @@ export const propertyType = defineType({
       validation: (rule) => rule.required(),
     }),
     defineField({
+      name: "reference",
+      title: "Referencia interna",
+      description: "Código interno de la agencia. Formato: DZTS-### (ej: DZTS-001).",
+      type: "string",
+      validation: (rule) =>
+        rule
+          .regex(/^DZTS-\d{3,}$/, {
+            name: "referencia",
+            invert: false,
+          })
+          .error("El formato debe ser DZTS-### (ej: DZTS-001)."),
+    }),
+    defineField({
       name: "subtitle",
       title: "Subtítulo",
       type: "string",
