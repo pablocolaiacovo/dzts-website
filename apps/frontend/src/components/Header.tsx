@@ -1,13 +1,11 @@
 "use client";
 
-import dynamic from "next/dynamic";
 import Image from "next/image";
 import Link from "next/link";
-import { useRef, useState } from "react";
+import { useRef } from "react";
 import { usePathname } from "next/navigation";
 import { urlFor } from "@/sanity/lib/image";
 
-const ContactModal = dynamic(() => import("./ContactModal"), { ssr: false });
 import type { SITE_SETTINGS_QUERY_RESULT } from "@/sanity/types";
 import "./Header.css";
 
@@ -21,7 +19,6 @@ type HeaderProps = {
 };
 
 export default function Header({ logo, siteName, navigation }: HeaderProps) {
-  const [showContactModal, setShowContactModal] = useState(false);
   const navCollapseRef = useRef<HTMLDivElement>(null);
   const pathname = usePathname();
 
@@ -30,12 +27,6 @@ export default function Header({ logo, siteName, navigation }: HeaderProps) {
     if (navElement?.classList.contains("show")) {
       navElement.classList.remove("show");
     }
-  };
-
-  const handleContactClick = (e: React.MouseEvent) => {
-    e.preventDefault();
-    collapseNav();
-    setShowContactModal(true);
   };
 
   const handleNavClick = () => {
@@ -58,20 +49,6 @@ export default function Header({ logo, siteName, navigation }: HeaderProps) {
   };
 
   const renderNavItem = (item: NavItem) => {
-    if (item.linkType === "action") {
-      return (
-        <a
-          href={`#${item.actionId || ""}`}
-          className="nav-link"
-          onClick={handleContactClick}
-          role="button"
-          aria-haspopup="dialog"
-        >
-          {item.label}
-        </a>
-      );
-    }
-
     if (item.linkType === "external" && item.externalUrl) {
       return (
         <a
@@ -157,10 +134,6 @@ export default function Header({ logo, siteName, navigation }: HeaderProps) {
         </nav>
       </header>
 
-      <ContactModal
-        show={showContactModal}
-        onHide={() => setShowContactModal(false)}
-      />
     </>
   );
 }

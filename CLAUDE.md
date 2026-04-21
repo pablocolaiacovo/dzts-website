@@ -113,7 +113,6 @@ Each app has its own `.env.local` file with different prefixes (Next.js uses `NE
 | -------------------------------- | --------------------------------- |
 | `NEXT_PUBLIC_SANITY_PROJECT_ID`  | Sanity project identifier         |
 | `NEXT_PUBLIC_SANITY_DATASET`     | Sanity dataset name               |
-| `NEXT_PUBLIC_WEB3FORMS_KEY`      | Web3Forms API key for contact form|
 | `NEXT_PUBLIC_SITE_URL`           | Production site URL (for sitemap.xml and robots.txt) |
 | `NEXT_PUBLIC_GA_MEASUREMENT_ID`  | Google Analytics 4 measurement ID (optional, e.g. `G-XXXXXXXXXX`) |
 | `SANITY_REVALIDATE_SECRET`       | HMAC secret for Sanity webhook (server-only, no `NEXT_PUBLIC_` prefix) |
@@ -131,9 +130,11 @@ See `.env.example` files in each app for templates.
 
 ### Frontend
 
-Next.js App Router project:
+Next.js App Router project with route groups:
 
-- `apps/frontend/src/app/` - Routes and layouts (file-based routing)
+- `apps/frontend/src/app/` - Root layout (html/body/fonts/bootstrap)
+- `apps/frontend/src/app/(site)/` - Site layout (header/footer/WhatsApp button) for public pages
+- `apps/frontend/src/app/(print)/` - Minimal layout (no chrome) for print-optimized pages
 - `apps/frontend/src/components/` - React components
 - `apps/frontend/src/lib/` - Shared utility functions (e.g., `filters.ts`)
 - `apps/frontend/src/types/` - Shared TypeScript type definitions (e.g., `filters.ts`)
@@ -193,7 +194,8 @@ Two GitHub Actions workflows run on PRs to `dev` and `main`:
 - `/` - Home page with search, featured properties, and location map
 - `/propiedades` - Properties listing page with filters, pagination, and active filter badges
 - `/propiedades/[slug]` - Property detail page with images, description, JSON-LD structured data, and location map
-- Custom `not-found.tsx` (branded 404 page) and `error.tsx` (error boundary with retry) at app root
+- `/propiedades/[slug]/ficha` - Print-optimized property sheet (no header/footer, `(print)` route group)
+- Custom `not-found.tsx` (branded 404 page) and `error.tsx` (error boundary with retry) at app root and `(site)` route group
 
 ### Content Integration
 
@@ -223,8 +225,8 @@ Two GitHub Actions workflows run on PRs to `dev` and `main`:
 ## Components
 
 - **MapSection** - Reusable component for displaying embedded Google Maps. Renders full-width iframe (450px height) when address is provided, returns null if no address exists.
-- **ContactButton** - Client component that wraps a button + dynamically imported `ContactModal`. Used on the property detail page (server component) to open the contact form without making the entire page a client component.
-- **ContactModal** - Client component with Web3Forms integration for the contact form. Dynamically imported (`next/dynamic`, `ssr: false`) wherever used.
+- **ShareButton** - Client component with Web Share API (mobile) / clipboard copy with "Link copiado" feedback (desktop). Used on the property detail page.
+- **FichaActions** - Client component with "Imprimir Ficha" (`window.print()`) and "Compartir" (same share logic as ShareButton) buttons. Used on the print-optimized ficha page.
 
 ## Conventions
 
@@ -284,7 +286,7 @@ Playwright e2e smoke tests live in `apps/frontend/e2e/`. Config is at `apps/fron
 ### Test Design Principles
 
 - Tests assert **page structure** (element existence, selectors, navigation URLs) rather than CMS content text, making them resilient to Sanity content changes.
-- Static UI labels hardcoded in source code (e.g., "Buscar", "Aplicar filtros", "404", "contactate con") are safe to assert.
+- Static UI labels hardcoded in source code (e.g., "Buscar", "Aplicar filtros", "404", "Ficha", "Compartir") are safe to assert.
 - Tests navigate from the listing page to discover property detail slugs dynamically — no hardcoded slugs.
 - **When a test fails, fix the feature/bug first** — don't make the test more permissive just to pass. Investigate the root cause before adjusting test expectations.
 
@@ -309,8 +311,8 @@ When modifying components, be aware these selectors are used by e2e tests:
 | `a[href^="/propiedades/"]` | `PropertyCard` (card links) | `propiedades.spec.ts`, `property-detail.spec.ts` |
 | `.badge .btn-close` | `ActiveFilterBadges` | `propiedades.spec.ts` |
 | `#propertyCarousel` | `ImageCarousel` | `property-detail.spec.ts` |
-| `button:has-text('contactate con')` | `ContactButton` | `property-detail.spec.ts` |
-| `.modal.show`, `#contactName`, `#contactEmail`, `#contactPhone`, `#contactComments` | `ContactModal` | `property-detail.spec.ts` |
+| `a:has-text('Ficha')` | Property detail (ficha link) | `property-detail.spec.ts` |
+| `button:has-text('Compartir')` | `ShareButton` | `property-detail.spec.ts` |
 | `nav[aria-label="Breadcrumb"]` | `Breadcrumb` | `navigation.spec.ts`, `propiedades.spec.ts`, `property-detail.spec.ts` |
 | `.navbar-brand` | `Header` | `navigation.spec.ts` |
 | `footer.site-footer` | `Footer` | `navigation.spec.ts` |
@@ -324,20 +326,28 @@ When modifying components, be aware these selectors are used by e2e tests:
 
 ## Recent Implementation Notes
 
-- Listing skeleton: `apps/frontend/src/app/propiedades/loading.tsx` mirrors `PropertiesLayout` (filters sidebar + badges/count + grid).
-- Property detail skeleton: `apps/frontend/src/app/propiedades/[slug]/loading.tsx` includes carousel-sized media + 450px map placeholder.
+- Listing skeleton: `apps/frontend/src/app/(site)/propiedades/loading.tsx` mirrors `PropertiesLayout` (filters sidebar + badges/count + grid).
+- Property detail skeleton: `apps/frontend/src/app/(site)/propiedades/[slug]/loading.tsx` includes carousel-sized media + 450px map placeholder.
 - Sanity property images can have `url`/`metadata` as `null`; normalize before passing to `ImageCarousel` and only cast to `SanityImageSource` when `url` is present.
 - `ImageCarousel` accepts `asset?: SanityImageSource | null` and `lqip?: string | null`. Uses `.quality(80)` for consistent compression.
 - Property detail `description` is Portable Text; use `PortableTextBlock[] | null` and import `@portabletext/types` (dependency added to frontend).
 - `FilterOption` and `FilterOptions` types live in `src/types/filters.ts`. The `parseMultiple()` and `buildFilterOptions()` helpers live in `src/lib/filters.ts`. Both pages and multiple components import from these shared modules.
-- `ContactButton` is the pattern for triggering the contact modal from server components — a thin client component that manages modal state and dynamically imports `ContactModal`.
+- `ShareButton` uses Web Share API on mobile (native share sheet) and clipboard copy with "Link copiado" feedback badge on desktop.
+- Property detail and ficha share query/types via `src/sanity/queries/propertyDetail.ts`.
 - Only one image per page should have `priority` (the LCP candidate). Do not mark logos or secondary images as priority.
 - The `html` element uses `lang="es"` (Spanish site targeting Argentine audience).
 - Home page sections come from the `homePage` singleton (`apps/frontend/src/sanity/queries/homePage.ts`) and render via `TextImageSection` with Portable Text and images.
 - `homePage.sections[]` includes optional `anchorId` for header anchors (e.g., `/#servicios`, `/#nosotros`).
 - Header smooth-scrolls to anchors when already on `/` and updates the hash without full navigation.
-- `TextImageSection` supports a carousel (multiple images) and uses `asset.url` directly when present (fallback to `urlFor`).
+- `TextImageSection` supports a carousel (multiple images) via `SectionCarousel` component. Always uses `urlFor()` for images (requires `_id` in GROQ query).
 - Anchored sections use `scroll-margin-top: 60px` to offset the sticky header.
 - Webhook revalidation route: `src/app/api/revalidate/route.ts`. Uses `parseBody` from `next-sanity/webhook` for HMAC validation and `revalidateTag(type, "max")` from `next/cache`.
 - In Next.js 16, `revalidateTag()` requires two arguments: `(tag, profile)`. Pass `"max"` as the profile to revalidate all cache entries for a tag regardless of their original `cacheLife`.
 - The `/propiedades` listing page calls `sanityFetch` directly without `"use cache"` (dynamic `searchParams`), so it has no cache tag and is unaffected by revalidation.
+- Route groups: `(site)` wraps pages with header/footer/WhatsApp button via its own layout; `(print)` provides a minimal layout for the ficha page. Root layout only has html/body/fonts/bootstrap.
+- The ficha page (`/propiedades/[slug]/ficha`) uses raw `<img>` tags (not `next/image`) for print reliability. It has `robots: { index: false, follow: false }`.
+- Property detail and ficha pages share Sanity queries/types via `src/sanity/queries/propertyDetail.ts`.
+- Property detail page includes: "Ficha" button (opens ficha in new tab), "Compartir" (ShareButton), WhatsApp share icon, and "Consultar por WhatsApp" full-width button.
+- WhatsApp consultation URL is built from `siteSettings.whatsappNumber` with a pre-filled message including the property name.
+- Sold/rented properties display a status banner ribbon (CSS-only, positioned absolute) overlaying the image carousel.
+- `TextImageSection` displays images in large circles (full column width, `border-radius: 50%`, `aspect-ratio: 1/1`).

@@ -38,6 +38,7 @@ interface PropertyListItem {
   propertyType?: string | null;
   city?: string | null;
   rooms?: number | null;
+  reference?: string | null;
   image?: SanityImageSource | null;
 }
 
@@ -60,6 +61,7 @@ const PROPERTIES_QUERY = defineQuery(`
     "propertyType": propertyType->name,
     "city": city->name,
     rooms,
+    reference,
     "image": images[0] { asset->{ _id, url, metadata { lqip } } }
   }
 `);

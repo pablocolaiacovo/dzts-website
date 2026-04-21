@@ -1,100 +1,24 @@
 import type { Metadata } from "next";
 import { PortableText } from "@portabletext/react";
-import type { PortableTextBlock } from "@portabletext/types";
-import { cacheLife, cacheTag } from "next/cache";
 import { notFound } from "next/navigation";
-import { defineQuery } from "next-sanity";
 import type { SanityImageSource } from "@sanity/image-url";
-import { sanityFetch } from "@/sanity/lib/live";
-import { client } from "@/sanity/lib/client";
 import { urlFor } from "@/sanity/lib/image";
 import { getCachedSiteSeo } from "@/sanity/queries/seo";
 import {
   getCachedOrganization,
   buildOrganizationJsonLd,
 } from "@/sanity/queries/siteSettings";
+import {
+  getCachedProperty,
+  getAllPropertySlugs,
+} from "@/sanity/queries/propertyDetail";
 import { resolveMetadata } from "@/lib/seo";
 
 import Breadcrumb from "@/components/Breadcrumb";
-import ContactButton from "@/components/ContactButton";
+import ShareButton from "@/components/ShareButton";
 import ImageCarousel from "@/components/ImageCarousel";
 import MapSection from "@/components/MapSection";
-
-const PROPERTY_QUERY = defineQuery(`
-  *[_type == "property" && slug.current == $slug][0]
-  {
-    title,
-    subtitle,
-    address,
-    description,
-    price,
-    "propertyType": propertyType->name,
-    operationType,
-    status,
-    currency,
-    "city": city->name,
-    "images": images[] { asset->{ _id, url, metadata { lqip } } },
-    "ogImage": images[0],
-    seo {
-      metaTitle,
-      metaDescription,
-      ogImage { asset->{ url } },
-      noIndex
-    }
-  }
-`);
-
-const PROPERTY_SLUGS_QUERY = defineQuery(`
-  *[_type == "property" && defined(slug.current)]{
-    "slug": slug.current
-  }
-`);
-
-interface PropertyImageAsset {
-  _id: string;
-  url?: string | null;
-  metadata?: { lqip?: string | null } | null;
-}
-
-interface PropertyImage {
-  asset: PropertyImageAsset | null;
-}
-
-interface PropertyDetail {
-  title: string | null;
-  subtitle?: string | null;
-  address?: string | null;
-  description?: PortableTextBlock[] | null;
-  price?: number | null;
-  propertyType?: string | null;
-  operationType?: string | null;
-  status?: string | null;
-  currency?: string | null;
-  city?: string | null;
-  images?: Array<PropertyImage | null> | null;
-  ogImage?: SanityImageSource | null;
-  seo?: {
-    metaTitle?: string | null;
-    metaDescription?: string | null;
-    ogImage?: { asset?: { url?: string | null } | null } | null;
-    noIndex?: boolean | null;
-  } | null;
-}
-
-interface PropertySlugEntry {
-  slug: string;
-}
-
-async function getCachedProperty(slug: string) {
-  "use cache";
-  cacheLife("minutes");
-  cacheTag("property");
-  const { data } = await sanityFetch({
-    query: PROPERTY_QUERY,
-    params: { slug },
-  });
-  return data as PropertyDetail | null;
-}
+import "./property-detail.css";
 
 export async function generateMetadata({
   params,
@@ -122,7 +46,7 @@ export async function generateMetadata({
 }
 
 export async function generateStaticParams() {
-  const slugs = await client.fetch<PropertySlugEntry[]>(PROPERTY_SLUGS_QUERY);
+  const slugs = await getAllPropertySlugs();
   return slugs.map((entry) => ({ slug: entry.slug }));
 }
 
@@ -172,6 +96,20 @@ export default async function PropertyPage({
     }),
   };
 
+  const isUnavailable =
+    property.status === "vendido" || property.status === "alquilado";
+  const statusLabel =
+    property.status === "vendido" ? "Vendido" : "Alquilado";
+
+  const whatsappNumber = organization?.whatsappNumber;
+  const whatsappConsultUrl = whatsappNumber
+    ? `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(`Hola, me interesa la propiedad "${property.title}". ¿Podrían darme más información?`)}`
+    : null;
+
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "";
+  const propertyUrl = `${siteUrl}/propiedades/${slug}`;
+  const whatsappShareUrl = `https://wa.me/?text=${encodeURIComponent(`${property.title} - ${propertyUrl}`)}`;
+
   return (
     <>
       <script
@@ -191,6 +129,11 @@ export default async function PropertyPage({
                 },
               ]}
             />
+            {property.reference && (
+              <div className="text-muted small mb-1">
+                Ref: {property.reference}
+              </div>
+            )}
             <h1 className="text-secondary mb-2" style={{ fontSize: "2.5rem" }}>
               {property.title}
             </h1>
@@ -207,11 +150,6 @@ export default async function PropertyPage({
                   {property.propertyType}
                 </span>
               )}
-              {property.status && property.status !== "disponible" && (
-                <span className="badge rounded-pill bg-danger text-white fs-6">
-                  {property.status === "vendido" ? "Vendido" : "Alquilado"}
-                </span>
-              )}
             </div>
 
             <div className="text-primary mb-3" style={{ fontSize: "1.1rem" }}>
@@ -224,19 +162,26 @@ export default async function PropertyPage({
             </div>
             <hr className="border-primary mb-4" />
 
-            <ImageCarousel
-              images={(property.images ?? []).map((img) => {
-                const asset = img?.asset?.url
-                  ? (img.asset as SanityImageSource)
-                  : null;
+            <div className="position-relative">
+              {isUnavailable && (
+                <div className="status-banner" aria-label={`Propiedad ${statusLabel.toLowerCase()}`}>
+                  <span>{statusLabel}</span>
+                </div>
+              )}
+              <ImageCarousel
+                images={(property.images ?? []).map((img) => {
+                  const asset = img?.asset?.url
+                    ? (img.asset as SanityImageSource)
+                    : null;
 
-                return {
-                  asset,
-                  lqip: img?.asset?.metadata?.lqip ?? null,
-                };
-              })}
-              title={property.title ?? ""}
-            />
+                  return {
+                    asset,
+                    lqip: img?.asset?.metadata?.lqip ?? null,
+                  };
+                })}
+                title={property.title ?? ""}
+              />
+            </div>
             {property.description ? (
               <div className="mb-5">
                 <PortableText value={property.description} />
@@ -244,17 +189,50 @@ export default async function PropertyPage({
             ) : null}
 
             <hr className="border-secondary my-4" />
-            <div className="d-flex flex-column flex-md-row align-items-center justify-content-between gap-3">
-              <span
-                className="text-primary fw-bold fs-3 fs-md-1"
-                style={{ fontSize: "clamp(1.5rem, 5vw, 2.5rem)" }}
-              >
-                {property.price != null
-                  ? `${property.currency === "ARS" ? "AR$" : "US$"}${property.price.toLocaleString("es-AR")}`
-                  : "Consultar precio"}
-              </span>
-              <ContactButton />
-            </div>
+            <p
+              className="text-primary fw-bold text-center mb-3"
+              style={{ fontSize: "clamp(1.5rem, 5vw, 2.5rem)" }}
+            >
+              {property.price != null
+                ? `${property.currency === "ARS" ? "AR$" : "US$"}${property.price.toLocaleString("es-AR")}`
+                : "Consultar precio"}
+            </p>
+            <div className="d-flex gap-2 w-100">
+                <a
+                  href={`/propiedades/${slug}/ficha`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn btn-outline-secondary text-dark py-2 fw-bold flex-fill text-center"
+                >
+                  <i className="bi bi-file-earmark-text me-2" aria-hidden="true" />
+                  Ficha
+                </a>
+                <ShareButton />
+                <a
+                  href={whatsappShareUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn btn-outline-success py-2 fw-bold flex-fill text-center"
+                  aria-label="Compartir por WhatsApp"
+                >
+                  <i className="bi bi-whatsapp me-2" aria-hidden="true" />
+                  WhatsApp
+                </a>
+              </div>
+
+            {whatsappConsultUrl && (
+              <div className="mt-4">
+                <a
+                  href={whatsappConsultUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn btn-success text-white px-4 py-3 fw-bold fs-5 w-100"
+                >
+                  <i className="bi bi-whatsapp me-2" aria-hidden="true" />
+                  Consultar por WhatsApp
+                </a>
+              </div>
+            )}
           </div>
         </div>
       </div>

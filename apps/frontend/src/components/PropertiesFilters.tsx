@@ -4,6 +4,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState, useTransition } from "react";
 import type { FilterOption } from "@/types/filters";
 import { parseMultiple } from "@/lib/filters";
+import ReferenceSearch from "./ReferenceSearch";
 import "./PropertiesFilters.css";
 
 interface PropertiesFiltersProps {
@@ -113,6 +114,8 @@ function PropertiesFiltersInner({
 
   const filterForm = (
     <>
+      <ReferenceSearch />
+
       {/* Operación - Radio buttons */}
       <div className="mb-4">
         <button
