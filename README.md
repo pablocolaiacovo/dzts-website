@@ -90,7 +90,67 @@ pnpm --filter dzts-website build   # writes apps/frontend/out/
 
 Upload the contents of `apps/frontend/out/` to shared hosting. The bundled `.htaccess` (in `apps/frontend/public/.htaccess`, copied into `out/` at build) sets security headers, normalises trailing slashes, and wires up the custom 404 page. Replace with the equivalent nginx config if the host is nginx.
 
-Content updates require a rebuild. To automate, point a Sanity webhook at a build trigger (e.g. GitHub Actions `repository_dispatch` or your host's deploy hook) — there is no `/api/revalidate` route in a static build.
+Content updates require a rebuild and re-upload. For content editors, this is fully automated — see the next section.
+
+## Automated Deploys (Sanity publish → shared hosting)
+
+The workflow at `.github/workflows/deploy.yml` rebuilds the site and uploads it over FTP. The content editor only ever touches Sanity Studio — the rest happens in the background.
+
+### Triggers
+
+- **`repository_dispatch: sanity-publish`** — fired by a Sanity webhook when a document is published. This is the editor-facing path.
+- **Push to `main`** (paths `apps/frontend/**` or the workflow file) — auto-deploys code changes after a PR merge.
+- **Manual** — GitHub → Actions → "Deploy Frontend" → Run workflow, as a fallback.
+
+A concurrency group (`deploy-frontend`) coalesces rapid-fire triggers into a single deploy.
+
+### One-time setup
+
+**1. GitHub Variables** (Settings → Secrets and variables → Actions → Variables):
+
+| Name | Value |
+|------|-------|
+| `NEXT_PUBLIC_SANITY_PROJECT_ID` | Sanity project ID |
+| `NEXT_PUBLIC_SANITY_DATASET` | Sanity dataset name (typically `production`) |
+| `NEXT_PUBLIC_SITE_URL` | The live site URL, e.g. `https://dzts.com.ar` |
+| `NEXT_PUBLIC_GA_MEASUREMENT_ID` | (optional) GA4 measurement ID |
+
+**2. GitHub Secrets** (Settings → Secrets and variables → Actions → Secrets):
+
+| Name | Value |
+|------|-------|
+| `FTP_SERVER` | FTP host (e.g. `ftp.dzts.com.ar`) |
+| `FTP_USERNAME` | FTP username |
+| `FTP_PASSWORD` | FTP password |
+| `FTP_SERVER_DIR` | Remote directory the site is served from — must end with `/`, e.g. `/public_html/` |
+
+**3. GitHub fine-grained PAT for Sanity → GitHub**:
+
+Create at https://github.com/settings/personal-access-tokens with:
+- Repository access: only this repo
+- Permission: **Contents: Read**, **Actions: Write**
+
+**4. Sanity webhook** (sanity.io/manage → Project → API → Webhooks → Add webhook):
+
+| Setting | Value |
+|---------|-------|
+| Name | `Deploy frontend` |
+| URL | `https://api.github.com/repos/<owner>/<repo>/dispatches` |
+| Dataset | your dataset |
+| Trigger on | Create, Update, Delete |
+| Filter | `_type in ["property", "siteSettings", "homePage", "propiedadesPage", "city", "propertyTypeCategory"]` |
+| Projection | `{ "event_type": "sanity-publish", "client_payload": { "_type": _type, "_id": _id } }` |
+| HTTP method | `POST` |
+| HTTP headers | `Authorization: Bearer <PAT>` and `Accept: application/vnd.github+json` |
+| API version | `v2021-03-25` or later |
+
+Once this is in place, publishing in Sanity triggers a new run under GitHub → Actions within seconds.
+
+### Editor workflow
+
+Editing and publishing a property in Sanity Studio. That's it. A deploy kicks off automatically and finishes in ~2 minutes — the live site reflects the change shortly after.
+
+If a deploy fails, GitHub sends an email to the repo watchers. To retry, open Actions → latest run → "Re-run failed jobs", or just republish in Sanity.
 
 ## Analytics
 
