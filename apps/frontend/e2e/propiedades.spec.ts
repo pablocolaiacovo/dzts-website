@@ -16,7 +16,7 @@ test.describe("Properties Listing Page", () => {
   });
 
   test("property cards are displayed as links", async ({ page }) => {
-    const cards = page.locator('a[href^="/propiedades/"]');
+    const cards = page.locator('a[href^="/propiedades/"]:not([href="/propiedades/"])');
     const count = await cards.count();
     expect(count).toBeGreaterThan(0);
   });
@@ -30,7 +30,7 @@ test.describe("Properties Listing Page", () => {
   test("clear filters resets URL", async ({ page }) => {
     await page.goto("/propiedades?operacion=venta");
     await page.click("button:has-text('Limpiar filtros')");
-    await expect(page).toHaveURL(/\/propiedades$/);
+    await expect(page).toHaveURL(/\/propiedades\/?$/);
   });
 
   test("active filter badges appear when filters applied", async ({

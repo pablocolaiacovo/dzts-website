@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
-import { cacheLife, cacheTag } from "next/cache";
 import { defineQuery } from "next-sanity";
 import type { SanityImageSource } from "@sanity/image-url";
 import { sanityFetch } from "@/sanity/lib/live";
@@ -48,9 +47,6 @@ const MAP_ADDRESS_QUERY = defineQuery(`
 `);
 
 async function getCachedMapAddress() {
-  "use cache";
-  cacheLife("hours");
-  cacheTag("siteSettings");
   const { data } = await sanityFetch({ query: MAP_ADDRESS_QUERY });
   return data;
 }
