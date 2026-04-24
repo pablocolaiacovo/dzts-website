@@ -136,6 +136,16 @@ export const siteSettingsType = defineType({
       group: "contact",
     }),
     defineField({
+      name: "mapPlaceId",
+      title: "Google Maps Place ID",
+      type: "string",
+      group: "contact",
+      description:
+        "Opcional. Identificador del negocio en Google Maps (ej: ChIJN1t_tDeuEmsRUsoyG83frY4). " +
+        "Si se completa, el mapa de la oficina mostrará el pin del negocio con su tarjeta de información " +
+        "en lugar de un simple pin de dirección. Se puede obtener en https://developers.google.com/maps/documentation/javascript/examples/places-placeid-finder",
+    }),
+    defineField({
       name: "whatsappNumber",
       title: "WhatsApp",
       type: "string",

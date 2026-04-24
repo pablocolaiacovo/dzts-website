@@ -42,12 +42,15 @@ export async function generateMetadata(): Promise<Metadata> {
   return metadata;
 }
 
-const MAP_ADDRESS_QUERY = defineQuery(`
-  *[_type == "siteSettings"][0].address
+const MAP_DATA_QUERY = defineQuery(`
+  *[_type == "siteSettings"][0] {
+    address,
+    mapPlaceId
+  }
 `);
 
-async function getCachedMapAddress() {
-  const { data } = await sanityFetch({ query: MAP_ADDRESS_QUERY });
+async function getCachedMapData() {
+  const { data } = await sanityFetch({ query: MAP_DATA_QUERY });
   return data;
 }
 
@@ -67,8 +70,14 @@ async function HomeSections() {
 }
 
 async function MapSectionWrapper() {
-  const address = await getCachedMapAddress();
-  return <MapSection address={address} title="Ubicación de la oficina" />;
+  const data = await getCachedMapData();
+  return (
+    <MapSection
+      address={data?.address}
+      placeId={data?.mapPlaceId}
+      title="Ubicación de la oficina"
+    />
+  );
 }
 
 function FeaturedPropertiesFallback({ heading }: { heading?: string | null }) {
