@@ -170,7 +170,7 @@ Two GitHub Actions workflows run on PRs to `dev` and `main`:
 2. **Build frontend**: `pnpm --filter frontend build`
 3. **Build studio**: `pnpm --filter dzts-studio exec sanity build`
 
-- Uses `ubuntu-latest`, Node 20, pnpm 10.
+- Uses `ubuntu-latest`, Node 24, pnpm 10.
 - Placeholder env vars (`ci-placeholder`) satisfy build-time validation without real credentials.
 - Studio build uses `exec sanity build` instead of `pnpm build` to skip the `prebuild` hook (schema extraction + typegen require a live Sanity API connection).
 - `--frozen-lockfile` ensures lockfile stays in sync with `package.json`.
