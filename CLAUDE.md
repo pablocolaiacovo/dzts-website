@@ -170,7 +170,7 @@ Two GitHub Actions workflows run on PRs to `dev` and `main`:
 2. **Build frontend**: `pnpm --filter frontend build`
 3. **Build studio**: `pnpm --filter dzts-studio exec sanity build`
 
-- Uses `ubuntu-latest`, Node 20, pnpm 10.
+- Uses `ubuntu-latest`, Node 24, pnpm 10.
 - Placeholder env vars (`ci-placeholder`) satisfy build-time validation without real credentials.
 - Studio build uses `exec sanity build` instead of `pnpm build` to skip the `prebuild` hook (schema extraction + typegen require a live Sanity API connection).
 - `--frozen-lockfile` ensures lockfile stays in sync with `package.json`.
@@ -262,7 +262,7 @@ The frontend is deployed as a static site to shared hosting:
 - Property detail pages include `<script type="application/ld+json">` with Schema.org `RealEstateListing` data (name, price, address, images).
 - Property detail pages generate OpenGraph metadata via `generateMetadata()`.
 - Ensure only one `<h1>` per page. Section headings within page content should use `<h2>` or lower.
-- **robots.txt** (`src/app/robots.ts`): Environment-aware. Blocks all bots in non-production (`VERCEL_ENV !== "production"`), allows indexing in production.
+- **robots.txt** (`src/app/robots.ts`): Environment-aware. Reads `SITE_ENV`, falling back to `VERCEL_ENV`. Only `"production"` allows indexing; everything else emits `Disallow: /`. `SITE_ENV=production` is set by `.github/workflows/deploy.yml` for FTP builds; `VERCEL_ENV` is auto-injected by Vercel, which keeps preview deploys blocked from search engines automatically.
 - **sitemap.xml** (`src/app/sitemap.ts`): Dynamically generated. Includes home, `/propiedades`, and all property detail pages fetched from Sanity.
 - **llms.txt** (`src/app/llms.txt/route.ts`): Markdown file for AI agents/LLMs ([spec](https://llmstxt.org/)). Lists main pages and all properties to help LLMs understand site content.
 
