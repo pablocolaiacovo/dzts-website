@@ -90,7 +90,84 @@ pnpm --filter dzts-website build   # writes apps/frontend/out/
 
 Upload the contents of `apps/frontend/out/` to shared hosting. The bundled `.htaccess` (in `apps/frontend/public/.htaccess`, copied into `out/` at build) sets security headers, normalises trailing slashes, and wires up the custom 404 page. Replace with the equivalent nginx config if the host is nginx.
 
-Content updates require a rebuild and re-upload. For content editors, this is fully automated — see the next section.
+Content updates require a rebuild and re-upload. For content editors, this is fully automated — see "Automated Deploys" below. The manual checklist is kept here for the first-ever deploy and as a fallback when the automation isn't available.
+
+### Manual deployment checklist
+
+#### Before building
+
+1. **Checkout and sync `dev`** (or whichever branch maps to production):
+   ```bash
+   git checkout dev && git pull
+   ```
+2. **Set production env vars in `apps/frontend/.env.local`.** These get baked into the static bundle at build time.
+   ```
+   NEXT_PUBLIC_SANITY_PROJECT_ID=<project-id>
+   NEXT_PUBLIC_SANITY_DATASET=production       # NOT "development"
+   NEXT_PUBLIC_SITE_URL=https://www.dzts.com.ar
+   NEXT_PUBLIC_GA_MEASUREMENT_ID=G-XXXXXXXXXX  # or leave blank
+   SITE_ENV=production                         # required for robots.txt to emit Allow: /
+   ```
+   `NEXT_PUBLIC_SITE_URL` drives the canonical URL, sitemap, and OpenGraph tags. Without it, `sitemap.xml` emits relative URLs and `llms.txt` is skipped. Without `SITE_ENV=production`, `robots.txt` emits `Disallow: /` and the site gets deindexed from search engines.
+3. **Confirm the production Sanity dataset has the expected content.** If you've been editing in `development`, either copy docs across (`sanity dataset export` / `import`) or point the deploy at the `development` dataset intentionally.
+
+#### Build
+
+4. **Install with a frozen lockfile** (matches CI exactly):
+   ```bash
+   pnpm install --frozen-lockfile
+   ```
+5. **Clean previous outputs, then build:**
+   ```bash
+   rm -rf apps/frontend/.next apps/frontend/out
+   pnpm --filter dzts-website build
+   ```
+6. **Smoke-test locally** before uploading anything:
+   ```bash
+   pnpm --filter dzts-website start
+   ```
+   Visit `http://localhost:3000/`, click into a property, test `/propiedades` filters, and hit a non-existent URL to confirm the 404 page.
+7. **Verify the build output:**
+    - `apps/frontend/out/.htaccess` is present (easiest file to lose — breaks trailing-slash rewrites and security headers).
+    - `apps/frontend/out/sitemap.xml` references the production URL (not localhost, not relative).
+    - `apps/frontend/out/robots.txt` says `Allow: /`. If it says `Disallow: /`, `SITE_ENV` was not set to `production` — rebuild before uploading.
+    - `apps/frontend/out/llms.txt` exists.
+
+#### Backup the current live site (first deploy only)
+
+8. Connect to FTP, navigate to the webroot (e.g. `/public_html/`).
+9. Create `/public_html/backup/` and move the current live site into it. FTP clients "move" by downloading and re-uploading — slow and risky for a live site. Prefer:
+    - **SSH or cPanel File Manager** to do a server-side `mv`, or
+    - **Download the live site to local first** as a true backup, then delete over FTP and upload the new build.
+10. Add a minimal `.htaccess` inside `/public_html/backup/` to prevent directory listing:
+    ```apache
+    Options -Indexes
+    ```
+
+#### Upload
+
+11. Upload the **contents** of `apps/frontend/out/` to `/public_html/` (not the `out/` folder itself). Make sure **dotfiles are included** — `.htaccess` is the critical one, and many FTP clients hide dotfiles by default. In FileZilla: Server menu → Force showing hidden files.
+12. After upload, confirm on the server:
+    - `/public_html/.htaccess` exists.
+    - `/public_html/index.html` has a fresh modified time.
+    - `/public_html/backup/` is still intact and reachable at `https://www.dzts.com.ar/backup/`.
+
+#### Post-deploy smoke test
+
+13. Hard-reload in an incognito window (`Ctrl/Cmd+Shift+N`, then `Ctrl/Cmd+F5`).
+14. Check in this order:
+    - Home page renders; hero image and office map pin appear.
+    - `/propiedades/` lists properties (test both `/propiedades` and `/propiedades/` — the `.htaccess` rewrite should handle both).
+    - A property detail page renders with map, JSON-LD, and Ficha button.
+    - `/nonexistent-url` shows the branded 404.
+    - `/sitemap.xml` and `/robots.txt` load correctly, with `robots.txt` saying `Allow: /`.
+15. If the host has Cloudflare or a CDN in front, purge its cache after deploy — visitors may see cached old assets for up to an hour otherwise.
+
+#### First-deploy-only gotchas
+
+- **MIME types.** Some shared hosts don't serve `.webp`, `.woff2`, `.mjs`, or `.avif` with the right `Content-Type`. If DevTools shows the file downloading with the wrong type, add `AddType` rules to `.htaccess`.
+- **Case-sensitive paths.** Local filesystems are usually case-insensitive; the server likely isn't. `<img src="/Images/foo.jpg">` that works locally may 404 on the server.
+- **Trailing-slash redirect loop.** The `.htaccess` rewrite adds trailing slashes. If the host *also* adds them, you get a redirect loop. Check DevTools → Network for `301 → 301 → 301` on a page and remove one of the rules.
 
 ## Automated Deploys (Sanity publish → shared hosting)
 
