@@ -80,55 +80,17 @@ cp apps/studio/.env.example apps/studio/.env.local
 
 Get the Sanity project ID and dataset from your [Sanity project settings](https://www.sanity.io/manage). The Web3Forms key is needed for the contact form — get one at [web3forms.com](https://web3forms.com).
 
-## Cache Revalidation Webhook
+## Static Export and Deployment
 
-The frontend uses on-demand cache revalidation so content changes published in Sanity appear immediately. This requires a webhook configured in the Sanity dashboard.
-
-### 1. Generate a secret
+The frontend is a static site (`output: "export"` in `next.config.ts`).
 
 ```bash
-openssl rand -hex 32
+pnpm --filter dzts-website build   # writes apps/frontend/out/
 ```
 
-Add the output as `SANITY_REVALIDATE_SECRET` in `apps/frontend/.env.local`.
+Upload the contents of `apps/frontend/out/` to shared hosting. The bundled `.htaccess` (in `apps/frontend/public/.htaccess`, copied into `out/` at build) sets security headers, normalises trailing slashes, and wires up the custom 404 page. Replace with the equivalent nginx config if the host is nginx.
 
-### 2. Create the webhook in Sanity
-
-Go to **sanity.io/manage → Project → API → Webhooks → Add webhook** and configure:
-
-| Setting | Value |
-|---------|-------|
-| Name | `Revalidate Next.js cache` |
-| URL | `https://<your-domain>/api/revalidate` |
-| Dataset | your dataset name |
-| Trigger on | Create, Update, Delete |
-| Filter | `_type in ["property", "siteSettings", "homePage", "propiedadesPage", "city", "propertyTypeCategory"]` |
-| Projection | `{_type}` |
-| Secret | same value as `SANITY_REVALIDATE_SECRET` |
-
-Without the webhook (e.g. local development), cache entries still expire based on their `cacheLife` TTL (`"minutes"` or `"hours"`).
-
-### Testing locally
-
-With the dev server running, you can simulate a webhook call using curl. Replace `YOUR_SECRET` with your `SANITY_REVALIDATE_SECRET` value and `_type` with the Sanity document type to revalidate:
-
-```bash
-BODY='{"_type":"property"}'
-SECRET="YOUR_SECRET"
-TS=$(date +%s%3N)
-SIG=$(echo -n "${TS}.${BODY}" \
-  | openssl dgst -sha256 -hmac "$SECRET" -binary \
-  | openssl base64 \
-  | tr '+/' '-_' | tr -d '=')
-
-curl -s http://localhost:3000/api/revalidate \
-  -X POST \
-  -H "Content-Type: application/json" \
-  -H "sanity-webhook-signature: t=${TS},v1=${SIG}" \
-  -d "$BODY"
-```
-
-A successful response looks like: `{"revalidated":true,"tag":"property"}`
+Content updates require a rebuild. To automate, point a Sanity webhook at a build trigger (e.g. GitHub Actions `repository_dispatch` or your host's deploy hook) — there is no `/api/revalidate` route in a static build.
 
 ## Analytics
 

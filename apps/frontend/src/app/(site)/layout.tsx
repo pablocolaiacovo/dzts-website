@@ -1,5 +1,4 @@
 import { Suspense } from "react";
-import { cacheLife, cacheTag } from "next/cache";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import WhatsAppButton from "@/components/WhatsAppButton";
@@ -7,9 +6,6 @@ import { sanityFetch } from "@/sanity/lib/live";
 import { SITE_SETTINGS_QUERY } from "@/sanity/queries/siteSettings";
 
 async function getSiteSettings() {
-  "use cache";
-  cacheLife("hours");
-  cacheTag("siteSettings");
   const { data } = await sanityFetch({ query: SITE_SETTINGS_QUERY });
   return data;
 }

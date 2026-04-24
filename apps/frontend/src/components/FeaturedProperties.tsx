@@ -1,5 +1,4 @@
 import { defineQuery } from "next-sanity";
-import { cacheLife, cacheTag } from "next/cache";
 import type { SanityImageSource } from "@sanity/image-url";
 import { sanityFetch } from "@/sanity/lib/live";
 import PropertyCard from "./PropertyCard";
@@ -38,9 +37,6 @@ export default async function FeaturedProperties({
 }: {
   heading: string;
 }) {
-  "use cache";
-  cacheLife("minutes");
-  cacheTag("property");
   const { data: properties } = await sanityFetch({ query: FEATURED_QUERY }) as { data: FeaturedProperty[] };
 
   return (
