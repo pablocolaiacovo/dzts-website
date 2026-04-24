@@ -45,7 +45,7 @@ export async function generateMetadata(): Promise<Metadata> {
 const MAP_DATA_QUERY = defineQuery(`
   *[_type == "siteSettings"][0] {
     address,
-    mapPlaceId
+    mapEmbedUrl
   }
 `);
 
@@ -74,7 +74,7 @@ async function MapSectionWrapper() {
   return (
     <MapSection
       address={data?.address}
-      placeId={data?.mapPlaceId}
+      embedUrl={data?.mapEmbedUrl}
       title="Ubicación de la oficina"
     />
   );

@@ -136,14 +136,21 @@ export const siteSettingsType = defineType({
       group: "contact",
     }),
     defineField({
-      name: "mapPlaceId",
-      title: "Google Maps Place ID",
-      type: "string",
+      name: "mapEmbedUrl",
+      title: "URL de mapa embebido (Google Maps)",
+      type: "url",
       group: "contact",
       description:
-        "Opcional. Identificador del negocio en Google Maps (ej: ChIJN1t_tDeuEmsRUsoyG83frY4). " +
-        "Si se completa, el mapa de la oficina mostrará el pin del negocio con su tarjeta de información " +
-        "en lugar de un simple pin de dirección. Se puede obtener en https://developers.google.com/maps/documentation/javascript/examples/places-placeid-finder",
+        "Opcional. URL del iframe de Google Maps para mostrar el pin del negocio con su tarjeta de información. " +
+        "Para obtenerla: abrir Google Maps, buscar el negocio, hacer clic en 'Compartir' → pestaña 'Insertar un mapa', " +
+        "y copiar la URL que aparece dentro de src=\"...\" (debe empezar con https://www.google.com/maps/embed?pb=...). " +
+        "Si se deja vacío, el mapa usa la dirección y muestra solo el pin de ubicación.",
+      validation: (rule) =>
+        rule.uri({ scheme: ["https"] }).custom((value) => {
+          if (!value) return true;
+          if (value.startsWith("https://www.google.com/maps/embed?")) return true;
+          return "La URL debe empezar con https://www.google.com/maps/embed? — copiala desde el atributo src=\"...\" del iframe que provee Google Maps en 'Compartir → Insertar un mapa'.";
+        }),
     }),
     defineField({
       name: "whatsappNumber",

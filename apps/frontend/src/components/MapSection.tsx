@@ -1,14 +1,17 @@
 interface MapSectionProps {
   address?: string | null;
-  placeId?: string | null;
+  embedUrl?: string | null;
   title: string;
 }
 
-export default function MapSection({ address, placeId, title }: MapSectionProps) {
-  const query = placeId ? `place_id:${placeId}` : address;
-  if (!query) return null;
+export default function MapSection({ address, embedUrl, title }: MapSectionProps) {
+  const mapSrc = embedUrl
+    ? embedUrl
+    : address
+      ? `https://www.google.com/maps?q=${encodeURIComponent(address)}&output=embed`
+      : null;
 
-  const mapSrc = `https://www.google.com/maps?q=${encodeURIComponent(query)}&output=embed`;
+  if (!mapSrc) return null;
 
   return (
     <div className="w-100">

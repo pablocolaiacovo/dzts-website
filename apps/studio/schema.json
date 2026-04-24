@@ -1086,6 +1086,13 @@
         },
         "optional": true
       },
+      "mapEmbedUrl": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "string"
+        },
+        "optional": true
+      },
       "whatsappNumber": {
         "type": "objectAttribute",
         "value": {
