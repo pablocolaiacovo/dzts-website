@@ -179,6 +179,7 @@ export type SiteSettings = {
   phone?: string;
   email?: string;
   address?: string;
+  mapEmbedUrl?: string;
   whatsappNumber?: string;
   whatsappMessage?: string;
   socialLinks?: Array<{
@@ -406,9 +407,12 @@ export type AllSanitySchemaTypes =
   | Geopoint;
 
 // Source: ../frontend/src/app/(site)/page.tsx
-// Variable: MAP_ADDRESS_QUERY
-// Query: *[_type == "siteSettings"][0].address
-export type MAP_ADDRESS_QUERY_RESULT = string | null;
+// Variable: MAP_DATA_QUERY
+// Query: *[_type == "siteSettings"][0] {    address,    mapEmbedUrl  }
+export type MAP_DATA_QUERY_RESULT = {
+  address: string | null;
+  mapEmbedUrl: string | null;
+} | null;
 
 // Source: ../frontend/src/app/(site)/propiedades/page.tsx
 // Variable: PROPERTIES_QUERY
@@ -768,7 +772,7 @@ export type SITE_SETTINGS_QUERY_RESULT = {
 import "@sanity/client";
 declare module "@sanity/client" {
   interface SanityQueries {
-    '\n  *[_type == "siteSettings"][0].address\n': MAP_ADDRESS_QUERY_RESULT;
+    '\n  *[_type == "siteSettings"][0] {\n    address,\n    mapEmbedUrl\n  }\n': MAP_DATA_QUERY_RESULT;
     '\n  *[_type == "property"\n    && defined(slug.current)\n    && !(status in ["vendido", "alquilado"])\n  ] | order(publishedAt desc) {\n    _id,\n    title,\n    "slug": slug.current,\n    subtitle,\n    price,\n    currency,\n    operationType,\n    "propertyType": propertyType->name,\n    "propertyTypeSlug": propertyType->slug.current,\n    "city": city->name,\n    "citySlug": city->slug.current,\n    rooms,\n    reference,\n    "image": images[0] { asset->{ _id, url, metadata { lqip } } }\n  }\n': PROPERTIES_QUERY_RESULT;
     '*\n  [_type == "property" && featured == true && !(status in ["vendido", "alquilado"])]\n  | order(publishedAt desc)[0...6]\n  {\n    _id,\n    title,\n    "slug": slug.current,\n    subtitle,\n    price,\n    currency,\n    operationType,\n    rooms,\n    "city": city->name,\n    "image": images[0] { asset->{ _id, url, metadata { lqip } } }\n  }': FEATURED_QUERY_RESULT;
     '*[_type == "property" && reference == $reference][0]{ "slug": slug.current }': REFERENCE_SLUG_QUERY_RESULT;
