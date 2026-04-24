@@ -254,7 +254,7 @@ The frontend is deployed as a static site to shared hosting:
 - `images.unoptimized: true` disables the Next.js image optimizer (no server to run it). `next/image` still works and emits plain `<img>` tags.
 - Security headers (`X-Content-Type-Options`, `X-Frame-Options`, `Referrer-Policy`) and the trailing-slash redirect live in `apps/frontend/public/.htaccess`, which Next copies into `out/`. Replace with the equivalent nginx config if the host is nginx.
 - `/propiedades` fetches **all** active properties at build time. Filtering and pagination happen client-side in `PropertiesListing.tsx` via `useSearchParams`.
-- Content updates require a **rebuild + redeploy**. To automate, point a Sanity webhook at a build trigger (GitHub Actions `repository_dispatch` / CI deploy hook) instead of an in-app endpoint. There is no `/api/revalidate` route.
+- Content updates require a **rebuild + redeploy**. This is automated via `.github/workflows/deploy.yml`: a Sanity webhook fires a `repository_dispatch: sanity-publish` event, the workflow runs `pnpm build`, and `apps/frontend/out/` is uploaded over FTP. See README "Automated Deploys" for the setup. There is no `/api/revalidate` route.
 
 ## SEO
 
