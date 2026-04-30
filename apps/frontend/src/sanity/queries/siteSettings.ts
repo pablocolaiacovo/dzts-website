@@ -1,5 +1,4 @@
 import { defineQuery } from "next-sanity";
-import { cacheLife, cacheTag } from "next/cache";
 import { sanityFetch } from "@/sanity/lib/live";
 
 const ORGANIZATION_QUERY = defineQuery(`
@@ -15,9 +14,6 @@ const ORGANIZATION_QUERY = defineQuery(`
 `);
 
 export async function getCachedOrganization() {
-  "use cache";
-  cacheLife("hours");
-  cacheTag("siteSettings");
   const { data } = await sanityFetch({ query: ORGANIZATION_QUERY });
   return data;
 }

@@ -32,12 +32,16 @@ Frontend-specific (from `apps/frontend/`):
 
 ```bash
 pnpm dev          # Start Next.js dev server with Turbopack
-pnpm build        # Production build
-pnpm start        # Run production server
+pnpm build        # Static export (writes to ./out)
+pnpm start        # Serve the static export locally with `serve`
 pnpm lint         # Run ESLint
 pnpm test:e2e     # Run Playwright e2e tests (requires build first)
 pnpm test:e2e:ui  # Run e2e tests with Playwright UI
 ```
+
+The frontend is a **fully static site** (`output: "export"` in `next.config.ts`).
+`pnpm build` produces `apps/frontend/out/` which is uploaded to shared hosting.
+There is no Node server in production — see "Static Export" below.
 
 Studio-specific (from `apps/studio/`):
 
@@ -66,7 +70,6 @@ The main Opus agent delegates coding tasks to lighter models via custom agents i
 - Fixing lint or TypeScript errors
 - Writing CSS/styling changes
 - Adding a new route/page with straightforward requirements
-- Updating caching (`cacheLife`/`cacheTag`) on existing functions
 - Writing or updating e2e tests in `apps/frontend/e2e/`
 
 ### Delegate to `quick-fix` (Haiku) when:
@@ -115,7 +118,6 @@ Each app has its own `.env.local` file with different prefixes (Next.js uses `NE
 | `NEXT_PUBLIC_SANITY_DATASET`     | Sanity dataset name               |
 | `NEXT_PUBLIC_SITE_URL`           | Production site URL (for sitemap.xml and robots.txt) |
 | `NEXT_PUBLIC_GA_MEASUREMENT_ID`  | Google Analytics 4 measurement ID (optional, e.g. `G-XXXXXXXXXX`) |
-| `SANITY_REVALIDATE_SECRET`       | HMAC secret for Sanity webhook (server-only, no `NEXT_PUBLIC_` prefix) |
 
 ### Studio (`apps/studio/.env.local`)
 
@@ -168,7 +170,7 @@ Two GitHub Actions workflows run on PRs to `dev` and `main`:
 2. **Build frontend**: `pnpm --filter frontend build`
 3. **Build studio**: `pnpm --filter dzts-studio exec sanity build`
 
-- Uses `ubuntu-latest`, Node 20, pnpm 10.
+- Uses `ubuntu-latest`, Node 24, pnpm 10.
 - Placeholder env vars (`ci-placeholder`) satisfy build-time validation without real credentials.
 - Studio build uses `exec sanity build` instead of `pnpm build` to skip the `prebuild` hook (schema extraction + typegen require a live Sanity API connection).
 - `--frozen-lockfile` ensures lockfile stays in sync with `package.json`.
@@ -242,32 +244,17 @@ Two GitHub Actions workflows run on PRs to `dev` and `main`:
 - Format prices with `toLocaleString("es-AR")` and display currency as `AR$`/`US$` (not `ARS`/`USD`).
 - Shared types go in `src/types/`, shared utilities in `src/lib/`. Do not duplicate type definitions or utility functions across components — import from the shared location.
 
-## Caching Strategy
+## Static Export
 
-The frontend uses Next.js 16 cache components (`"use cache"` directive + `cacheLife()` + `cacheTag()`):
+The frontend is deployed as a static site to shared hosting:
 
-- **`cacheLife("hours")`** - For rarely-changing data: site settings, SEO, page headings, map address.
-- **`cacheLife("minutes")`** - For content that updates more often: featured properties, individual property detail pages, home sections, filter option lists.
-- Cached functions are standalone `async function` with `"use cache"` as the first line, calling `sanityFetch` inside.
-- Every cached function includes a `cacheTag()` call matching the Sanity document `_type` it queries, enabling on-demand revalidation via webhook.
-
-### Cache Tags
-
-| Tag | Sanity `_type` | Cached functions |
-|-----|----------------|-----------------|
-| `"siteSettings"` | `siteSettings` | `getSiteSettings()`, `getCachedMapAddress()`, `getCachedSiteSeo()` |
-| `"property"` | `property` | `getCachedProperty()`, `FeaturedProperties`, `getCachedRoomCounts()` |
-| `"homePage"` | `homePage` | `getCachedHomeSections()`, `getCachedHomeContent()`, `getCachedHomeSeo()` |
-| `"propiedadesPage"` | `propiedadesPage` | `getCachedPropiedadesHeading()`, `getCachedPropiedadesSeo()` |
-| `"city"` | `city` | `getCachedCities()` |
-| `"propertyTypeCategory"` | `propertyTypeCategory` | `getCachedPropertyTypes()` |
-
-### On-Demand Revalidation
-
-- A webhook route at `POST /api/revalidate` (`src/app/api/revalidate/route.ts`) receives Sanity webhook payloads, validates the HMAC signature via `parseBody` from `next-sanity/webhook`, and calls `revalidateTag(body._type, "max")`.
-- The `"max"` second argument is required by Next.js 16 to invalidate cache entries across all cache life profiles.
-- The webhook must be configured in the Sanity dashboard (see README for setup instructions).
-- Without the webhook (e.g. local development), `cacheLife` TTLs still apply as a fallback.
+- `next.config.ts` sets `output: "export"` and `trailingSlash: true`.
+- `pnpm build` emits `apps/frontend/out/`; upload that directory to the host.
+- There is **no Node server** in production — no API routes, no middleware, no runtime caching, no server actions.
+- `images.unoptimized: true` disables the Next.js image optimizer (no server to run it). `next/image` still works and emits plain `<img>` tags.
+- Security headers (`X-Content-Type-Options`, `X-Frame-Options`, `Referrer-Policy`) and the trailing-slash redirect live in `apps/frontend/public/.htaccess`, which Next copies into `out/`. Replace with the equivalent nginx config if the host is nginx.
+- `/propiedades` fetches **all** active properties at build time. Filtering and pagination happen client-side in `PropertiesListing.tsx` via `useSearchParams`.
+- Content updates require a **rebuild + redeploy**. This is automated via `.github/workflows/deploy.yml`: a Sanity webhook fires a `repository_dispatch: sanity-publish` event, the workflow runs `pnpm build`, and `apps/frontend/out/` is uploaded over FTP. See README "Automated Deploys" for the setup. There is no `/api/revalidate` route.
 
 ## SEO
 
@@ -275,7 +262,7 @@ The frontend uses Next.js 16 cache components (`"use cache"` directive + `cacheL
 - Property detail pages include `<script type="application/ld+json">` with Schema.org `RealEstateListing` data (name, price, address, images).
 - Property detail pages generate OpenGraph metadata via `generateMetadata()`.
 - Ensure only one `<h1>` per page. Section headings within page content should use `<h2>` or lower.
-- **robots.txt** (`src/app/robots.ts`): Environment-aware. Blocks all bots in non-production (`VERCEL_ENV !== "production"`), allows indexing in production.
+- **robots.txt** (`src/app/robots.ts`): Environment-aware. Reads `SITE_ENV`, falling back to `VERCEL_ENV`. Only `"production"` allows indexing; everything else emits `Disallow: /`. `SITE_ENV=production` is set by `.github/workflows/deploy.yml` for FTP builds; `VERCEL_ENV` is auto-injected by Vercel, which keeps preview deploys blocked from search engines automatically.
 - **sitemap.xml** (`src/app/sitemap.ts`): Dynamically generated. Includes home, `/propiedades`, and all property detail pages fetched from Sanity.
 - **llms.txt** (`src/app/llms.txt/route.ts`): Markdown file for AI agents/LLMs ([spec](https://llmstxt.org/)). Lists main pages and all properties to help LLMs understand site content.
 
@@ -341,9 +328,7 @@ When modifying components, be aware these selectors are used by e2e tests:
 - Header smooth-scrolls to anchors when already on `/` and updates the hash without full navigation.
 - `TextImageSection` supports a carousel (multiple images) via `SectionCarousel` component. Always uses `urlFor()` for images (requires `_id` in GROQ query).
 - Anchored sections use `scroll-margin-top: 60px` to offset the sticky header.
-- Webhook revalidation route: `src/app/api/revalidate/route.ts`. Uses `parseBody` from `next-sanity/webhook` for HMAC validation and `revalidateTag(type, "max")` from `next/cache`.
-- In Next.js 16, `revalidateTag()` requires two arguments: `(tag, profile)`. Pass `"max"` as the profile to revalidate all cache entries for a tag regardless of their original `cacheLife`.
-- The `/propiedades` listing page calls `sanityFetch` directly without `"use cache"` (dynamic `searchParams`), so it has no cache tag and is unaffected by revalidation.
+- The `/propiedades` listing page fetches all active properties at build time and passes them to `PropertiesListing.tsx`, a client component that reads `useSearchParams` to handle filtering and pagination without navigation round-trips.
 - Route groups: `(site)` wraps pages with header/footer/WhatsApp button via its own layout; `(print)` provides a minimal layout for the ficha page. Root layout only has html/body/fonts/bootstrap.
 - The ficha page (`/propiedades/[slug]/ficha`) uses raw `<img>` tags (not `next/image`) for print reliability. It has `robots: { index: false, follow: false }`.
 - Property detail and ficha pages share Sanity queries/types via `src/sanity/queries/propertyDetail.ts`.

@@ -1,6 +1,5 @@
 import type { PortableTextBlock } from "@portabletext/types";
 import { defineQuery } from "next-sanity";
-import { cacheLife, cacheTag } from "next/cache";
 import type { SanityImageSource } from "@sanity/image-url";
 import { sanityFetch } from "@/sanity/lib/live";
 import { client } from "@/sanity/lib/client";
@@ -73,9 +72,6 @@ export interface PropertySlugEntry {
 }
 
 export async function getCachedProperty(slug: string) {
-  "use cache";
-  cacheLife("minutes");
-  cacheTag("property");
   const { data } = await sanityFetch({
     query: PROPERTY_QUERY,
     params: { slug },

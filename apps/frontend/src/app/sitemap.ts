@@ -1,6 +1,8 @@
 import type { MetadataRoute } from "next";
 import { client } from "@/sanity/lib/client";
 
+export const dynamic = "force-static";
+
 interface PropertySlug {
   slug: string;
   _updatedAt: string;

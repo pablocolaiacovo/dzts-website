@@ -3,10 +3,10 @@ import { test, expect } from "@playwright/test";
 test.describe("Property Detail Page", () => {
   test("navigate from listing to detail page", async ({ page }) => {
     await page.goto("/propiedades");
-    const firstCard = page.locator('a[href^="/propiedades/"]').first();
+    const firstCard = page.locator('a[href^="/propiedades/"]:not([href="/propiedades/"])').first();
     await expect(firstCard).toBeVisible();
     await firstCard.click();
-    await expect(page).toHaveURL(/\/propiedades\/.+/);
+    await expect(page).toHaveURL(/\/propiedades\/[^/]+\/?$/);
     await page.waitForLoadState("networkidle");
   });
 
@@ -14,8 +14,8 @@ test.describe("Property Detail Page", () => {
     page,
   }) => {
     await page.goto("/propiedades");
-    await page.locator('a[href^="/propiedades/"]').first().click();
-    await expect(page).toHaveURL(/\/propiedades\/.+/);
+    await page.locator('a[href^="/propiedades/"]:not([href="/propiedades/"])').first().click();
+    await expect(page).toHaveURL(/\/propiedades\/[^/]+\/?$/);
     await page.waitForLoadState("networkidle");
 
     // Wait for carousel first (unique to detail page) to ensure page is fully rendered
@@ -27,7 +27,7 @@ test.describe("Property Detail Page", () => {
     // Verify breadcrumb exists - detail page has 3 items (Home, Propiedades, Property title)
     // The detail page breadcrumb links to /propiedades in the 2nd item
     const detailBreadcrumb = page.locator('nav[aria-label="Breadcrumb"]').filter({
-      has: page.locator('a[href="/propiedades"]')
+      has: page.locator('a[href="/propiedades/"], a[href="/propiedades"]')
     }).first();
     await expect(detailBreadcrumb.locator(".breadcrumb-item")).toHaveCount(3);
 
@@ -42,8 +42,8 @@ test.describe("Property Detail Page", () => {
 
   test("detail page has JSON-LD structured data", async ({ page }) => {
     await page.goto("/propiedades");
-    await page.locator('a[href^="/propiedades/"]').first().click();
-    await expect(page).toHaveURL(/\/propiedades\/.+/);
+    await page.locator('a[href^="/propiedades/"]:not([href="/propiedades/"])').first().click();
+    await expect(page).toHaveURL(/\/propiedades\/[^/]+\/?$/);
     await page.waitForLoadState("networkidle");
 
     const jsonLd = page.locator('script[type="application/ld+json"]');
