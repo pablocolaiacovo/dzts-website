@@ -1,15 +1,26 @@
 interface MapSectionProps {
   address?: string | null;
+  location?: { lat?: number | null; lng?: number | null } | null;
   embedUrl?: string | null;
   title: string;
 }
 
-export default function MapSection({ address, embedUrl, title }: MapSectionProps) {
+export default function MapSection({
+  address,
+  location,
+  embedUrl,
+  title,
+}: MapSectionProps) {
+  const hasCoords =
+    location?.lat != null && location?.lng != null;
+
   const mapSrc = embedUrl
     ? embedUrl
-    : address
-      ? `https://www.google.com/maps?q=${encodeURIComponent(address)}&output=embed`
-      : null;
+    : hasCoords
+      ? `https://www.google.com/maps?q=${location!.lat},${location!.lng}&z=17&output=embed`
+      : address
+        ? `https://www.google.com/maps?q=${encodeURIComponent(address)}&output=embed`
+        : null;
 
   if (!mapSrc) return null;
 

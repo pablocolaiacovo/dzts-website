@@ -110,6 +110,14 @@ export const propertyType = defineType({
       to: [{ type: "city" }],
     }),
     defineField({
+      name: "location",
+      title: "Ubicación en el mapa",
+      description:
+        "Coordenadas precisas para fijar el pin del mapa. Si está vacío, el mapa usa la dirección textual (menos preciso). " +
+        "Para obtener las coordenadas: en Google Maps, hacer clic derecho sobre el punto exacto → la primera fila del menú muestra latitud, longitud → copiar y pegar.",
+      type: "geopoint",
+    }),
+    defineField({
       name: "rooms",
       title: "Habitaciones",
       type: "number",
