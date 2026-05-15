@@ -5,7 +5,7 @@ import PropertyCard from "./PropertyCard";
 
 const FEATURED_QUERY = defineQuery(`*
   [_type == "property" && featured == true && !(status in ["vendido", "alquilado"])]
-  | order(publishedAt desc)[0...6]
+  | order(orderRank asc, publishedAt desc)[0...6]
   {
     _id,
     title,

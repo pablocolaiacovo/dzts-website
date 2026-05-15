@@ -1,5 +1,6 @@
 import { defineField, defineType } from "sanity";
 import { MarkerIcon } from "@sanity/icons";
+import { orderRankField } from "@sanity/orderable-document-list";
 
 export const cityType = defineType({
     name: "city",
@@ -20,5 +21,6 @@ export const cityType = defineType({
             options: { source: "name" },
             validation: (rule) => rule.required(),
         }),
+        orderRankField({ type: "city" }),
     ],
 });

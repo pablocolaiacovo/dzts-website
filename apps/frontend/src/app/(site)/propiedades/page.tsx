@@ -28,7 +28,7 @@ const PROPERTIES_QUERY = defineQuery(`
   *[_type == "property"
     && defined(slug.current)
     && !(status in ["vendido", "alquilado"])
-  ] | order(publishedAt desc) {
+  ] | order(orderRank asc, publishedAt desc) {
     _id,
     title,
     "slug": slug.current,

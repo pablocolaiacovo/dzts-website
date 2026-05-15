@@ -1,5 +1,6 @@
 import { defineField, defineType } from "sanity";
 import { HomeIcon } from "@sanity/icons";
+import { orderRankField } from "@sanity/orderable-document-list";
 
 export const propertyType = defineType({
   name: "property",
@@ -58,8 +59,11 @@ export const propertyType = defineType({
     defineField({
       name: "images",
       title: "Imágenes",
+      description:
+        "Podés arrastrar varias imágenes a la vez sobre el área de carga, o hacer clic en 'Subir' y seleccionar múltiples archivos con Ctrl/Cmd+click.",
       type: "array",
       of: [{ type: "image" }],
+      options: { layout: "grid" },
     }),
     defineField({
       name: "operationType",
@@ -158,5 +162,6 @@ export const propertyType = defineType({
       type: "seo",
       group: "seo",
     }),
+    orderRankField({ type: "property" }),
   ],
 });
