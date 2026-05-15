@@ -240,6 +240,7 @@ export default async function PropertyPage({
         address={[property.address, property.city, "Argentina"]
           .filter(Boolean)
           .join(", ")}
+        location={property.location}
         title={`Ubicación de ${property.title || "la propiedad"}`}
       />
     </>
