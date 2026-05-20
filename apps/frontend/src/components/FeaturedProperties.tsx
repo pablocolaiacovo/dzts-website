@@ -1,13 +1,10 @@
 import { defineQuery } from "next-sanity";
 import { sanityFetch } from "@/sanity/lib/live";
+import type { FEATURED_QUERY_RESULT } from "@/sanity/types";
 import PropertyCard from "./PropertyCard";
 
 const FEATURED_QUERY = defineQuery(`
-  *[_type == "homePage"][0]
-    .featuredProperties[
-      @->published != false && !(@->status in ["vendido", "alquilado"])
-    ]->[0...6]
-  {
+  *[_type == "homePage"][0].featuredProperties[]->{
     _id,
     title,
     "slug": slug.current,
@@ -16,39 +13,36 @@ const FEATURED_QUERY = defineQuery(`
     currency,
     operationType,
     status,
+    published,
     rooms,
     "city": city->name,
     "image": images[0] { asset->{ _id, url, metadata { lqip } } }
   }`);
-
-interface FeaturedProperty {
-  _id: string;
-  title: string | null;
-  slug: string | null;
-  subtitle: string | null;
-  price: number | null;
-  currency: string | null;
-  operationType: string | null;
-  status: string | null;
-  rooms: number | null;
-  city: string | null;
-  image: { asset: { _id: string; url: string; metadata: { lqip: string } } | null } | null;
-}
 
 export default async function FeaturedProperties({
   heading,
 }: {
   heading: string;
 }) {
-  const { data: properties } = (await sanityFetch({ query: FEATURED_QUERY })) as {
-    data: FeaturedProperty[] | null;
+  const { data } = (await sanityFetch({ query: FEATURED_QUERY })) as {
+    data: FEATURED_QUERY_RESULT | null;
   };
+
+  // Preserve the manual order from the Studio; hide sold/rented/unpublished.
+  const properties = (data ?? [])
+    .filter(
+      (property) =>
+        property.published !== false &&
+        property.status !== "vendido" &&
+        property.status !== "alquilado",
+    )
+    .slice(0, 6);
 
   return (
     <div className="container py-4">
       <h2 className="text-center mb-5 fw-bold">{heading}</h2>
       <div className="row justify-content-center g-4">
-        {properties && properties.length > 0 ? (
+        {properties.length > 0 ? (
           properties.map((property) => (
             <div
               key={property._id}

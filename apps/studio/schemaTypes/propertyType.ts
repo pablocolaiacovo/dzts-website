@@ -179,12 +179,6 @@ export const propertyType = defineType({
       initialValue: "USD",
     }),
     defineField({
-      name: "featured",
-      title: "Destacada",
-      type: "boolean",
-      initialValue: false,
-    }),
-    defineField({
       name: "seo",
       title: "SEO",
       type: "seo",
