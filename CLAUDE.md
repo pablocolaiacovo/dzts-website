@@ -123,10 +123,12 @@ Each app has its own `.env.local` file with different prefixes (Next.js uses `NE
 
 ### Studio (`apps/studio/.env.local`)
 
-| Variable                   | Description               |
-| -------------------------- | ------------------------- |
-| `SANITY_STUDIO_PROJECT_ID` | Sanity project identifier |
-| `SANITY_STUDIO_DATASET`    | Sanity dataset name       |
+| Variable                   | Description                                                                              |
+| -------------------------- | ---------------------------------------------------------------------------------------- |
+| `SANITY_STUDIO_PROJECT_ID` | Sanity project identifier                                                                |
+| `SANITY_STUDIO_DATASET`    | Sanity dataset name                                                                      |
+| `SANITY_STUDIO_HOSTNAME`   | Subdomain on `*.sanity.studio` (required for unattended `sanity deploy` in CI)           |
+| `SANITY_STUDIO_APP_ID`     | App ID from sanity.io/manage → Studios; pins the version channel selector to this app   |
 
 See `.env.example` files in each app for templates.
 
@@ -162,6 +164,23 @@ Sanity Studio project:
 - Feature branches follow the naming convention: `feat/feature-name`
 - Push changes and create PRs using `gh pr create` command
 
+### Releasing dev → main
+
+When opening a release PR from `dev` to `main`, expect conflicts in `apps/studio/package.json` and `pnpm-lock.yaml` (sometimes other files too). Historical `ours`-strategy merge commits in `dev` make git think it has `main`'s state when it doesn't, so each release surfaces the divergence as conflicts.
+
+Resolution (matches the pattern of prior `merge: resolve main into dev for release PR` commits):
+
+```bash
+git checkout dev && git pull
+git merge origin/main           # surfaces conflicts
+git checkout --ours <conflicted-files>  # dev usually wins (newer versions)
+pnpm install --no-frozen-lockfile       # regenerate lockfile cleanly
+git add . && git commit -m "merge: resolve main into dev for release PR"
+git push origin dev             # direct push to dev is OK for this case
+```
+
+After this, the release PR turns `MERGEABLE` and can be merged normally.
+
 ## CI
 
 Two GitHub Actions workflows run on PRs to `dev` and `main`:
@@ -184,6 +203,13 @@ Two GitHub Actions workflows run on PRs to `dev` and `main`:
 - Binds to the GitHub `Preview` environment; reads `NEXT_PUBLIC_SANITY_PROJECT_ID` / `NEXT_PUBLIC_SANITY_DATASET` from that environment's Secrets (non-prod Sanity project). `deploy.yml` binds to `Production` for the real Sanity project + FTP credentials. `ci.yml` is unscoped and uses placeholder values.
 - Uploads `playwright-report/` and `test-results/` as artifacts on failure.
 - The pnpm filter name for the frontend is `dzts-website` (the `name` field in `package.json`), not `frontend`.
+
+### Deploy Studio (`.github/workflows/deploy-studio.yml`)
+
+- Auto-deploys the Sanity Studio to `*.sanity.studio` on pushes to `main` that touch `apps/studio/**` or `apps/frontend/src/sanity/types.ts`.
+- Binds to the `production` environment; reads `SANITY_STUDIO_HOSTNAME` and `SANITY_STUDIO_APP_ID` as env vars, and `SANITY_DEPLOY_TOKEN` as a secret (generated in sanity.io/manage → API → Tokens with Deploy Studio permission).
+- Runs `pnpm --filter dzts-studio exec sanity deploy` — same rationale as `ci.yml` for using `exec` (bypasses the `prebuild` typegen hook; `sanity deploy` handles schema extraction and build itself).
+- Studio hostname and app ID are read from env vars in `sanity.cli.ts`, so local interactive `sanity deploy` no longer prompts either.
 
 ### Dependabot (`.github/dependabot.yml`)
 

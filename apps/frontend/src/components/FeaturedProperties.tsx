@@ -1,11 +1,12 @@
 import { defineQuery } from "next-sanity";
-import type { SanityImageSource } from "@sanity/image-url";
 import { sanityFetch } from "@/sanity/lib/live";
 import PropertyCard from "./PropertyCard";
 
-const FEATURED_QUERY = defineQuery(`*
-  [_type == "property" && featured == true && !(status in ["vendido", "alquilado"])]
-  | order(orderRank asc, publishedAt desc)[0...6]
+const FEATURED_QUERY = defineQuery(`
+  *[_type == "homePage"][0]
+    .featuredProperties[
+      @->published != false && !(@->status in ["vendido", "alquilado"])
+    ]->[0...6]
   {
     _id,
     title,
@@ -14,6 +15,7 @@ const FEATURED_QUERY = defineQuery(`*
     price,
     currency,
     operationType,
+    status,
     rooms,
     "city": city->name,
     "image": images[0] { asset->{ _id, url, metadata { lqip } } }
@@ -27,6 +29,7 @@ interface FeaturedProperty {
   price: number | null;
   currency: string | null;
   operationType: string | null;
+  status: string | null;
   rooms: number | null;
   city: string | null;
   image: { asset: { _id: string; url: string; metadata: { lqip: string } } | null } | null;
@@ -37,13 +40,15 @@ export default async function FeaturedProperties({
 }: {
   heading: string;
 }) {
-  const { data: properties } = await sanityFetch({ query: FEATURED_QUERY }) as { data: FeaturedProperty[] };
+  const { data: properties } = (await sanityFetch({ query: FEATURED_QUERY })) as {
+    data: FeaturedProperty[] | null;
+  };
 
   return (
     <div className="container py-4">
       <h2 className="text-center mb-5 fw-bold">{heading}</h2>
       <div className="row justify-content-center g-4">
-        {properties.length > 0 ? (
+        {properties && properties.length > 0 ? (
           properties.map((property) => (
             <div
               key={property._id}
@@ -56,6 +61,7 @@ export default async function FeaturedProperties({
                 price={property.price}
                 currency={property.currency}
                 operationType={property.operationType}
+                status={property.status}
                 image={property.image}
                 lqip={property.image?.asset?.metadata?.lqip}
                 rooms={property.rooms}
