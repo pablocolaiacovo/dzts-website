@@ -18,9 +18,14 @@ interface CarouselImage {
 interface ImageCarouselProps {
   images: CarouselImage[];
   title: string;
+  id?: string;
 }
 
-export default function ImageCarousel({ images, title }: ImageCarouselProps) {
+export default function ImageCarousel({
+  images,
+  title,
+  id = "propertyCarousel",
+}: ImageCarouselProps) {
   const prefersReducedMotion = useReducedMotion();
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState(0);
@@ -44,7 +49,7 @@ export default function ImageCarousel({ images, title }: ImageCarouselProps) {
 
   return (
     <div
-      id="propertyCarousel"
+      id={id}
       className="carousel slide mb-4"
       {...(!prefersReducedMotion ? { 'data-bs-ride': 'carousel' } : {})}
     >
@@ -53,7 +58,7 @@ export default function ImageCarousel({ images, title }: ImageCarouselProps) {
           <button
             key={index}
             type="button"
-            data-bs-target="#propertyCarousel"
+            data-bs-target={`#${id}`}
             data-bs-slide-to={index}
             className={index === 0 ? 'active' : ''}
             aria-current={index === 0 ? 'true' : undefined}
@@ -104,7 +109,7 @@ export default function ImageCarousel({ images, title }: ImageCarouselProps) {
           <button
             className="carousel-control-prev"
             type="button"
-            data-bs-target="#propertyCarousel"
+            data-bs-target={`#${id}`}
             data-bs-slide="prev"
             style={{ background: 'linear-gradient(to right, rgba(0,0,0,0.4), transparent)' }}
           >
@@ -114,7 +119,7 @@ export default function ImageCarousel({ images, title }: ImageCarouselProps) {
           <button
             className="carousel-control-next"
             type="button"
-            data-bs-target="#propertyCarousel"
+            data-bs-target={`#${id}`}
             data-bs-slide="next"
             style={{ background: 'linear-gradient(to left, rgba(0,0,0,0.4), transparent)' }}
           >

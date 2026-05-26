@@ -62,6 +62,13 @@ export const propertyType = defineType({
       of: [{ type: "image" }],
     }),
     defineField({
+      name: "blueprints",
+      title: "Planos",
+      description: "Planos de la propiedad. Se muestran en una pestaña separada de las fotos.",
+      type: "array",
+      of: [{ type: "image" }],
+    }),
+    defineField({
       name: "operationType",
       title: "Tipo de operación",
       type: "string",
