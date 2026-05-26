@@ -91,6 +91,19 @@ Suppress at file level for `useSearchParams()` / `useRouter()` access patterns a
 
 ---
 
+## `react-doctor/control-has-associated-label`
+
+Suppress when an `<input>` carries `id="X"` and there is a sibling `<label htmlFor="X">` (whether immediately adjacent or earlier in the same JSX subtree) supplying the visible label. The rule only matches label-wrapping or inline `aria-label`/`aria-labelledby` and can't follow sibling associations statically, but the explicit `id`/`htmlFor` pairing is fully valid for WAI-ARIA and assistive tech.
+
+This codebase uses the explicit pattern intentionally because Bootstrap 5's `.form-check` / `.form-control` styles target adjacent-sibling selectors — wrapping the input inside the label breaks the checkbox/radio glyph positioning and the field spacing without any a11y benefit.
+
+Known sites (all `<input id> + sibling <label htmlFor>`):
+
+- `src/components/PropertiesFilters.tsx` — `solo-disponibles`, `operacion-*`, `propiedad-*`, `localidad-*`, `dormitorios-*`, `superficie-min`, `superficie-max`.
+- `src/components/ReferenceSearch.tsx` — `reference-search`.
+
+---
+
 ## `react-doctor/no-pure-black-background`
 
 Intentional design choice — fullscreen image lightbox uses pure black to maximize image contrast, mirroring the system gallery viewer pattern. The `bg-black` Bootstrap class is the right primitive here.
