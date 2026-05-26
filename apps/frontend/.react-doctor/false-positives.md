@@ -4,6 +4,19 @@ Diagnostics intentionally suppressed for this project. Drop any matching the pat
 
 ---
 
+## `react-hooks-js/todo`
+
+React Compiler "unsupported syntax" advisory. The compiler bails on the file silently; the rule surfaces the bailout as a diagnostic regardless of whether the file carries an explicit `'use no memo'` directive.
+
+Suppress when the file is one of the following, where the unsupported pattern is intentional and the refactor alternatives are worse than skipping memoization:
+
+- `src/components/BootstrapClient.tsx` — dynamic `import()` inside `useEffect`, used to lazy-load Bootstrap's JS bundle after hydration. Component renders `null`; nothing to memoize.
+- `src/components/ReferenceSearch.tsx` — `try/finally` in `handleSubmit` to clean up the `pending` state regardless of fetch outcome. Render is small; skipping memoization has no measurable cost.
+
+Both files carry a `'use no memo'` directive making the compiler opt-out explicit.
+
+---
+
 ## `react-doctor/no-danger`
 
 `dangerouslySetInnerHTML` used to inject **JSON-LD structured data** for SEO.
