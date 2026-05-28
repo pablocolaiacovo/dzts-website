@@ -34,7 +34,7 @@
     "@next/eslint-plugin-next": "16.2.6",
     "@playwright/test": "^1.52.0",
     "@types/node": "^25.1.0",
-    "@types/react": "19.2.14",
+    "@types/react": "19.2.15",
     "@types/react-dom": "19.2.3",
     "@typescript-eslint/eslint-plugin": "^8.54.0",
     "@typescript-eslint/parser": "^8.54.0",
