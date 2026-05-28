@@ -1,8 +1,9 @@
 import type { StructureResolver } from "sanity/structure";
-import { CogIcon, DocumentsIcon, HomeIcon, MarkerIcon, TagsIcon } from "@sanity/icons";
-import { orderableDocumentListDeskItem } from "@sanity/orderable-document-list";
+import { CogIcon, DocumentsIcon, HomeIcon } from "@sanity/icons";
 
-export const structure: StructureResolver = (S, context) =>
+const SINGLETONS = ["siteSettings", "homePage", "propiedadesPage"];
+
+export const structure: StructureResolver = (S) =>
   S.list()
     .title("Contenido")
     .items([
@@ -38,27 +39,7 @@ export const structure: StructureResolver = (S, context) =>
 
       S.divider(),
 
-      orderableDocumentListDeskItem({
-        type: "property",
-        title: "Propiedades",
-        icon: HomeIcon,
-        S,
-        context,
-      }),
-
-      orderableDocumentListDeskItem({
-        type: "city",
-        title: "Ciudades",
-        icon: MarkerIcon,
-        S,
-        context,
-      }),
-
-      orderableDocumentListDeskItem({
-        type: "propertyTypeCategory",
-        title: "Tipos de Propiedad",
-        icon: TagsIcon,
-        S,
-        context,
-      }),
+      ...S.documentTypeListItems().filter(
+        (listItem) => !SINGLETONS.includes(listItem.getId() as string)
+      ),
     ]);

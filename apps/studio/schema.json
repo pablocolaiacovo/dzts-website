@@ -559,13 +559,6 @@
           "name": "seo"
         },
         "optional": true
-      },
-      "orderRank": {
-        "type": "objectAttribute",
-        "value": {
-          "type": "string"
-        },
-        "optional": true
       }
     }
   },
@@ -702,13 +695,6 @@
           "name": "slug"
         },
         "optional": true
-      },
-      "orderRank": {
-        "type": "objectAttribute",
-        "value": {
-          "type": "string"
-        },
-        "optional": true
       }
     }
   },
@@ -789,13 +775,6 @@
         "value": {
           "type": "inline",
           "name": "slug"
-        },
-        "optional": true
-      },
-      "orderRank": {
-        "type": "objectAttribute",
-        "value": {
-          "type": "string"
         },
         "optional": true
       }

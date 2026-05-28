@@ -28,7 +28,7 @@ const PROPERTIES_QUERY = defineQuery(`
   *[_type == "property"
     && defined(slug.current)
     && published != false
-  ] | order(orderRank asc, publishedAt desc) {
+  ] | order(publishedAt desc) {
     _id,
     title,
     "slug": slug.current,

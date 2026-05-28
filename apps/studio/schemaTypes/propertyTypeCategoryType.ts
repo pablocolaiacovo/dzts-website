@@ -1,6 +1,5 @@
 import { defineField, defineType } from "sanity";
 import { TagsIcon } from "@sanity/icons";
-import { orderRankField } from "@sanity/orderable-document-list";
 
 export const propertyTypeCategoryType = defineType({
   name: "propertyTypeCategory",
@@ -21,6 +20,5 @@ export const propertyTypeCategoryType = defineType({
       options: { source: "name" },
       validation: (rule) => rule.required(),
     }),
-    orderRankField({ type: "propertyTypeCategory" }),
   ],
 });

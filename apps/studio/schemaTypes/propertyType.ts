@@ -1,6 +1,5 @@
 import { defineField, defineType } from "sanity";
 import { HomeIcon } from "@sanity/icons";
-import { orderRankField } from "@sanity/orderable-document-list";
 
 export const propertyType = defineType({
   name: "property",
@@ -184,6 +183,5 @@ export const propertyType = defineType({
       type: "seo",
       group: "seo",
     }),
-    orderRankField({ type: "property" }),
   ],
 });

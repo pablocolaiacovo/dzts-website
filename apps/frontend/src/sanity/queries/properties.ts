@@ -2,11 +2,11 @@ import { defineQuery } from "next-sanity";
 import { sanityFetch } from "@/sanity/lib/live";
 
 export const CITIES_QUERY = defineQuery(`
-  *[_type == "city"] | order(orderRank asc) { name, "slug": slug.current }
+  *[_type == "city"] | order(name asc) { name, "slug": slug.current }
 `);
 
 export const PROPERTY_TYPES_QUERY = defineQuery(`
-  *[_type == "propertyTypeCategory"] | order(orderRank asc) { name, "slug": slug.current }
+  *[_type == "propertyTypeCategory"] | order(name asc) { name, "slug": slug.current }
 `);
 
 export const ROOM_COUNTS_QUERY = defineQuery(`
