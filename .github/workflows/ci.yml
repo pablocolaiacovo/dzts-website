@@ -4,15 +4,22 @@ on:
   pull_request:
     branches: [dev, main]
 
+# Studio build uses `exec sanity build` (no live API), so placeholders are fine.
+# The frontend static export pre-renders property pages via generateStaticParams,
+# which fetches from Sanity at build time — so it needs real (non-prod) read
+# credentials, supplied below from the `preview` environment like e2e.yml.
 env:
-  NEXT_PUBLIC_SANITY_PROJECT_ID: "ci-placeholder"
-  NEXT_PUBLIC_SANITY_DATASET: "ci-placeholder"
   SANITY_STUDIO_PROJECT_ID: "ci-placeholder"
   SANITY_STUDIO_DATASET: "ci-placeholder"
 
 jobs:
   ci:
     runs-on: ubuntu-latest
+    environment: preview
+
+    env:
+      NEXT_PUBLIC_SANITY_PROJECT_ID: ${{ vars.NEXT_PUBLIC_SANITY_PROJECT_ID }}
+      NEXT_PUBLIC_SANITY_DATASET: ${{ vars.NEXT_PUBLIC_SANITY_DATASET }}
 
     steps:
       - uses: actions/checkout@v4
