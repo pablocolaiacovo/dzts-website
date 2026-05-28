@@ -27,10 +27,13 @@ jobs:
       - run: pnpm install --frozen-lockfile
 
       - name: Lint frontend
-        run: pnpm --filter frontend lint
+        run: pnpm --filter dzts-website lint
+
+      - name: Unit tests frontend
+        run: pnpm --filter dzts-website test
 
       - name: Build frontend
-        run: pnpm --filter frontend build
+        run: pnpm --filter dzts-website build
 
       - name: Build studio
         run: pnpm --filter dzts-studio exec sanity build
