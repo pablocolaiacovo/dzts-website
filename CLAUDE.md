@@ -166,20 +166,15 @@ Sanity Studio project:
 
 ### Releasing dev → main
 
-When opening a release PR from `dev` to `main`, expect conflicts in `apps/studio/package.json` and `pnpm-lock.yaml` (sometimes other files too). Historical `ours`-strategy merge commits in `dev` make git think it has `main`'s state when it doesn't, so each release surfaces the divergence as conflicts.
+**Merge method matters: feature PRs into `dev` are squashed; the release PR `dev → main` is merged with a merge commit (not squashed).** The repo allows both methods — pick the right one per PR.
 
-Resolution (matches the pattern of prior `merge: resolve main into dev for release PR` commits):
+`dev` is a long-lived branch. Squashing it into `main` creates a brand-new commit that shares no history with `dev`, so `main` and `dev` stay permanently diverged and every subsequent release surfaces phantom conflicts. A **merge commit** keeps `main` a true descendant of `dev`, so releases merge cleanly with no conflict-resolution dance.
 
-```bash
-git checkout dev && git pull
-git merge origin/main           # surfaces conflicts
-git checkout --ours <conflicted-files>  # dev usually wins (newer versions)
-pnpm install --no-frozen-lockfile       # regenerate lockfile cleanly
-git add . && git commit -m "merge: resolve main into dev for release PR"
-git push origin dev             # direct push to dev is OK for this case
-```
+To release: open the PR from `dev` → `main` and merge it with **"Create a merge commit"**.
 
-After this, the release PR turns `MERGEABLE` and can be merged normally.
+`git log --first-parent main` then gives a clean release-level history; per-feature commits stay reachable through the merge.
+
+> Older releases were squashed, which is why `dev`'s history has `merge: resolve main into dev for release PR` commits (a `--ours` workaround for the divergence those squashes caused). That workaround is no longer needed.
 
 ## CI
 
@@ -187,18 +182,21 @@ Two GitHub Actions workflows run on PRs to `dev` and `main`:
 
 ### Lint & Build (`.github/workflows/ci.yml`)
 
-1. **Lint frontend**: `pnpm --filter frontend lint`
-2. **Build frontend**: `pnpm --filter frontend build`
-3. **Build studio**: `pnpm --filter dzts-studio exec sanity build`
+1. **Lint frontend**: `pnpm --filter dzts-website lint`
+2. **Unit tests frontend**: `pnpm --filter dzts-website test` (vitest)
+3. **Typecheck frontend**: `pnpm --filter dzts-website exec tsc --noEmit`
+4. **Build studio**: `pnpm --filter dzts-studio exec sanity build`
 
-- Uses `ubuntu-latest`, Node 24, pnpm 10.
-- Placeholder env vars (`ci-placeholder`) satisfy build-time validation without real credentials.
+- Uses `ubuntu-latest`, Node 24, pnpm 10. The filter is `dzts-website` (the `name` in `package.json`), not `frontend` — a wrong filter silently no-ops the step.
+- The frontend is **typechecked, not built**, here: the static export fetches Sanity content at build time, which can't run on `ci-placeholder` creds (`Dataset not found`). The full `next build` is validated in `e2e.yml` against the `preview` environment's real (non-prod) creds.
+- Placeholder env vars (`ci-placeholder`) satisfy the studio build without real credentials.
 - Studio build uses `exec sanity build` instead of `pnpm build` to skip the `prebuild` hook (schema extraction + typegen require a live Sanity API connection).
 - `--frozen-lockfile` ensures lockfile stays in sync with `package.json`.
 
 ### E2E Tests (`.github/workflows/e2e.yml`)
 
 - Runs Playwright e2e tests against a production build of the frontend.
+- Runs inside the official Playwright container (`mcr.microsoft.com/playwright:<version>-noble`) so browsers + OS deps are preinstalled — there is no `playwright install` step (it used to hang and burn the 15-min job timeout). A small `resolve-playwright` job reads the `@playwright/test` version from `pnpm-lock.yaml` and feeds it as the image tag, keeping the container in sync with the package automatically (Dependabot can't update `container:` image refs — dependabot-core#5819).
 - Only triggers when `apps/frontend/` or the workflow file changes (path filter).
 - Binds to the GitHub `Preview` environment; reads `NEXT_PUBLIC_SANITY_PROJECT_ID` / `NEXT_PUBLIC_SANITY_DATASET` from that environment's Secrets (non-prod Sanity project). `deploy.yml` binds to `Production` for the real Sanity project + FTP credentials. `ci.yml` is unscoped and uses placeholder values.
 - Uploads `playwright-report/` and `test-results/` as artifacts on failure.
@@ -215,7 +213,16 @@ Two GitHub Actions workflows run on PRs to `dev` and `main`:
 
 - Opens weekly PRs (Mondays) for outdated npm dependencies and GitHub Actions versions.
 - npm updates are grouped by ecosystem (`next-ecosystem`, `react`, `sanity`, `eslint`, `bootstrap`) to reduce PR noise. Ungrouped packages get individual PRs.
-- Dependabot PRs target the default branch and trigger the CI workflow, so lint + build are validated before merge.
+- `target-branch: "dev"` is set on both ecosystems so PRs open against `dev` (the `deps → dev → release` flow), not `main`. Dependabot reads this file from the **default branch (`main`)**, so the `target-branch` change only takes effect once it lands on `main` — keep `dev` mirrored so a release merge doesn't revert it.
+- Dependabot is disabled by default on forks; it was enabled manually (Settings → Code security) for this repo. The `dependabot.yml` is inert until that toggle is on.
+- Dependabot PRs trigger the CI + e2e workflows, so lint + build + e2e are validated before merge.
+
+### Code Scanning (CodeQL)
+
+- Enabled via **Default setup** (no `codeql.yml` workflow). Languages: `javascript-typescript` + `actions`; `default` query suite; weekly schedule + on PRs.
+- JS/TS is analyzed "no-build" — CodeQL needs no `pnpm install`, build step, or Sanity env vars, so there's no placeholder-env friction. Don't switch to Advanced setup unless custom queries or build steps are actually needed.
+- Code scanning is free on this public repo. On Dependabot PRs the `GITHUB_TOKEN` is read-only, so alerts may not upload there — internal branches (`feat/*`, `dev`) analyze normally.
+- Results land in the fork's **Security** tab. Keep it informational (not a required check) to avoid blocking PRs on low-severity noise.
 
 ## Page Structure & Routes
 

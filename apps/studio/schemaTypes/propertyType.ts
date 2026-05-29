@@ -1,5 +1,8 @@
 import { defineField, defineType } from "sanity";
 import { HomeIcon } from "@sanity/icons";
+import { nextReference } from "../lib/reference";
+
+const REFERENCE_API_VERSION = "2025-02-19";
 
 export const propertyType = defineType({
   name: "property",
@@ -29,13 +32,34 @@ export const propertyType = defineType({
       title: "Referencia interna",
       description: "Código interno de la agencia. Formato: DZTS-### (ej: DZTS-001).",
       type: "string",
+      initialValue: async (_, context) => {
+        const client = context.getClient({ apiVersion: REFERENCE_API_VERSION });
+        const refs = await client.fetch<(string | null)[]>(
+          `*[_type == "property" && defined(reference)].reference`,
+        );
+        return nextReference(refs);
+      },
       validation: (rule) =>
         rule
           .regex(/^DZTS-\d{3,}$/, {
             name: "referencia",
             invert: false,
           })
-          .error("El formato debe ser DZTS-### (ej: DZTS-001)."),
+          .error("El formato debe ser DZTS-### (ej: DZTS-001).")
+          .custom(async (value, context) => {
+            if (!value) return true;
+            const client = context.getClient({
+              apiVersion: REFERENCE_API_VERSION,
+            });
+            const id = (context.document?._id ?? "").replace(/^drafts\./, "");
+            const dupes = await client.fetch<number>(
+              `count(*[_type == "property" && reference == $value && !(_id in [$id, "drafts." + $id])])`,
+              { value, id },
+            );
+            return dupes > 0
+              ? "Ese código ya está en uso por otra propiedad."
+              : true;
+          }),
     }),
     defineField({
       name: "subtitle",
@@ -58,8 +82,11 @@ export const propertyType = defineType({
     defineField({
       name: "images",
       title: "Imágenes",
+      description:
+        "Podés arrastrar varias imágenes a la vez sobre el área de carga, o hacer clic en 'Subir' y seleccionar múltiples archivos con Ctrl/Cmd+click.",
       type: "array",
       of: [{ type: "image" }],
+      options: { layout: "grid" },
     }),
     defineField({
       name: "blueprints",
@@ -182,16 +209,13 @@ export const propertyType = defineType({
       initialValue: "USD",
     }),
     defineField({
-      name: "featured",
-      title: "Destacada",
-      type: "boolean",
-      initialValue: false,
-    }),
-    defineField({
       name: "seo",
       title: "SEO",
       type: "seo",
       group: "seo",
     }),
   ],
+  preview: {
+    select: { title: "title", subtitle: "subtitle", media: "images.0" },
+  },
 });

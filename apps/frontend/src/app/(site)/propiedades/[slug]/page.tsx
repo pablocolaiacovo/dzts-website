@@ -20,6 +20,15 @@ import ImageCarousel from "@/components/ImageCarousel";
 import MapSection from "@/components/MapSection";
 import "./property-detail.css";
 
+type Property = NonNullable<Awaited<ReturnType<typeof getCachedProperty>>>;
+type PropertyFeature = { label: string; value: string | number };
+
+const STATUS_LABELS: Record<string, string> = {
+  reservado: "Reservado",
+  vendido: "Vendido",
+  alquilado: "Alquilado",
+};
+
 export async function generateMetadata({
   params,
 }: {
@@ -50,6 +59,237 @@ export async function generateStaticParams() {
   return slugs.map((entry) => ({ slug: entry.slug }));
 }
 
+function PropertyHeader({
+  property,
+  slug,
+}: {
+  property: Property;
+  slug: string;
+}) {
+  const statusLabel = property.status
+    ? STATUS_LABELS[property.status]
+    : undefined;
+  const isReservado = property.status === "reservado";
+
+  const carouselImages = (property.images ?? []).map((img) => {
+    const asset = img?.asset?.url
+      ? (img.asset as SanityImageSource)
+      : null;
+    return { asset, lqip: img?.asset?.metadata?.lqip ?? null };
+  });
+
+  const blueprintImages = (property.blueprints ?? []).map((img) => {
+    const asset = img?.asset?.url
+      ? (img.asset as SanityImageSource)
+      : null;
+    return { asset, lqip: img?.asset?.metadata?.lqip ?? null };
+  });
+  const hasBlueprints = blueprintImages.some((slide) => slide.asset);
+
+  return (
+    <>
+      <Breadcrumb
+        items={[
+          { label: "Inicio", href: "/", isHome: true },
+          { label: "Propiedades", href: "/propiedades" },
+          {
+            label: property.title || "Propiedad",
+            href: `/propiedades/${slug}`,
+          },
+        ]}
+      />
+      {property.reference && (
+        <div className="text-muted small mb-1">Ref: {property.reference}</div>
+      )}
+      <h1 className="text-secondary mb-2" style={{ fontSize: "2.5rem" }}>
+        {property.title}
+      </h1>
+      <div className="d-flex gap-2 mb-2">
+        {property.operationType && (
+          <span
+            className={`badge rounded-pill fs-6 ${property.operationType === "venta" ? "bg-success" : "bg-warning text-dark"}`}
+          >
+            {property.operationType === "venta" ? "Venta" : "Alquiler"}
+          </span>
+        )}
+        {property.propertyType && (
+          <span className="badge rounded-pill bg-info text-white fs-6">
+            {property.propertyType}
+          </span>
+        )}
+      </div>
+
+      <div className="text-primary mb-3" style={{ fontSize: "1.1rem" }}>
+        {property.subtitle && <div>{property.subtitle}</div>}
+        <div>
+          {property.address}
+          {property.address && property.city && ", "}
+          {property.city && <span>{property.city}</span>}
+        </div>
+      </div>
+      <hr className="border-primary mb-4" />
+
+      {hasBlueprints ? (
+        <>
+          <ul
+            className="nav nav-tabs mb-3"
+            id="propertyMediaTabs"
+            role="tablist"
+          >
+            <li className="nav-item" role="presentation">
+              <button
+                className="nav-link active"
+                id="fotos-tab"
+                data-bs-toggle="tab"
+                data-bs-target="#fotos-pane"
+                type="button"
+                role="tab"
+                aria-controls="fotos-pane"
+                aria-selected="true"
+              >
+                <i className="bi bi-images me-2" aria-hidden="true" />
+                Fotos
+              </button>
+            </li>
+            <li className="nav-item" role="presentation">
+              <button
+                className="nav-link"
+                id="planos-tab"
+                data-bs-toggle="tab"
+                data-bs-target="#planos-pane"
+                type="button"
+                role="tab"
+                aria-controls="planos-pane"
+                aria-selected="false"
+              >
+                <i className="bi bi-rulers me-2" aria-hidden="true" />
+                Planos
+              </button>
+            </li>
+          </ul>
+          <div className="tab-content">
+            <div
+              className="tab-pane fade show active"
+              id="fotos-pane"
+              role="tabpanel"
+              aria-labelledby="fotos-tab"
+            >
+              <div className="position-relative">
+                {statusLabel && (
+                  <div
+                    className={`status-banner${isReservado ? " status-banner--reservado" : ""}`}
+                    aria-label={`Propiedad ${statusLabel.toLowerCase()}`}
+                  >
+                    <span>{statusLabel}</span>
+                  </div>
+                )}
+                <ImageCarousel
+                  images={carouselImages}
+                  title={property.title ?? ""}
+                />
+              </div>
+            </div>
+            <div
+              className="tab-pane fade"
+              id="planos-pane"
+              role="tabpanel"
+              aria-labelledby="planos-tab"
+            >
+              <ImageCarousel
+                id="blueprintCarousel"
+                images={blueprintImages}
+                title={`${property.title ?? ""} - Plano`}
+              />
+            </div>
+          </div>
+        </>
+      ) : (
+        <div className="position-relative">
+          {statusLabel && (
+            <div
+              className={`status-banner${isReservado ? " status-banner--reservado" : ""}`}
+              aria-label={`Propiedad ${statusLabel.toLowerCase()}`}
+            >
+              <span>{statusLabel}</span>
+            </div>
+          )}
+          <ImageCarousel
+            images={carouselImages}
+            title={property.title ?? ""}
+          />
+        </div>
+      )}
+    </>
+  );
+}
+
+function PropertyFeaturesGrid({ features }: { features: PropertyFeature[] }) {
+  if (features.length === 0) return null;
+
+  return (
+    <div className="row g-3 my-4 text-center">
+      {features.map((feature) => (
+        <div className="col-6 col-md-4" key={feature.label}>
+          <div className="bg-light rounded-3 p-3 h-100">
+            <div className="fw-bold fs-4 text-primary">{feature.value}</div>
+            <div className="text-muted small">{feature.label}</div>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function PropertyActions({
+  slug,
+  whatsappShareUrl,
+  whatsappConsultUrl,
+}: {
+  slug: string;
+  whatsappShareUrl: string;
+  whatsappConsultUrl: string | null;
+}) {
+  return (
+    <>
+      <div className="d-flex gap-2 w-100">
+        <a
+          href={`/propiedades/${slug}/ficha`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="btn btn-outline-secondary text-dark py-2 fw-bold flex-fill text-center"
+        >
+          <i className="bi bi-file-earmark-text me-2" aria-hidden="true" />
+          Ficha
+        </a>
+        <ShareButton />
+        <a
+          href={whatsappShareUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="btn btn-outline-success py-2 fw-bold flex-fill text-center"
+          aria-label="Compartir por WhatsApp"
+        >
+          <i className="bi bi-whatsapp me-2" aria-hidden="true" />
+          WhatsApp
+        </a>
+      </div>
+      {whatsappConsultUrl && (
+        <div className="mt-4">
+          <a
+            href={whatsappConsultUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="btn btn-success text-white px-4 py-3 fw-bold fs-5 w-100"
+          >
+            <i className="bi bi-whatsapp me-2" aria-hidden="true" />
+            Consultar por WhatsApp
+          </a>
+        </div>
+      )}
+    </>
+  );
+}
+
 export default async function PropertyPage({
   params,
 }: {
@@ -68,16 +308,6 @@ export default async function PropertyPage({
   const imageUrls = (property.images ?? [])
     .filter((img) => img?.asset?.url)
     .map((img) => img!.asset!.url!);
-
-  const photoSlides = (property.images ?? []).map((img) => ({
-    asset: img?.asset?.url ? (img.asset as SanityImageSource) : null,
-    lqip: img?.asset?.metadata?.lqip ?? null,
-  }));
-  const blueprintSlides = (property.blueprints ?? []).map((img) => ({
-    asset: img?.asset?.url ? (img.asset as SanityImageSource) : null,
-    lqip: img?.asset?.metadata?.lqip ?? null,
-  }));
-  const hasBlueprints = blueprintSlides.some((slide) => slide.asset);
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -106,15 +336,7 @@ export default async function PropertyPage({
     }),
   };
 
-  const statusLabels: Record<string, string> = {
-    reservado: "Reservado",
-    vendido: "Vendido",
-    alquilado: "Alquilado",
-  };
-  const statusLabel = property.status ? statusLabels[property.status] : undefined;
-  const isReservado = property.status === "reservado";
-
-  const features: { label: string; value: string | number }[] = [
+  const features: PropertyFeature[] = [
     property.rooms != null && { label: "Dormitorios", value: property.rooms },
     property.bathrooms != null && { label: "Baños", value: property.bathrooms },
     property.garages != null && { label: "Cocheras", value: property.garages },
@@ -130,7 +352,7 @@ export default async function PropertyPage({
       label: "Sup. total",
       value: `${property.sizeTotal} m²`,
     },
-  ].filter(Boolean) as { label: string; value: string | number }[];
+  ].filter(Boolean) as PropertyFeature[];
 
   const whatsappNumber = organization?.whatsappNumber;
   const whatsappConsultUrl = whatsappNumber
@@ -150,153 +372,8 @@ export default async function PropertyPage({
       <div className="container py-5">
         <div className="row justify-content-center">
           <div className="col-12 col-lg-10">
-            <Breadcrumb
-              items={[
-                { label: "Inicio", href: "/", isHome: true },
-                { label: "Propiedades", href: "/propiedades" },
-                {
-                  label: property.title || "Propiedad",
-                  href: `/propiedades/${slug}`,
-                },
-              ]}
-            />
-            {property.reference && (
-              <div className="text-muted small mb-1">
-                Ref: {property.reference}
-              </div>
-            )}
-            <h1 className="text-secondary mb-2" style={{ fontSize: "2.5rem" }}>
-              {property.title}
-            </h1>
-            <div className="d-flex gap-2 mb-2">
-              {property.operationType && (
-                <span
-                  className={`badge rounded-pill fs-6 ${property.operationType === "venta" ? "bg-success" : "bg-warning text-dark"}`}
-                >
-                  {property.operationType === "venta" ? "Venta" : "Alquiler"}
-                </span>
-              )}
-              {property.propertyType && (
-                <span className="badge rounded-pill bg-info text-white fs-6">
-                  {property.propertyType}
-                </span>
-              )}
-            </div>
-
-            <div className="text-primary mb-3" style={{ fontSize: "1.1rem" }}>
-              {property.subtitle && <div>{property.subtitle}</div>}
-              <div>
-                {property.address}
-                {property.address && property.city && ", "}
-                {property.city && <span>{property.city}</span>}
-              </div>
-            </div>
-            <hr className="border-primary mb-4" />
-
-            {hasBlueprints ? (
-              <>
-                <ul
-                  className="nav nav-tabs mb-3"
-                  id="propertyMediaTabs"
-                  role="tablist"
-                >
-                  <li className="nav-item" role="presentation">
-                    <button
-                      className="nav-link active"
-                      id="fotos-tab"
-                      data-bs-toggle="tab"
-                      data-bs-target="#fotos-pane"
-                      type="button"
-                      role="tab"
-                      aria-controls="fotos-pane"
-                      aria-selected="true"
-                    >
-                      <i className="bi bi-images me-2" aria-hidden="true" />
-                      Fotos
-                    </button>
-                  </li>
-                  <li className="nav-item" role="presentation">
-                    <button
-                      className="nav-link"
-                      id="planos-tab"
-                      data-bs-toggle="tab"
-                      data-bs-target="#planos-pane"
-                      type="button"
-                      role="tab"
-                      aria-controls="planos-pane"
-                      aria-selected="false"
-                    >
-                      <i className="bi bi-rulers me-2" aria-hidden="true" />
-                      Planos
-                    </button>
-                  </li>
-                </ul>
-                <div className="tab-content">
-                  <div
-                    className="tab-pane fade show active"
-                    id="fotos-pane"
-                    role="tabpanel"
-                    aria-labelledby="fotos-tab"
-                  >
-                    <div className="position-relative">
-                      {statusLabel && (
-                        <div
-                          className={`status-banner${isReservado ? " status-banner--reservado" : ""}`}
-                          aria-label={`Propiedad ${statusLabel.toLowerCase()}`}
-                        >
-                          <span>{statusLabel}</span>
-                        </div>
-                      )}
-                      <ImageCarousel
-                        images={photoSlides}
-                        title={property.title ?? ""}
-                      />
-                    </div>
-                  </div>
-                  <div
-                    className="tab-pane fade"
-                    id="planos-pane"
-                    role="tabpanel"
-                    aria-labelledby="planos-tab"
-                  >
-                    <ImageCarousel
-                      id="blueprintCarousel"
-                      images={blueprintSlides}
-                      title={`${property.title ?? ""} - Plano`}
-                    />
-                  </div>
-                </div>
-              </>
-            ) : (
-              <div className="position-relative">
-                {statusLabel && (
-                  <div
-                    className={`status-banner${isReservado ? " status-banner--reservado" : ""}`}
-                    aria-label={`Propiedad ${statusLabel.toLowerCase()}`}
-                  >
-                    <span>{statusLabel}</span>
-                  </div>
-                )}
-                <ImageCarousel
-                  images={photoSlides}
-                  title={property.title ?? ""}
-                />
-              </div>
-            )}
-            {features.length > 0 && (
-              <div className="row g-3 my-4 text-center">
-                {features.map((feature) => (
-                  <div className="col-6 col-md-4" key={feature.label}>
-                    <div className="bg-light rounded-3 p-3 h-100">
-                      <div className="fw-bold fs-4 text-primary">
-                        {feature.value}
-                      </div>
-                      <div className="text-muted small">{feature.label}</div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
+            <PropertyHeader property={property} slug={slug} />
+            <PropertyFeaturesGrid features={features} />
             {property.description ? (
               <div className="mb-5">
                 <PortableText value={property.description} />
@@ -312,42 +389,11 @@ export default async function PropertyPage({
                 ? `${property.currency === "ARS" ? "AR$" : "US$"}${property.price.toLocaleString("es-AR")}`
                 : "Consultar precio"}
             </p>
-            <div className="d-flex gap-2 w-100">
-                <a
-                  href={`/propiedades/${slug}/ficha`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="btn btn-outline-secondary text-dark py-2 fw-bold flex-fill text-center"
-                >
-                  <i className="bi bi-file-earmark-text me-2" aria-hidden="true" />
-                  Ficha
-                </a>
-                <ShareButton />
-                <a
-                  href={whatsappShareUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="btn btn-outline-success py-2 fw-bold flex-fill text-center"
-                  aria-label="Compartir por WhatsApp"
-                >
-                  <i className="bi bi-whatsapp me-2" aria-hidden="true" />
-                  WhatsApp
-                </a>
-              </div>
-
-            {whatsappConsultUrl && (
-              <div className="mt-4">
-                <a
-                  href={whatsappConsultUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="btn btn-success text-white px-4 py-3 fw-bold fs-5 w-100"
-                >
-                  <i className="bi bi-whatsapp me-2" aria-hidden="true" />
-                  Consultar por WhatsApp
-                </a>
-              </div>
-            )}
+            <PropertyActions
+              slug={slug}
+              whatsappShareUrl={whatsappShareUrl}
+              whatsappConsultUrl={whatsappConsultUrl}
+            />
           </div>
         </div>
       </div>
