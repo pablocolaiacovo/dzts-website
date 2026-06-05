@@ -52,8 +52,6 @@ function PropertiesListingInner({
   const searchParams = useSearchParams();
 
   const operationType = routeFilters.operation || "";
-  const propertyTypeSlugs = routeFilters.typeSlug ? [routeFilters.typeSlug] : [];
-  const citySlugs = routeFilters.citySlug ? [routeFilters.citySlug] : [];
   const roomsList = parseMultiple(searchParams.get("dormitorios"))
     .map((r) => parseInt(r, 10))
     .filter((room) => Number.isFinite(room));
@@ -66,19 +64,14 @@ function PropertiesListingInner({
   const currentPage = Number.isFinite(parsedPage) ? Math.max(1, parsedPage) : 1;
   const sort = parseSortParam(searchParams.get("orden"));
 
+  const typeSlug = routeFilters.typeSlug;
+  const citySlug = routeFilters.citySlug;
+
   const filtered = useMemo(() => {
     const result = properties.filter((p) => {
       if (operationType && p.operationType !== operationType) return false;
-      if (
-        propertyTypeSlugs.length > 0 &&
-        (!p.propertyTypeSlug || !propertyTypeSlugs.includes(p.propertyTypeSlug))
-      )
-        return false;
-      if (
-        citySlugs.length > 0 &&
-        (!p.citySlug || !citySlugs.includes(p.citySlug))
-      )
-        return false;
+      if (typeSlug && p.propertyTypeSlug !== typeSlug) return false;
+      if (citySlug && p.citySlug !== citySlug) return false;
       if (
         roomsList.length > 0 &&
         (typeof p.rooms !== "number" || !roomsList.includes(p.rooms))
@@ -97,8 +90,8 @@ function PropertiesListingInner({
   }, [
     properties,
     operationType,
-    propertyTypeSlugs,
-    citySlugs,
+    typeSlug,
+    citySlug,
     roomsList,
     onlyAvailable,
     surfaceMin,
