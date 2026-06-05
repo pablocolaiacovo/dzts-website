@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { parseSegments, buildFilterPath } from "./filterRoutes";
+import { parseSegments, buildFilterPath, buildFilterCombos } from "./filterRoutes";
 
 const KNOWN = {
   types: new Set(["casa", "departamento"]),
@@ -82,5 +82,42 @@ describe("buildFilterPath", () => {
     expect(
       buildFilterPath({ operation: null, typeSlug: null, citySlug: null }),
     ).toBe("/propiedades");
+  });
+});
+
+describe("buildFilterCombos", () => {
+  const props = [
+    { operationType: "venta", typeSlug: "casa", citySlug: "rosario" },
+    { operationType: "venta", typeSlug: "casa", citySlug: "rosario" },
+    { operationType: "alquiler", typeSlug: "departamento", citySlug: "funes" },
+    { operationType: "venta", typeSlug: null, citySlug: null },
+  ];
+
+  it("emite todas las subcombinaciones canónicas presentes, sin duplicados", () => {
+    const combos = buildFilterCombos(props).map((c) => c.join("/")).sort();
+    expect(combos).toEqual(
+      [
+        "alquiler",
+        "alquiler/departamento",
+        "alquiler/departamento/funes",
+        "alquiler/funes",
+        "casa",
+        "casa/rosario",
+        "departamento",
+        "departamento/funes",
+        "funes",
+        "rosario",
+        "venta",
+        "venta/casa",
+        "venta/casa/rosario",
+        "venta/rosario",
+      ].sort(),
+    );
+  });
+
+  it("ignora propiedades sin ninguna dimensión", () => {
+    expect(buildFilterCombos([{ operationType: null, typeSlug: null, citySlug: null }])).toEqual(
+      [],
+    );
   });
 });

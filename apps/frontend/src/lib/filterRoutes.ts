@@ -1,4 +1,4 @@
-import type { ParsedFilters, OperationSlug } from "@/types/filterRoutes";
+import type { ParsedFilters, OperationSlug, FilterCombo } from "@/types/filterRoutes";
 
 export const OPERATION_SLUGS: readonly OperationSlug[] = ["venta", "alquiler"];
 
@@ -51,4 +51,42 @@ export function buildFilterPath(filters: ParsedFilters): string {
     (p): p is string => Boolean(p),
   );
   return parts.length === 0 ? "/propiedades" : `/propiedades/${parts.join("/")}`;
+}
+
+interface ComboSource {
+  operationType?: string | null;
+  typeSlug?: string | null;
+  citySlug?: string | null;
+}
+
+export function buildFilterCombos(properties: ComboSource[]): FilterCombo[] {
+  const seen = new Set<string>();
+  const combos: FilterCombo[] = [];
+
+  for (const p of properties) {
+    const dims = [p.operationType, p.typeSlug, p.citySlug]; // orden canónico
+    // recorrer los 2^3 subconjuntos preservando el orden de las dimensiones
+    for (let mask = 1; mask < 8; mask++) {
+      const combo: string[] = [];
+      let ok = true;
+      for (let i = 0; i < 3; i++) {
+        if (mask & (1 << i)) {
+          const value = dims[i];
+          if (!value) {
+            ok = false;
+            break;
+          }
+          combo.push(value);
+        }
+      }
+      if (!ok) continue;
+      const key = combo.join("/");
+      if (!seen.has(key)) {
+        seen.add(key);
+        combos.push(combo);
+      }
+    }
+  }
+
+  return combos;
 }
