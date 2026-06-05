@@ -39,6 +39,7 @@ export interface PropertyListItem {
 interface PropertiesListingProps {
   properties: PropertyListItem[];
   filterOptions: FilterOptions;
+  routeFilters: import("@/types/filterRoutes").ParsedFilters;
 }
 
 const PAGE_SIZE = 12;
@@ -46,12 +47,13 @@ const PAGE_SIZE = 12;
 function PropertiesListingInner({
   properties,
   filterOptions,
+  routeFilters,
 }: PropertiesListingProps) {
   const searchParams = useSearchParams();
 
-  const operationType = searchParams.get("operacion") || "";
-  const propertyTypeSlugs = parseMultiple(searchParams.get("propiedad"));
-  const citySlugs = parseMultiple(searchParams.get("localidad"));
+  const operationType = routeFilters.operation || "";
+  const propertyTypeSlugs = routeFilters.typeSlug ? [routeFilters.typeSlug] : [];
+  const citySlugs = routeFilters.citySlug ? [routeFilters.citySlug] : [];
   const roomsList = parseMultiple(searchParams.get("dormitorios"))
     .map((r) => parseInt(r, 10))
     .filter((room) => Number.isFinite(room));
@@ -110,9 +112,6 @@ function PropertiesListingInner({
   const pageItems = filtered.slice(start, start + PAGE_SIZE);
 
   const currentSearchParams = {
-    operacion: operationType || undefined,
-    propiedad: searchParams.get("propiedad") || undefined,
-    localidad: searchParams.get("localidad") || undefined,
     dormitorios: searchParams.get("dormitorios") || undefined,
     disponibles: onlyAvailable ? "1" : undefined,
     supmin: searchParams.get("supmin") || undefined,
@@ -121,7 +120,7 @@ function PropertiesListingInner({
   };
 
   return (
-    <PropertiesLayout filterOptions={filterOptions} totalCount={totalCount}>
+    <PropertiesLayout filterOptions={filterOptions} totalCount={totalCount} routeFilters={routeFilters}>
       <PropertiesGrid properties={pageItems} />
       <Pagination
         currentPage={currentPage}
@@ -136,6 +135,7 @@ function PropertiesListingFallback({
   properties,
 }: {
   properties: PropertyListItem[];
+  routeFilters?: import("@/types/filterRoutes").ParsedFilters;
 }) {
   const pageItems = properties.slice(0, PAGE_SIZE);
   return (
