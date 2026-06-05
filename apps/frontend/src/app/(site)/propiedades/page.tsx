@@ -78,15 +78,13 @@ export default async function PropiedadesPage() {
     }),
   );
 
-  const existingCombos = new Set(
-    buildFilterCombos(
-      propertiesList.map((p) => ({
-        operationType: p.operationType,
-        typeSlug: p.propertyTypeSlug,
-        citySlug: p.citySlug,
-      })),
-    ).map((c) => c.join("/")),
-  );
+  const existingCombos = buildFilterCombos(
+    propertiesList.map((p) => ({
+      operationType: p.operationType,
+      typeSlug: p.propertyTypeSlug,
+      citySlug: p.citySlug,
+    })),
+  ).map((c) => c.join("/"));
 
   return (
     <main className="container-fluid px-3 px-lg-4 py-4 py-md-5">

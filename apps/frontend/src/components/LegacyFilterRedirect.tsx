@@ -1,12 +1,12 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import type { OperationSlug, ParsedFilters } from "@/types/filterRoutes";
 
 interface LegacyFilterRedirectProps {
   /** Canonical filter combos that have a pre-rendered page (e.g. "venta/casa"). */
-  existingCombos: Set<string>;
+  existingCombos: string[];
 }
 
 /**
@@ -19,6 +19,7 @@ export default function LegacyFilterRedirect({
 }: LegacyFilterRedirectProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const comboSet = useMemo(() => new Set(existingCombos), [existingCombos]);
 
   useEffect(() => {
     const operacion = searchParams.get("operacion");
@@ -38,7 +39,7 @@ export default function LegacyFilterRedirect({
     for (const seg of segments) {
       if (!seg) continue;
       const candidate = [...kept, seg];
-      if (existingCombos.has(candidate.join("/"))) kept.push(seg);
+      if (comboSet.has(candidate.join("/"))) kept.push(seg);
     }
     const path = kept.length ? `/propiedades/${kept.join("/")}` : "/propiedades";
 
@@ -48,7 +49,7 @@ export default function LegacyFilterRedirect({
     rest.delete("localidad");
     const qs = rest.toString();
     router.replace(qs ? `${path}?${qs}` : path);
-  }, [router, searchParams, existingCombos]);
+  }, [router, searchParams, comboSet]);
 
   return null;
 }
