@@ -10,12 +10,14 @@ import "./PropertiesLayout.css";
 interface PropertiesLayoutProps {
   filterOptions: FilterOptions;
   totalCount: number;
+  routeFilters: import("@/types/filterRoutes").ParsedFilters;
   children: React.ReactNode;
 }
 
 export default function PropertiesLayout({
   filterOptions,
   totalCount,
+  routeFilters,
   children,
 }: PropertiesLayoutProps) {
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -46,6 +48,7 @@ export default function PropertiesLayout({
                 onToggleCollapse={() => setIsCollapsed(!isCollapsed)}
                 isPending={isPending}
                 startTransition={startTransition}
+                routeFilters={routeFilters}
               />
             </div>
           </div>
@@ -55,6 +58,7 @@ export default function PropertiesLayout({
             cities={filterOptions.cities}
             propertyTypes={filterOptions.propertyTypes}
             startTransition={startTransition}
+            routeFilters={routeFilters}
           />
 
             <div className="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-2 mb-3">
