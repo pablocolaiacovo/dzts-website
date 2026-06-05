@@ -15,6 +15,7 @@ import PropertiesListing, {
   type PropertyListItem,
 } from "@/components/PropertiesListing";
 import { buildFilterOptions } from "@/lib/filters";
+import { buildFilterCombos } from "@/lib/filterRoutes";
 import LegacyFilterRedirect from "@/components/LegacyFilterRedirect";
 import SectionLinks from "@/components/SectionLinks";
 
@@ -77,10 +78,20 @@ export default async function PropiedadesPage() {
     }),
   );
 
+  const existingCombos = new Set(
+    buildFilterCombos(
+      propertiesList.map((p) => ({
+        operationType: p.operationType,
+        typeSlug: p.propertyTypeSlug,
+        citySlug: p.citySlug,
+      })),
+    ).map((c) => c.join("/")),
+  );
+
   return (
     <main className="container-fluid px-3 px-lg-4 py-4 py-md-5">
       <Suspense fallback={null}>
-        <LegacyFilterRedirect />
+        <LegacyFilterRedirect existingCombos={existingCombos} />
       </Suspense>
       <Breadcrumb
         items={[

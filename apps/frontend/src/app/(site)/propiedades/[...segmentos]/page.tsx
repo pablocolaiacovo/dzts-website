@@ -115,7 +115,7 @@ export default async function PropiedadesSegmentos({
     <main className="container-fluid px-3 px-lg-4 py-4 py-md-5">
       <FilteredListingIntro
         filters={filters}
-        h1={override?.seo?.metaTitle || defaults.h1}
+        h1={defaults.h1}
         typeName={filters.typeSlug ? labels.typeNameBySlug[filters.typeSlug] ?? null : null}
         cityName={filters.citySlug ? labels.cityNameBySlug[filters.citySlug] ?? null : null}
         intro={override?.intro ?? null}

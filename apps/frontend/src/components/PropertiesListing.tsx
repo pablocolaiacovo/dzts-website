@@ -128,7 +128,6 @@ function PropertiesListingFallback({
   properties,
 }: {
   properties: PropertyListItem[];
-  routeFilters?: import("@/types/filterRoutes").ParsedFilters;
 }) {
   const pageItems = properties.slice(0, PAGE_SIZE);
   return (
