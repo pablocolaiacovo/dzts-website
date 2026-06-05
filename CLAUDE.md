@@ -229,9 +229,11 @@ Two GitHub Actions workflows run on PRs to `dev` and `main`:
 ### Frontend Routes
 
 - `/` - Home page with search, featured properties, and location map
-- `/propiedades` - Properties listing page with filters, pagination, and active filter badges
-- `/propiedades/[slug]` - Property detail page with images, description, JSON-LD structured data, and location map
-- `/propiedades/[slug]/ficha` - Print-optimized property sheet (no header/footer, `(print)` route group)
+- `/propiedades` - Base listing page (all properties); secondary filters (dormitorios, superficie, disponibles, orden, pagina) are query params handled client-side
+- `/propiedades/[...segmentos]` - **Unified catch-all** that renders EITHER a property detail OR a filtered listing:
+  - A single segment matching a property slug → property detail (images, description, JSON-LD, map). Detail URLs stay `/propiedades/<slug>` (no SEO regression).
+  - One or more segments matching the **principal filters** in canonical order **operación/tipo/ciudad** (e.g. `/propiedades/venta`, `/propiedades/venta/casa/rosario`) → indexable filtered listing with its own SEO. Segments are parsed by value against disjoint slug sets, not by position, so `/propiedades/venta/rosario` (no type) works. `generateStaticParams()` emits property slugs + only the filter combos that have ≥1 property. A build-time **disjointness guard** throws if a property slug collides with an operación/tipo/ciudad slug.
+- `/propiedades/[slug]/ficha` - Print-optimized property sheet (no header/footer, `(print)` route group). Lives in a separate route group, takes precedence over the catch-all.
 - Custom `not-found.tsx` (branded 404 page) and `error.tsx` (error boundary with retry) at app root and `(site)` route group
 
 ### Content Integration
@@ -239,6 +241,7 @@ Two GitHub Actions workflows run on PRs to `dev` and `main`:
 - Property schema includes: title, subtitle, address, description, price, images, operationType (rent/sale), currency, city, and propertyType
 - Site Settings singleton in Sanity stores office address for home page map display
 - All property and site data is fetched server-side via `sanityFetch` for optimal performance
+- **`filterPageSeo` ("SEO de sección")** is a Sanity document type for per-section SEO overrides on filter routes. Each entry keys on operation + optional propertyType + optional city, and carries the reusable `seo` object plus an optional `intro` (Portable Text). Resolution chain per filter page: **override en Sanity → plantilla automática (code, from segment names) → SEO del sitio** (`src/lib/filterSeo.ts` builds the template + matches overrides; `resolveMetadata()` applies the chain). Most pages need no Sanity entry; curate venta/alquiler by hand. Adding/changing this type requires the manual `typegen → deploy → commit types.ts` flow.
 
 ## Recent Implementation Notes
 
@@ -329,16 +332,19 @@ When modifying components, be aware these selectors are used by e2e tests:
 | `#operacion`, `#propiedad`, `#localidad`, `#dormitorios` | `SearchProperties` | `home.spec.ts` |
 | `button.btn-custom` | `SearchProperties` (search button) | `home.spec.ts` |
 | `#filters-form` | `PropertiesFilters` | `propiedades.spec.ts` |
-| `label[for='operacion-venta']` | `PropertiesFilters` (radio) | `propiedades.spec.ts` |
-| `a[href^="/propiedades/"]` | `PropertyCard` (card links) | `propiedades.spec.ts`, `property-detail.spec.ts` |
-| `.badge .btn-close` | `ActiveFilterBadges` | `propiedades.spec.ts` |
+| `label[for='operacion-venta']` | `PropertiesFilters` (radio; applying operación/tipo/ciudad **navigates** to the canonical route, e.g. `/propiedades/venta`, not a query param) | `propiedades.spec.ts` |
+| `a[href^="/propiedades/"]:not(.btn)` | `PropertyCard` (card links; `:not(.btn)` excludes `SectionLinks` buttons) | `propiedades.spec.ts`, `property-detail.spec.ts` |
+| `.badge .btn-close` | `ActiveFilterBadges` (removing a principal filter navigates to the path without that segment) | `propiedades.spec.ts` |
+| `a[href="/propiedades/venta/"]` | `SectionLinks` (internal section links on the base page) | `secciones.spec.ts` |
 | `#propertyCarousel` | `ImageCarousel` | `property-detail.spec.ts` |
 | `a:has-text('Ficha')` | Property detail (ficha link) | `property-detail.spec.ts` |
 | `button:has-text('Compartir')` | `ShareButton` | `property-detail.spec.ts` |
-| `nav[aria-label="Breadcrumb"]` | `Breadcrumb` | `navigation.spec.ts`, `propiedades.spec.ts`, `property-detail.spec.ts` |
+| `nav[aria-label="Breadcrumb"]` | `Breadcrumb` | `navigation.spec.ts`, `propiedades.spec.ts`, `property-detail.spec.ts`, `secciones.spec.ts` |
 | `.navbar-brand` | `Header` | `navigation.spec.ts` |
 | `footer.site-footer` | `Footer` | `navigation.spec.ts` |
 | `script[type="application/ld+json"]` | Property detail page | `property-detail.spec.ts` |
+
+> **Filter routes (`secciones.spec.ts`):** `/propiedades/{operación}/{tipo}/{ciudad}` are real pre-rendered pages with their own SEO; principal filters are route segments, secondary filters stay query params. A non-existent combo returns 404. Section links only point to combos that exist (≥1 property), so they never 404.
 
 ### Configuration Notes
 
@@ -348,8 +354,8 @@ When modifying components, be aware these selectors are used by e2e tests:
 
 ## Recent Implementation Notes
 
-- Listing skeleton: `apps/frontend/src/app/(site)/propiedades/loading.tsx` mirrors `PropertiesLayout` (filters sidebar + badges/count + grid).
-- Property detail skeleton: `apps/frontend/src/app/(site)/propiedades/[slug]/loading.tsx` includes carousel-sized media + 450px map placeholder.
+- Listing skeleton: `apps/frontend/src/app/(site)/propiedades/loading.tsx` mirrors `PropertiesLayout` (filters sidebar + badges/count + grid). It must NOT contain an `<h1>` (it's also the fallback for filter routes, which render their own `<h1>` — avoid duplicate h1s).
+- The catch-all route reuses that same loading skeleton: `apps/frontend/src/app/(site)/propiedades/[...segmentos]/loading.tsx` re-exports `propiedades/loading.tsx`.
 - Sanity property images can have `url`/`metadata` as `null`; normalize before passing to `ImageCarousel` and only cast to `SanityImageSource` when `url` is present.
 - `ImageCarousel` accepts `asset?: SanityImageSource | null` and `lqip?: string | null`. Uses `.quality(80)` for consistent compression.
 - Property detail `description` is Portable Text; use `PortableTextBlock[] | null` and import `@portabletext/types` (dependency added to frontend).
@@ -363,7 +369,7 @@ When modifying components, be aware these selectors are used by e2e tests:
 - Header smooth-scrolls to anchors when already on `/` and updates the hash without full navigation.
 - `TextImageSection` supports a carousel (multiple images) via `SectionCarousel` component. Always uses `urlFor()` for images (requires `_id` in GROQ query).
 - Anchored sections use `scroll-margin-top: 60px` to offset the sticky header.
-- The `/propiedades` listing page fetches all active properties at build time and passes them to `PropertiesListing.tsx`, a client component that reads `useSearchParams` to handle filtering and pagination without navigation round-trips.
+- The `/propiedades` listing page fetches all active properties at build time and passes them to `PropertiesListing.tsx`. Principal filters (operación/tipo/ciudad) arrive as the `routeFilters` prop (from the route); the catch-all passes the parsed segments, the base page passes all-null. Secondary filters (dormitorios, superficie, disponibles, orden, página) are still read client-side from `useSearchParams`. Applying a principal filter **navigates** to the canonical route; secondary filters stay query-param updates without navigation. A `LegacyFilterRedirect` client component on the base page rewrites old `/propiedades?operacion=…` links to the canonical path.
 - Route groups: `(site)` wraps pages with header/footer/WhatsApp button via its own layout; `(print)` provides a minimal layout for the ficha page. Root layout only has html/body/fonts/bootstrap.
 - The ficha page (`/propiedades/[slug]/ficha`) uses raw `<img>` tags (not `next/image`) for print reliability. It has `robots: { index: false, follow: false }`.
 - Property detail and ficha pages share Sanity queries/types via `src/sanity/queries/propertyDetail.ts`.
