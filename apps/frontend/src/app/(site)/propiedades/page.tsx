@@ -87,6 +87,7 @@ export default async function PropiedadesPage() {
       <PropertiesListing
         properties={propertiesList}
         filterOptions={filterOptions}
+        routeFilters={{ operation: null, typeSlug: null, citySlug: null }}
       />
     </main>
   );
