@@ -16,6 +16,7 @@ import PropertiesListing, {
 } from "@/components/PropertiesListing";
 import { buildFilterOptions } from "@/lib/filters";
 import LegacyFilterRedirect from "@/components/LegacyFilterRedirect";
+import SectionLinks from "@/components/SectionLinks";
 
 export async function generateMetadata(): Promise<Metadata> {
   const [pageSeo, siteSeo] = await Promise.all([
@@ -88,6 +89,7 @@ export default async function PropiedadesPage() {
         ]}
       />
       <h1 className="text-center mb-4 fw-bold">{heading}</h1>
+      <SectionLinks properties={propertiesList} />
 
       <PropertiesListing
         properties={propertiesList}
