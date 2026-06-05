@@ -127,9 +127,8 @@ Cada ruta de filtro genera su `<head>` propio en build vía `generateMetadata()`
 - **`<title>` y `meta description`:** únicos por combinación, vía una **plantilla**
   derivada de los nombres de operación/tipo/ciudad
   (ej. "Casas en venta en Rosario | DZTS Inmobiliaria").
-  - **Override editable en Sanity** para las páginas de nivel operación (`venta`,
-    `alquiler`), que son las candidatas principales a sitelink. El resto usa la
-    plantilla automática.
+  - **Override editable en Sanity** (ver sección siguiente) para las páginas que se
+    quieran cuidar a mano. El resto usa la plantilla automática.
 - **`canonical`:** a la URL limpia (sin query params secundarios) → evita
   duplicados por dormitorios/orden/página.
 - **OpenGraph:** propio por página.
@@ -140,6 +139,54 @@ Cada ruta de filtro genera su `<head>` propio en build vía `generateMetadata()`
 
 El patrón replica el ya existente en el detalle y en `propiedades/page.tsx`
 (`resolveMetadata()` + `getCached*Seo()`), sin dependencias nuevas.
+
+## SEO editable por sección (Sanity)
+
+El SEO de cada página de filtro se resuelve en **dos niveles**, reaprovechando la
+cadena de fallback de `resolveMetadata()`:
+
+```
+override en Sanity (si existe)  →  plantilla automática (código)  →  SEO del sitio
+```
+
+- **Plantilla automática:** cubre todas las combinaciones sin intervención. Genera
+  title/description desde los nombres de operación/tipo/ciudad. Es el
+  `contentDefaults` que ya consume `resolveMetadata()`.
+- **Override editable:** un **nuevo tipo de documento en Sanity**, p. ej.
+  `filterPageSeo` ("SEO de sección"), pensado para curar a mano las páginas
+  importantes (típicamente `venta` y `alquiler`).
+
+### Esquema del documento `filterPageSeo`
+
+| Campo | Tipo | Notas |
+|---|---|---|
+| `operation` | string (select: `venta` / `alquiler`) | opcional |
+| `propertyType` | reference → `propertyType` | opcional |
+| `city` | reference → `city` | opcional |
+| `seo` | objeto `seo` existente | metaTitle, metaDescription, ogImage, noIndex |
+| `intro` | Portable Text | opcional; texto único que se renderiza en la página |
+
+- **Respuesta a la pregunta "¿dónde defino el SEO de `/propiedades/venta`?":**
+  se crea una entrada de `filterPageSeo` con `operation = venta` (tipo y ciudad
+  vacíos) y se completa el bloque `seo`. Para `/propiedades/venta/casa/rosario`,
+  una entrada con `operation = venta`, `propertyType = casa`, `city = rosario`.
+- **Matching:** en build se traen todas las entradas de `filterPageSeo` (son pocas,
+  cacheado una vez) y se busca la que coincide exactamente con los segmentos
+  activos (operación + slug de tipo + slug de ciudad, con nulos). Si hay match,
+  su `seo` pisa la plantilla; si no, se usa la plantilla.
+- **`intro`:** cuando la entrada tiene texto introductorio, se renderiza en la
+  página de listado (encima o debajo del grid). Contenido único por landing →
+  ayuda al SEO y a la candidatura a sitelink.
+- **Unicidad:** se define un `preview`/título derivado de la combinación para que el
+  editor vea claramente cada entrada; se documenta que debe haber **una sola
+  entrada por combinación**.
+
+### Flujo de cambio de esquema (manual)
+
+Agregar `filterPageSeo` toca el schema de Studio, así que aplica el flujo de tres
+pasos del repo: `typegen` → `deploy` → commitear `apps/frontend/src/sanity/types.ts`
+(ver CLAUDE.md / README "Schema changes"). El build FTP del frontend corre contra
+los tipos commiteados.
 
 ## Refactor de los filtros (UX)
 
