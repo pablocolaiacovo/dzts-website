@@ -567,7 +567,6 @@ export default function PropertiesFilters(props: PropertiesFiltersProps) {
     <PropertiesFiltersInner
       key={searchKey}
       searchParams={searchParams}
-      routeFilters={props.routeFilters}
       {...props}
     />
   );
