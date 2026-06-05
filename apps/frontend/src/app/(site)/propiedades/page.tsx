@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { defineQuery } from "next-sanity";
 import { sanityFetch } from "@/sanity/lib/live";
 import {
@@ -14,6 +15,7 @@ import PropertiesListing, {
   type PropertyListItem,
 } from "@/components/PropertiesListing";
 import { buildFilterOptions } from "@/lib/filters";
+import LegacyFilterRedirect from "@/components/LegacyFilterRedirect";
 
 export async function generateMetadata(): Promise<Metadata> {
   const [pageSeo, siteSeo] = await Promise.all([
@@ -76,6 +78,9 @@ export default async function PropiedadesPage() {
 
   return (
     <main className="container-fluid px-3 px-lg-4 py-4 py-md-5">
+      <Suspense fallback={null}>
+        <LegacyFilterRedirect />
+      </Suspense>
       <Breadcrumb
         items={[
           { label: "Inicio", href: "/", isHome: true },
