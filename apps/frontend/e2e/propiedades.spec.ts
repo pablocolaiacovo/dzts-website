@@ -21,10 +21,10 @@ test.describe("Properties Listing Page", () => {
     expect(count).toBeGreaterThan(0);
   });
 
-  test("filter by operacion updates URL", async ({ page }) => {
+  test("filter by operacion navigates to the route", async ({ page }) => {
     await page.click("label[for='operacion-venta']");
     await page.click("button:has-text('Aplicar filtros')");
-    await expect(page).toHaveURL(/operacion=venta/);
+    await expect(page).toHaveURL(/\/propiedades\/venta\/?/);
   });
 
   test("solo disponibles filter updates URL", async ({ page }) => {
@@ -43,23 +43,21 @@ test.describe("Properties Listing Page", () => {
   });
 
   test("clear filters resets URL", async ({ page }) => {
-    await page.goto("/propiedades?operacion=venta");
+    await page.goto("/propiedades/venta");
     await page.click("button:has-text('Limpiar filtros')");
     await expect(page).toHaveURL(/\/propiedades\/?$/);
   });
 
-  test("active filter badges appear when filters applied", async ({
-    page,
-  }) => {
-    await page.goto("/propiedades?operacion=venta");
+  test("active filter badges appear when filters applied", async ({ page }) => {
+    await page.goto("/propiedades/venta");
     const badges = page.locator(".badge:has(.btn-close)");
     await expect(badges.first()).toBeVisible();
   });
 
   test("removing a filter badge updates URL", async ({ page }) => {
-    await page.goto("/propiedades?operacion=venta");
+    await page.goto("/propiedades/venta");
     const closeBtn = page.locator(".badge .btn-close").first();
     await closeBtn.click();
-    await expect(page).not.toHaveURL(/operacion=venta/);
+    await expect(page).toHaveURL(/\/propiedades\/?$/);
   });
 });
