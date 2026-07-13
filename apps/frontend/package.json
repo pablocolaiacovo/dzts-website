@@ -20,7 +20,7 @@
     "@popperjs/core": "^2.11.8",
     "@portabletext/react": "^6.2.0",
     "@portabletext/types": "^4.0.2",
-    "@sanity/client": "^7.23.0",
+    "@sanity/client": "^7.23.1",
     "@sanity/image-url": "^2.1.1",
     "bootstrap": "^5.3.8",
     "bootstrap-icons": "^1.13.1",
