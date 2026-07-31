@@ -10,7 +10,7 @@
     "deploy-graphql": "sanity graphql deploy",
     "predev": "pnpm run typegen",
     "prebuild": "pnpm run typegen",
-    "typegen": "sanity schema extract && sanity typegen generate"
+    "typegen": "sanity schema extract --force && sanity typegen generate"
   },
   "keywords": [
     "sanity"
