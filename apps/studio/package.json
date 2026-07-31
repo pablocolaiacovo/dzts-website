@@ -10,17 +10,17 @@
     "deploy-graphql": "sanity graphql deploy",
     "predev": "pnpm run typegen",
     "prebuild": "pnpm run typegen",
-    "typegen": "sanity schema extract && sanity typegen generate"
+    "typegen": "sanity schema extract --force && sanity typegen generate"
   },
   "keywords": [
     "sanity"
   ],
   "dependencies": {
-    "@sanity/icons": "^3.7.4",
-    "@sanity/vision": "^6.1.0",
+    "@sanity/icons": "^5.1.0",
+    "@sanity/vision": "^6.5.0",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
-    "sanity": "^6.1.0",
+    "sanity": "^6.5.0",
     "styled-components": "^6.3.8"
   },
   "devDependencies": {

@@ -1,5 +1,5 @@
 import { defineField, defineType } from "sanity";
-import { HomeIcon } from "@sanity/icons";
+import { HomeIcon } from "@sanity/icons/Home";
 import { nextReference } from "../lib/reference";
 
 const REFERENCE_API_VERSION = "2025-02-19";

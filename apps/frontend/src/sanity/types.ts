@@ -760,12 +760,7 @@ export type SITE_SETTINGS_QUERY_RESULT = {
   socialLinks: Array<{
     _key: string;
     platform:
-      | "facebook"
-      | "instagram"
-      | "linkedin"
-      | "twitter"
-      | "youtube"
-      | null;
+      "facebook" | "instagram" | "linkedin" | "twitter" | "youtube" | null;
     url: string | null;
   }> | null;
   footerLinks: Array<{
