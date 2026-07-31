@@ -42,6 +42,9 @@ export default async function FichaPage({
   const validImages = (property.images ?? []).filter(
     (img) => img?.asset?.url
   );
+  const validBlueprints = (property.blueprints ?? []).filter(
+    (img) => img?.asset?.url
+  );
 
   const features: { label: string; value: string | number }[] = [
     property.rooms != null && { label: "Dormitorios", value: property.rooms },
@@ -145,6 +148,28 @@ export default async function FichaPage({
           <div className="ficha-description">
             <h2>Descripción</h2>
             <PortableText value={property.description} />
+          </div>
+        )}
+
+        {validBlueprints.length > 0 && (
+          <div className="ficha-blueprints">
+            <h2>Planos</h2>
+            {validBlueprints.map((img, index) => {
+              const src = urlFor(img!.asset as SanityImageSource)
+                .width(1200)
+                .quality(80)
+                .auto("format")
+                .url();
+              return (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  key={index}
+                  src={src}
+                  alt={`${property.title} - Plano ${index + 1}`}
+                  className="ficha-blueprint"
+                />
+              );
+            })}
           </div>
         )}
       </div>

@@ -104,6 +104,26 @@
   color: #000;
 }
 
+.ficha-blueprints {
+  margin-bottom: 1.5rem;
+}
+
+.ficha-blueprints h2 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+  color: #000;
+}
+
+.ficha-blueprint {
+  width: 100%;
+  height: auto;
+  display: block;
+  margin-bottom: 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
 @media print {
   body {
     -webkit-print-color-adjust: exact;
@@ -125,5 +145,20 @@
 
   .ficha-description {
     break-inside: avoid;
+  }
+
+  .ficha-blueprints {
+    break-before: page;
+  }
+
+  .ficha-blueprint {
+    break-inside: avoid;
+    break-after: page;
+    max-height: 95vh;
+    object-fit: contain;
+  }
+
+  .ficha-blueprint:last-child {
+    break-after: auto;
   }
 }

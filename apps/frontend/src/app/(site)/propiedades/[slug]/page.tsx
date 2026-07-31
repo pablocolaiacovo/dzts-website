@@ -78,6 +78,14 @@ function PropertyHeader({
     return { asset, lqip: img?.asset?.metadata?.lqip ?? null };
   });
 
+  const blueprintImages = (property.blueprints ?? []).map((img) => {
+    const asset = img?.asset?.url
+      ? (img.asset as SanityImageSource)
+      : null;
+    return { asset, lqip: img?.asset?.metadata?.lqip ?? null };
+  });
+  const hasBlueprints = blueprintImages.some((slide) => slide.asset);
+
   return (
     <>
       <Breadcrumb
@@ -121,20 +129,96 @@ function PropertyHeader({
       </div>
       <hr className="border-primary mb-4" />
 
-      <div className="position-relative">
-        {statusLabel && (
-          <div
-            className={`status-banner${isReservado ? " status-banner--reservado" : ""}`}
-            aria-label={`Propiedad ${statusLabel.toLowerCase()}`}
+      {hasBlueprints ? (
+        <>
+          <ul
+            className="nav nav-tabs mb-3"
+            id="propertyMediaTabs"
+            role="tablist"
           >
-            <span>{statusLabel}</span>
+            <li className="nav-item" role="presentation">
+              <button
+                className="nav-link active"
+                id="fotos-tab"
+                data-bs-toggle="tab"
+                data-bs-target="#fotos-pane"
+                type="button"
+                role="tab"
+                aria-controls="fotos-pane"
+                aria-selected="true"
+              >
+                <i className="bi bi-images me-2" aria-hidden="true" />
+                Fotos
+              </button>
+            </li>
+            <li className="nav-item" role="presentation">
+              <button
+                className="nav-link"
+                id="planos-tab"
+                data-bs-toggle="tab"
+                data-bs-target="#planos-pane"
+                type="button"
+                role="tab"
+                aria-controls="planos-pane"
+                aria-selected="false"
+              >
+                <i className="bi bi-rulers me-2" aria-hidden="true" />
+                Planos
+              </button>
+            </li>
+          </ul>
+          <div className="tab-content">
+            <div
+              className="tab-pane fade show active"
+              id="fotos-pane"
+              role="tabpanel"
+              aria-labelledby="fotos-tab"
+            >
+              <div className="position-relative">
+                {statusLabel && (
+                  <div
+                    className={`status-banner${isReservado ? " status-banner--reservado" : ""}`}
+                    aria-label={`Propiedad ${statusLabel.toLowerCase()}`}
+                  >
+                    <span>{statusLabel}</span>
+                  </div>
+                )}
+                <ImageCarousel
+                  images={carouselImages}
+                  title={property.title ?? ""}
+                />
+              </div>
+            </div>
+            <div
+              className="tab-pane fade"
+              id="planos-pane"
+              role="tabpanel"
+              aria-labelledby="planos-tab"
+            >
+              <ImageCarousel
+                id="blueprintCarousel"
+                images={blueprintImages}
+                title={`${property.title ?? ""} - Plano`}
+              />
+            </div>
           </div>
-        )}
-        <ImageCarousel
-          images={carouselImages}
-          title={property.title ?? ""}
-        />
-      </div>
+        </>
+      ) : (
+        <div className="position-relative">
+          {statusLabel && (
+            <div
+              className={`status-banner${isReservado ? " status-banner--reservado" : ""}`}
+              aria-label={`Propiedad ${statusLabel.toLowerCase()}`}
+            >
+              <span>{statusLabel}</span>
+            </div>
+          )}
+          <ImageCarousel
+            images={carouselImages}
+            title={property.title ?? ""}
+          />
+        </div>
+      )}
     </>
   );
 }

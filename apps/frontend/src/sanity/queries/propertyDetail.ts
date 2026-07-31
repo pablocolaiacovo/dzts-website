@@ -25,6 +25,7 @@ export const PROPERTY_QUERY = defineQuery(`
     sizeCovered,
     sizeTotal,
     "images": images[] { asset->{ _id, url, metadata { lqip } } },
+    "blueprints": blueprints[] { asset->{ _id, url, metadata { lqip } } },
     "ogImage": images[0],
     seo {
       metaTitle,
@@ -70,6 +71,7 @@ export interface PropertyDetail {
   sizeCovered?: number | null;
   sizeTotal?: number | null;
   images?: Array<PropertyImage | null> | null;
+  blueprints?: Array<PropertyImage | null> | null;
   ogImage?: SanityImageSource | null;
   seo?: {
     metaTitle?: string | null;
