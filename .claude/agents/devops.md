@@ -26,6 +26,7 @@ apps/studio/     # Sanity Studio v5 → deployed to *.sanity.studio
 .github/workflows/e2e.yml           # Playwright e2e against a real production build
 .github/workflows/deploy.yml        # frontend build + FTP upload
 .github/workflows/deploy-studio.yml # sanity deploy on main
+.github/workflows/release.yml       # CalVer tag + GitHub Release on every push to main
 .github/dependabot.yml              # weekly npm + actions updates, target-branch: dev
 ```
 
@@ -57,9 +58,10 @@ There is **no server in production** for the frontend — it is a static export 
 ### Cut a release (dev → main)
 
 1. Verify `dev` is green: `gh run list --branch dev --limit 3`.
-2. `gh pr create --base main --head dev --title "release: dev → main"` with a body summarizing the included PRs (`git log --first-parent main..dev --oneline`).
+2. `gh pr create --base main --head dev --title "release: dev → main" --label release` with a body summarizing the included PRs (`git log --first-parent main..dev --oneline`). The `release` label excludes this PR from the auto-generated release notes (`.github/release.yml`).
 3. Wait for checks, then merge with a **merge commit**: `gh pr merge --merge` (never `--squash`).
 4. Confirm post-merge workflows: `deploy.yml` fires if `apps/frontend/**` changed; `deploy-studio.yml` fires if `apps/studio/**` or the committed sanity types changed. Check both runs complete.
+5. Verify `release.yml` ran on `main` and created the CalVer tag + GitHub Release: `gh release list --limit 1`.
 
 ### Dependabot PR handling
 

@@ -187,6 +187,8 @@ To release: open the PR from `dev` → `main` and merge it with **"Create a merg
 
 > Older releases were squashed, which is why `dev`'s history has `merge: resolve main into dev for release PR` commits (a `--ours` workaround for the divergence those squashes caused). That workaround is no longer needed.
 
+On every push to `main`, `.github/workflows/release.yml` creates a CalVer tag (`vYYYY.MM.DD`, with a `.N` suffix for same-day repeats, computed in the `America/Argentina/Buenos_Aires` timezone) and a GitHub Release with auto-generated notes listing the included PRs. `.github/release.yml` categorizes those notes ("Dependencias" vs "Cambios") and excludes PRs labeled `release`, so release PRs must be created with `--label release` to keep them out of their own changelog.
+
 ## CI
 
 Two GitHub Actions workflows run on PRs to `dev` and `main`:
