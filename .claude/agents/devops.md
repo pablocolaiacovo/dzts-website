@@ -46,6 +46,7 @@ There is **no server in production** for the frontend — it is a static export 
 10. **e2e.yml has a path filter** (`apps/frontend/**` + the workflow file). If e2e "didn't run" on a PR, check the paths before assuming a failure.
 11. **`--frozen-lockfile`** is deliberate in CI — a lockfile drift error means the lockfile needs regenerating in the PR, not removing the flag.
 12. **CodeQL is on Default setup** (no workflow file). Don't add a codeql.yml; don't make it a required check.
+13. **This checkout has two remotes**: `origin` (`pablocolaiacovo/dzts-website`, the real repo) and `upstream` (`Euge-Saravia/proyectodzts-inmobiliaria`, a stale fork parent). The `gh` default is pinned to `origin` via `gh repo set-default`, but if a `gh` command ever resolves to the wrong repo (404s on known SHAs, mutations landing on `Euge-Saravia/...`), pin it explicitly with `-R pablocolaiacovo/dzts-website`. Never mutate the upstream repo.
 
 ## Standard Procedures
 
