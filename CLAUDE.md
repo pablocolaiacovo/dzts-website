@@ -62,6 +62,7 @@ The main Opus agent delegates coding tasks to lighter models via custom agents i
 |------|-------|-------|---------|
 | **Quick Fix** | `quick-fix` | Haiku | Typos, import changes, renames, toggling a flag, single constant changes |
 | **Implement** | `implementer` | Sonnet | Components, bug fixes, schema changes, CSS, lint fixes, new routes, caching updates |
+| **DevOps** | `devops` | Sonnet | GitHub Actions workflows, CI failures, releases (dev → main), Dependabot PRs, deploy issues |
 | **Architect** | _(main agent)_ | Opus | Multi-system debugging, architecture decisions, planning, PR reviews, new patterns |
 
 ### Delegate to `implementer` (Sonnet) when:
@@ -81,6 +82,16 @@ The main Opus agent delegates coding tasks to lighter models via custom agents i
 - Renaming a variable or file
 - Changing a single constant value
 - Toggling a boolean flag
+
+### Delegate to `devops` (Sonnet) when:
+
+- Editing or debugging GitHub Actions workflows (`.github/workflows/**`) or `dependabot.yml`
+- Diagnosing a failing CI/e2e/deploy run (`gh run view --log-failed`)
+- Cutting a release: opening and merging the `dev → main` PR (merge commit, never squash)
+- Reviewing/merging Dependabot PRs
+- Checking or wiring GitHub environment secrets/vars (Preview/Production)
+
+The devops agent does **not** change application source code — if a CI failure traces to an app bug, it reports back and the fix routes to `implementer` or `quick-fix`.
 
 ### Keep on Opus (handle directly) when:
 
