@@ -9,8 +9,9 @@ on:
 permissions:
   contents: write
 
-# Queue releases, never cancel — every push to main must get its own tag +
-# notes, even if pushes land close together.
+# Serialize releases. Note GitHub keeps at most one pending run per group:
+# under 3+ rapid pushes to main a pending run can be cancelled, and the
+# skipped push's PRs simply fold into the next release's notes.
 concurrency:
   group: release
   cancel-in-progress: false
