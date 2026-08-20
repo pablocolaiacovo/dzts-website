@@ -1,5 +1,7 @@
 import { defineType, defineField, defineArrayMember } from "sanity";
-import { CogIcon, LinkIcon, MenuIcon } from "@sanity/icons";
+import { CogIcon } from "@sanity/icons/Cog";
+import { LinkIcon } from "@sanity/icons/Link";
+import { MenuIcon } from "@sanity/icons/Menu";
 
 export const siteSettingsType = defineType({
   name: "siteSettings",

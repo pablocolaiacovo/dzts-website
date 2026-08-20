@@ -62,6 +62,7 @@ The main Opus agent delegates coding tasks to lighter models via custom agents i
 |------|-------|-------|---------|
 | **Quick Fix** | `quick-fix` | Haiku | Typos, import changes, renames, toggling a flag, single constant changes |
 | **Implement** | `implementer` | Sonnet | Components, bug fixes, schema changes, CSS, lint fixes, new routes, caching updates |
+| **DevOps** | `devops` | Sonnet | GitHub Actions workflows, CI failures, releases (dev → main), Dependabot PRs, deploy issues |
 | **Architect** | _(main agent)_ | Opus | Multi-system debugging, architecture decisions, planning, PR reviews, new patterns |
 
 ### Delegate to `implementer` (Sonnet) when:
@@ -81,6 +82,16 @@ The main Opus agent delegates coding tasks to lighter models via custom agents i
 - Renaming a variable or file
 - Changing a single constant value
 - Toggling a boolean flag
+
+### Delegate to `devops` (Sonnet) when:
+
+- Editing or debugging GitHub Actions workflows (`.github/workflows/**`) or `dependabot.yml`
+- Diagnosing a failing CI/e2e/deploy run (`gh run view --log-failed`)
+- Cutting a release: opening and merging the `dev → main` PR (merge commit, never squash)
+- Reviewing/merging Dependabot PRs
+- Checking or wiring GitHub environment secrets/vars (Preview/Production)
+
+The devops agent does **not** change application source code — if a CI failure traces to an app bug, it reports back and the fix routes to `implementer` or `quick-fix`.
 
 ### Keep on Opus (handle directly) when:
 
@@ -175,6 +186,12 @@ To release: open the PR from `dev` → `main` and merge it with **"Create a merg
 `git log --first-parent main` then gives a clean release-level history; per-feature commits stay reachable through the merge.
 
 > Older releases were squashed, which is why `dev`'s history has `merge: resolve main into dev for release PR` commits (a `--ours` workaround for the divergence those squashes caused). That workaround is no longer needed.
+
+On every push to `main`, `.github/workflows/release.yml` creates a CalVer tag (`vYYYY.MM.DD`, with a `.N` suffix for same-day repeats, computed in the `America/Argentina/Buenos_Aires` timezone) and a GitHub Release with auto-generated notes listing the included PRs. `.github/release.yml` categorizes those notes ("Dependencias" vs "Cambios") and excludes PRs labeled `release`, so release PRs must be created with `--label release` to keep them out of their own changelog.
+
+## Feature Specs
+
+Significant features and infra changes are documented in `docs/specs/` as `YYYY-MM-DD-<slug>.md`, forming a chronological history of what was built and why. Each spec records the goal, the decisions made (with rationale), the implementation summary, and operational notes. **When implementing a significant feature or infra change, write its spec in the same PR.** Small fixes and routine dependency bumps don't need one.
 
 ## CI
 

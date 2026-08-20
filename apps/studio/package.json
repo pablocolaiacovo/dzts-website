@@ -10,25 +10,25 @@
     "deploy-graphql": "sanity graphql deploy",
     "predev": "pnpm run typegen",
     "prebuild": "pnpm run typegen",
-    "typegen": "sanity schema extract && sanity typegen generate"
+    "typegen": "sanity schema extract --force && sanity typegen generate"
   },
   "keywords": [
     "sanity"
   ],
   "dependencies": {
-    "@sanity/icons": "^3.7.4",
-    "@sanity/vision": "^5.29.0",
+    "@sanity/icons": "^5.1.0",
+    "@sanity/vision": "^6.5.0",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
-    "sanity": "^5.29.0",
+    "sanity": "^6.5.0",
     "styled-components": "^6.3.8"
   },
   "devDependencies": {
     "@sanity/eslint-config-studio": "^6.0.0",
-    "@types/react": "^19.2.16",
+    "@types/react": "^19.2.17",
     "eslint": "^9",
-    "prettier": "^3.8.1",
-    "typescript": "^5.9.3"
+    "prettier": "^3.9.4",
+    "typescript": "^6.0.3"
   },
   "prettier": {
     "semi": false,

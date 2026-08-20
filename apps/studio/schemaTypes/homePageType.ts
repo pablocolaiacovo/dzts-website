@@ -1,5 +1,6 @@
 import { defineType, defineField, defineArrayMember } from "sanity";
-import { HomeIcon, PanelRightIcon } from "@sanity/icons";
+import { HomeIcon } from "@sanity/icons/Home";
+import { PanelRightIcon } from "@sanity/icons/PanelRight";
 
 export const homePageType = defineType({
   name: "homePage",
