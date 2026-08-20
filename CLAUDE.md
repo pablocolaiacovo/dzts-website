@@ -63,6 +63,7 @@ The main Opus agent delegates coding tasks to lighter models via custom agents i
 | **Quick Fix** | `quick-fix` | Haiku | Typos, import changes, renames, toggling a flag, single constant changes |
 | **Implement** | `implementer` | Sonnet | Components, bug fixes, schema changes, CSS, lint fixes, new routes, caching updates |
 | **DevOps** | `devops` | Sonnet | GitHub Actions workflows, CI failures, releases (dev → main), Dependabot PRs, deploy issues |
+| **Triage** | `triage` | Opus | PR/issue triage: merge-readiness assessment, priority ranking, recommended merge order, release backlog reports |
 | **Architect** | _(main agent)_ | Opus | Multi-system debugging, architecture decisions, planning, PR reviews, new patterns |
 
 ### Delegate to `implementer` (Sonnet) when:
@@ -92,6 +93,15 @@ The main Opus agent delegates coding tasks to lighter models via custom agents i
 - Checking or wiring GitHub environment secrets/vars (Preview/Production)
 
 The devops agent does **not** change application source code — if a CI failure traces to an app bug, it reports back and the fix routes to `implementer` or `quick-fix`.
+
+### Delegate to `triage` (Opus) when:
+
+- Assessing which open PRs are ready to merge and in what order
+- Ranking open PRs/issues by priority (security > production breakage > unblocking > dep hygiene > features > chores)
+- Producing a release-backlog report (`dev` ahead of `main`) and a cut-a-release recommendation
+- Matching open Dependabot security alerts to pending dependency PRs
+
+The triage agent **decides and recommends — it never merges, closes, or edits code**. It may apply labels/comments only when explicitly asked. Execution routes onward: merges/releases to `devops`, code fixes to `implementer`/`quick-fix`, business-priority calls to the user.
 
 ### Keep on Opus (handle directly) when:
 
