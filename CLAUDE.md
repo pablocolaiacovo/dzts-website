@@ -189,6 +189,10 @@ To release: open the PR from `dev` → `main` and merge it with **"Create a merg
 
 On every push to `main`, `.github/workflows/release.yml` creates a CalVer tag (`vYYYY.MM.DD`, with a `.N` suffix for same-day repeats, computed in the `America/Argentina/Buenos_Aires` timezone) and a GitHub Release with auto-generated notes listing the included PRs. `.github/release.yml` categorizes those notes ("Dependencias" vs "Cambios") and excludes PRs labeled `release`, so release PRs must be created with `--label release` to keep them out of their own changelog.
 
+## Feature Specs
+
+Significant features and infra changes are documented in `docs/specs/` as `YYYY-MM-DD-<slug>.md`, forming a chronological history of what was built and why. Each spec records the goal, the decisions made (with rationale), the implementation summary, and operational notes. **When implementing a significant feature or infra change, write its spec in the same PR.** Small fixes and routine dependency bumps don't need one.
+
 ## CI
 
 Two GitHub Actions workflows run on PRs to `dev` and `main`:
