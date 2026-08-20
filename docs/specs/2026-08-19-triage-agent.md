@@ -1,7 +1,7 @@
 # Triage Agent
 
 - **Date**: 2026-08-19
-- **PR**: (filled on open — feat/triage-agent → dev)
+- **PR**: [#142](https://github.com/pablocolaiacovo/dzts-website/pull/142)
 - **Status**: Implemented
 - **Owner**: main agent (architect tier)
 
