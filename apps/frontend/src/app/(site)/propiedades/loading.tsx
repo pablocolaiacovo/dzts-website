@@ -6,7 +6,9 @@ export default function PropiedadesLoading() {
           <span className="placeholder col-3"></span>
         </div>
       </nav>
-      <h1 className="text-center mb-4 fw-bold">Propiedades</h1>
+      <div className="text-center mb-4 fw-bold fs-1 placeholder-glow">
+        <span className="placeholder col-5"></span>
+      </div>
 
       <div className="row g-4">
         {/* Filter sidebar skeleton - desktop only */}

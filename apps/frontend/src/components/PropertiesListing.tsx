@@ -39,6 +39,7 @@ export interface PropertyListItem {
 interface PropertiesListingProps {
   properties: PropertyListItem[];
   filterOptions: FilterOptions;
+  routeFilters: import("@/types/filterRoutes").ParsedFilters;
 }
 
 const PAGE_SIZE = 12;
@@ -46,12 +47,11 @@ const PAGE_SIZE = 12;
 function PropertiesListingInner({
   properties,
   filterOptions,
+  routeFilters,
 }: PropertiesListingProps) {
   const searchParams = useSearchParams();
 
-  const operationType = searchParams.get("operacion") || "";
-  const propertyTypeSlugs = parseMultiple(searchParams.get("propiedad"));
-  const citySlugs = parseMultiple(searchParams.get("localidad"));
+  const operationType = routeFilters.operation || "";
   const roomsList = parseMultiple(searchParams.get("dormitorios"))
     .map((r) => parseInt(r, 10))
     .filter((room) => Number.isFinite(room));
@@ -64,19 +64,14 @@ function PropertiesListingInner({
   const currentPage = Number.isFinite(parsedPage) ? Math.max(1, parsedPage) : 1;
   const sort = parseSortParam(searchParams.get("orden"));
 
+  const typeSlug = routeFilters.typeSlug;
+  const citySlug = routeFilters.citySlug;
+
   const filtered = useMemo(() => {
     const result = properties.filter((p) => {
       if (operationType && p.operationType !== operationType) return false;
-      if (
-        propertyTypeSlugs.length > 0 &&
-        (!p.propertyTypeSlug || !propertyTypeSlugs.includes(p.propertyTypeSlug))
-      )
-        return false;
-      if (
-        citySlugs.length > 0 &&
-        (!p.citySlug || !citySlugs.includes(p.citySlug))
-      )
-        return false;
+      if (typeSlug && p.propertyTypeSlug !== typeSlug) return false;
+      if (citySlug && p.citySlug !== citySlug) return false;
       if (
         roomsList.length > 0 &&
         (typeof p.rooms !== "number" || !roomsList.includes(p.rooms))
@@ -95,8 +90,8 @@ function PropertiesListingInner({
   }, [
     properties,
     operationType,
-    propertyTypeSlugs,
-    citySlugs,
+    typeSlug,
+    citySlug,
     roomsList,
     onlyAvailable,
     surfaceMin,
@@ -110,9 +105,6 @@ function PropertiesListingInner({
   const pageItems = filtered.slice(start, start + PAGE_SIZE);
 
   const currentSearchParams = {
-    operacion: operationType || undefined,
-    propiedad: searchParams.get("propiedad") || undefined,
-    localidad: searchParams.get("localidad") || undefined,
     dormitorios: searchParams.get("dormitorios") || undefined,
     disponibles: onlyAvailable ? "1" : undefined,
     supmin: searchParams.get("supmin") || undefined,
@@ -121,7 +113,7 @@ function PropertiesListingInner({
   };
 
   return (
-    <PropertiesLayout filterOptions={filterOptions} totalCount={totalCount}>
+    <PropertiesLayout filterOptions={filterOptions} totalCount={totalCount} routeFilters={routeFilters}>
       <PropertiesGrid properties={pageItems} />
       <Pagination
         currentPage={currentPage}

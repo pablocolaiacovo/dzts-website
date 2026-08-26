@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { defineQuery } from "next-sanity";
 import { sanityFetch } from "@/sanity/lib/live";
 import {
@@ -14,6 +15,9 @@ import PropertiesListing, {
   type PropertyListItem,
 } from "@/components/PropertiesListing";
 import { buildFilterOptions } from "@/lib/filters";
+import { buildFilterCombos } from "@/lib/filterRoutes";
+import LegacyFilterRedirect from "@/components/LegacyFilterRedirect";
+import SectionLinks from "@/components/SectionLinks";
 
 export async function generateMetadata(): Promise<Metadata> {
   const [pageSeo, siteSeo] = await Promise.all([
@@ -74,8 +78,19 @@ export default async function PropiedadesPage() {
     }),
   );
 
+  const existingCombos = buildFilterCombos(
+    propertiesList.map((p) => ({
+      operationType: p.operationType,
+      typeSlug: p.propertyTypeSlug,
+      citySlug: p.citySlug,
+    })),
+  ).map((c) => c.join("/"));
+
   return (
     <main className="container-fluid px-3 px-lg-4 py-4 py-md-5">
+      <Suspense fallback={null}>
+        <LegacyFilterRedirect existingCombos={existingCombos} />
+      </Suspense>
       <Breadcrumb
         items={[
           { label: "Inicio", href: "/", isHome: true },
@@ -83,10 +98,12 @@ export default async function PropiedadesPage() {
         ]}
       />
       <h1 className="text-center mb-4 fw-bold">{heading}</h1>
+      <SectionLinks properties={propertiesList} />
 
       <PropertiesListing
         properties={propertiesList}
         filterOptions={filterOptions}
+        routeFilters={{ operation: null, typeSlug: null, citySlug: null }}
       />
     </main>
   );

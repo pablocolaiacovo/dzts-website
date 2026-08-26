@@ -8,17 +8,14 @@ import {
   getCachedOrganization,
   buildOrganizationJsonLd,
 } from "@/sanity/queries/siteSettings";
-import {
-  getCachedProperty,
-  getAllPropertySlugs,
-} from "@/sanity/queries/propertyDetail";
+import { getCachedProperty } from "@/sanity/queries/propertyDetail";
 import { resolveMetadata } from "@/lib/seo";
 
 import Breadcrumb from "@/components/Breadcrumb";
 import ShareButton from "@/components/ShareButton";
 import ImageCarousel from "@/components/ImageCarousel";
 import MapSection from "@/components/MapSection";
-import "./property-detail.css";
+import "@/app/(site)/propiedades/property-detail.css";
 
 type Property = NonNullable<Awaited<ReturnType<typeof getCachedProperty>>>;
 type PropertyFeature = { label: string; value: string | number };
@@ -29,34 +26,21 @@ const STATUS_LABELS: Record<string, string> = {
   alquilado: "Alquilado",
 };
 
-export async function generateMetadata({
-  params,
-}: {
-  params: Promise<{ slug: string }>;
-}): Promise<Metadata> {
-  const { slug } = await params;
+export async function buildPropertyMetadata(slug: string): Promise<Metadata> {
   const [property, siteSeo] = await Promise.all([
     getCachedProperty(slug),
     getCachedSiteSeo(),
   ]);
-
   if (!property) return {};
-
   const ogImageUrl = property.ogImage
     ? urlFor(property.ogImage).width(1200).height(630).url()
     : undefined;
-
   return resolveMetadata(property.seo, siteSeo, {
     title: property.title,
     description: property.subtitle,
     ogImageUrl,
     canonicalUrl: `/propiedades/${slug}`,
   });
-}
-
-export async function generateStaticParams() {
-  const slugs = await getAllPropertySlugs();
-  return slugs.map((entry) => ({ slug: entry.slug }));
 }
 
 function PropertyHeader({
@@ -206,12 +190,7 @@ function PropertyActions({
   );
 }
 
-export default async function PropertyPage({
-  params,
-}: {
-  params: Promise<{ slug: string }>;
-}) {
-  const { slug } = await params;
+export default async function PropertyDetail({ slug }: { slug: string }) {
   const [property, organization] = await Promise.all([
     getCachedProperty(slug),
     getCachedOrganization(),

@@ -9,6 +9,8 @@ import {
 } from "react";
 import type { FilterOption } from "@/types/filters";
 import { parseMultiple } from "@/lib/filters";
+import { buildFilterPath } from "@/lib/filterRoutes";
+import type { ParsedFilters, OperationSlug } from "@/types/filterRoutes";
 import ReferenceSearch from "./ReferenceSearch";
 import "./PropertiesFilters.css";
 
@@ -20,12 +22,14 @@ interface PropertiesFiltersProps {
   onToggleCollapse: () => void;
   isPending: boolean;
   startTransition: TransitionStartFunction;
+  routeFilters: ParsedFilters;
 }
 
 type SearchParams = ReturnType<typeof useSearchParams>;
 
 interface PropertiesFiltersInnerProps extends PropertiesFiltersProps {
   searchParams: SearchParams;
+  routeFilters: ParsedFilters;
 }
 
 type FilterState = {
@@ -40,8 +44,8 @@ type FilterState = {
 
 type FilterAction =
   | { type: "SET_OPERACION"; value: string }
-  | { type: "TOGGLE_PROPIEDAD"; slug: string }
-  | { type: "TOGGLE_LOCALIDAD"; slug: string }
+  | { type: "SET_PROPIEDAD"; value: string }
+  | { type: "SET_LOCALIDAD"; value: string }
   | { type: "TOGGLE_DORMITORIOS"; value: string }
   | { type: "TOGGLE_SOLO_DISPONIBLES" }
   | { type: "SET_SUP_MIN"; value: string }
@@ -66,10 +70,10 @@ function filterReducer(state: FilterState, action: FilterAction): FilterState {
   switch (action.type) {
     case "SET_OPERACION":
       return { ...state, operacion: action.value };
-    case "TOGGLE_PROPIEDAD":
-      return { ...state, propiedad: toggleInArray(state.propiedad, action.slug) };
-    case "TOGGLE_LOCALIDAD":
-      return { ...state, localidad: toggleInArray(state.localidad, action.slug) };
+    case "SET_PROPIEDAD":
+      return { ...state, propiedad: action.value ? [action.value] : [] };
+    case "SET_LOCALIDAD":
+      return { ...state, localidad: action.value ? [action.value] : [] };
     case "TOGGLE_DORMITORIOS":
       return {
         ...state,
@@ -293,6 +297,7 @@ function PropertiesFiltersInner({
   searchParams,
   isPending,
   startTransition,
+  routeFilters,
 }: PropertiesFiltersInnerProps) {
   const router = useRouter();
   const [isOpenMobile, setIsOpenMobile] = useState(false);
@@ -302,9 +307,9 @@ function PropertiesFiltersInner({
   const initialSupMax = searchParams.get("supmax") || "";
 
   const [filters, dispatch] = useReducer(filterReducer, undefined, () => ({
-    operacion: searchParams.get("operacion") || "",
-    propiedad: parseMultiple(searchParams.get("propiedad")),
-    localidad: parseMultiple(searchParams.get("localidad")),
+    operacion: routeFilters.operation || "",
+    propiedad: routeFilters.typeSlug ? [routeFilters.typeSlug] : [],
+    localidad: routeFilters.citySlug ? [routeFilters.citySlug] : [],
     dormitorios: initialDormitorios,
     soloDisponibles: searchParams.get("disponibles") === "1",
     supMin: initialSupMin,
@@ -332,34 +337,29 @@ function PropertiesFiltersInner({
   };
 
   const applyFilters = () => {
+    const path = buildFilterPath({
+      operation: (filters.operacion as OperationSlug) || null,
+      typeSlug: filters.propiedad[0] ?? null,
+      citySlug: filters.localidad[0] ?? null,
+    });
     const params = new URLSearchParams();
-
-    if (filters.operacion) params.set("operacion", filters.operacion);
-    if (filters.propiedad.length > 0)
-      params.set("propiedad", filters.propiedad.join(","));
-    if (filters.localidad.length > 0)
-      params.set("localidad", filters.localidad.join(","));
-    if (filters.dormitorios.length > 0)
-      params.set("dormitorios", filters.dormitorios.join(","));
+    if (filters.dormitorios.length > 0) params.set("dormitorios", filters.dormitorios.join(","));
     if (filters.soloDisponibles) params.set("disponibles", "1");
     if (filters.supMin) params.set("supmin", filters.supMin);
     if (filters.supMax) params.set("supmax", filters.supMax);
-
     const orden = searchParams.get("orden");
     if (orden) params.set("orden", orden);
-
-    const queryString = params.toString();
+    const qs = params.toString();
     startTransition(() => {
-      router.push(queryString ? `/propiedades?${queryString}` : "/propiedades");
+      router.push(qs ? `${path}?${qs}` : path);
     });
     setIsOpenMobile(false);
   };
 
   const clearFilters = () => {
     dispatch({ type: "RESET" });
-    const orden = searchParams.get("orden");
     startTransition(() => {
-      router.push(orden ? `/propiedades?orden=${orden}` : "/propiedades");
+      router.push("/propiedades");
     });
     setIsOpenMobile(false);
   };
@@ -404,11 +404,12 @@ function PropertiesFiltersInner({
         expanded={expandedSections.propiedad}
         onToggle={() => toggleSection("propiedad")}
       >
-        <FilterCheckboxGroup
+        <FilterRadioGroup
+          name="propiedad"
           idPrefix="propiedad"
-          items={propertyTypes.map((t) => ({ value: t.slug, label: t.name }))}
-          selected={filters.propiedad}
-          onToggle={(slug) => dispatch({ type: "TOGGLE_PROPIEDAD", slug })}
+          value={filters.propiedad[0] || ""}
+          options={[{ value: "", label: "Todas" }, ...propertyTypes.map((t) => ({ value: t.slug, label: t.name }))]}
+          onChange={(value) => dispatch({ type: "SET_PROPIEDAD", value })}
         />
       </FilterAccordionSection>
 
@@ -419,11 +420,12 @@ function PropertiesFiltersInner({
         onToggle={() => toggleSection("localidad")}
         bodyStyle={{ maxHeight: 200, overflowY: "auto" }}
       >
-        <FilterCheckboxGroup
+        <FilterRadioGroup
+          name="localidad"
           idPrefix="localidad"
-          items={cities.map((c) => ({ value: c.slug, label: c.name }))}
-          selected={filters.localidad}
-          onToggle={(slug) => dispatch({ type: "TOGGLE_LOCALIDAD", slug })}
+          value={filters.localidad[0] || ""}
+          options={[{ value: "", label: "Todas" }, ...cities.map((c) => ({ value: c.slug, label: c.name }))]}
+          onChange={(value) => dispatch({ type: "SET_LOCALIDAD", value })}
         />
       </FilterAccordionSection>
 

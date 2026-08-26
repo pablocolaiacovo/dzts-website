@@ -1,27 +1,29 @@
 "use client";
 
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import type { TransitionStartFunction } from "react";
 import type { FilterOption } from "@/types/filters";
+import type { ParsedFilters } from "@/types/filterRoutes";
 import { parseMultiple } from "@/lib/filters";
+import { buildFilterPath } from "@/lib/filterRoutes";
 
 interface ActiveFilterBadgesProps {
   cities: FilterOption[];
   propertyTypes: FilterOption[];
   startTransition: TransitionStartFunction;
+  routeFilters: ParsedFilters;
 }
 
 export default function ActiveFilterBadges({
   cities,
   propertyTypes,
   startTransition,
+  routeFilters,
 }: ActiveFilterBadgesProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const pathname = usePathname();
 
-  const appliedOperacion = searchParams.get("operacion") || "";
-  const appliedPropiedad = parseMultiple(searchParams.get("propiedad"));
-  const appliedLocalidad = parseMultiple(searchParams.get("localidad"));
   const appliedDormitorios = parseMultiple(searchParams.get("dormitorios"));
   const appliedDisponibles = searchParams.get("disponibles") === "1";
   const appliedSupMin = searchParams.get("supmin") || "";
@@ -54,60 +56,18 @@ export default function ActiveFilterBadges({
     return `Hasta ${max} m²`;
   };
 
-  const appliedFilters: { key: string; value: string; label: string; icon: string }[] = [];
-  if (appliedOperacion) {
-    appliedFilters.push({
-      key: "operacion",
-      value: appliedOperacion,
-      label: getOperacionLabel(appliedOperacion),
-      icon: "bi-tag",
+  const removePrincipal = (dim: "operation" | "typeSlug" | "citySlug") => {
+    const next: ParsedFilters = { ...routeFilters, [dim]: null };
+    const qs = searchParams.toString();
+    const path = buildFilterPath(next);
+    startTransition(() => {
+      router.push(qs ? `${path}?${qs}` : path);
     });
-  }
-  appliedPropiedad.forEach((slug) => {
-    appliedFilters.push({
-      key: "propiedad",
-      value: slug,
-      label: getPropiedadLabel(slug),
-      icon: "bi-house",
-    });
-  });
-  appliedLocalidad.forEach((slug) => {
-    appliedFilters.push({
-      key: "localidad",
-      value: slug,
-      label: getLocalidadLabel(slug),
-      icon: "bi-geo-alt",
-    });
-  });
-  appliedDormitorios.forEach((value) => {
-    appliedFilters.push({
-      key: "dormitorios",
-      value,
-      label: getDormitoriosLabel(value),
-      icon: "bi-door-open",
-    });
-  });
-  if (appliedDisponibles) {
-    appliedFilters.push({
-      key: "disponibles",
-      value: "1",
-      label: "Solo disponibles",
-      icon: "bi-check-circle",
-    });
-  }
-  if (appliedSupMin || appliedSupMax) {
-    appliedFilters.push({
-      key: "superficie",
-      value: "",
-      label: getSuperficieLabel(appliedSupMin, appliedSupMax),
-      icon: "bi-rulers",
-    });
-  }
+  };
 
-  const removeFilter = (key: string, value: string) => {
+  const removeSecondary = (key: string, value: string) => {
     const params = new URLSearchParams(searchParams.toString());
-
-    if (key === "operacion" || key === "disponibles") {
+    if (key === "disponibles") {
       params.delete(key);
     } else if (key === "superficie") {
       params.delete("supmin");
@@ -115,17 +75,13 @@ export default function ActiveFilterBadges({
     } else {
       const current = parseMultiple(params.get(key));
       const updated = current.filter((v) => v !== value);
-      if (updated.length > 0) {
-        params.set(key, updated.join(","));
-      } else {
-        params.delete(key);
-      }
+      if (updated.length > 0) params.set(key, updated.join(","));
+      else params.delete(key);
     }
-
     params.delete("pagina");
-    const queryString = params.toString();
+    const qs = params.toString();
     startTransition(() => {
-      router.push(queryString ? `/propiedades?${queryString}` : "/propiedades");
+      router.push(qs ? `${pathname}?${qs}` : pathname);
     });
   };
 
@@ -135,6 +91,63 @@ export default function ActiveFilterBadges({
     });
   };
 
+  const appliedFilters: { key: string; value: string; label: string; icon: string; onRemove: () => void }[] = [];
+
+  if (routeFilters.operation) {
+    appliedFilters.push({
+      key: "operation",
+      value: routeFilters.operation,
+      label: getOperacionLabel(routeFilters.operation),
+      icon: "bi-tag",
+      onRemove: () => removePrincipal("operation"),
+    });
+  }
+  if (routeFilters.typeSlug) {
+    appliedFilters.push({
+      key: "typeSlug",
+      value: routeFilters.typeSlug,
+      label: getPropiedadLabel(routeFilters.typeSlug),
+      icon: "bi-house",
+      onRemove: () => removePrincipal("typeSlug"),
+    });
+  }
+  if (routeFilters.citySlug) {
+    appliedFilters.push({
+      key: "citySlug",
+      value: routeFilters.citySlug,
+      label: getLocalidadLabel(routeFilters.citySlug),
+      icon: "bi-geo-alt",
+      onRemove: () => removePrincipal("citySlug"),
+    });
+  }
+  appliedDormitorios.forEach((value) => {
+    appliedFilters.push({
+      key: "dormitorios",
+      value,
+      label: getDormitoriosLabel(value),
+      icon: "bi-door-open",
+      onRemove: () => removeSecondary("dormitorios", value),
+    });
+  });
+  if (appliedDisponibles) {
+    appliedFilters.push({
+      key: "disponibles",
+      value: "1",
+      label: "Solo disponibles",
+      icon: "bi-check-circle",
+      onRemove: () => removeSecondary("disponibles", "1"),
+    });
+  }
+  if (appliedSupMin || appliedSupMax) {
+    appliedFilters.push({
+      key: "superficie",
+      value: "",
+      label: getSuperficieLabel(appliedSupMin, appliedSupMax),
+      icon: "bi-rulers",
+      onRemove: () => removeSecondary("superficie", ""),
+    });
+  }
+
   if (appliedFilters.length === 0) {
     return null;
   }
@@ -142,7 +155,7 @@ export default function ActiveFilterBadges({
   return (
     <div className="d-flex flex-wrap align-items-center gap-2 mb-4">
       <span className="text-muted small me-1">Filtros activos:</span>
-      {appliedFilters.map(({ key, value, label, icon }) => (
+      {appliedFilters.map(({ key, value, label, icon, onRemove }) => (
         <span
           key={`${key}-${value}`}
           className="badge bg-primary bg-opacity-10 text-primary border border-primary rounded-pill d-inline-flex align-items-center gap-1 px-3 py-2"
@@ -154,7 +167,7 @@ export default function ActiveFilterBadges({
             className="btn-close btn-close-sm ms-1"
             style={{ fontSize: "0.6rem" }}
             aria-label={`Quitar filtro ${label}`}
-            onClick={() => removeFilter(key, value)}
+            onClick={onRemove}
           />
         </span>
       ))}

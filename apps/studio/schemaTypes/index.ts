@@ -1,4 +1,5 @@
 import {cityType} from './cityType'
+import {filterPageSeoType} from './filterPageSeoType'
 import {homePageType} from './homePageType'
 import {propiedadesPageType} from './propiedadesPageType'
 import {propertyType} from './propertyType'
@@ -14,4 +15,5 @@ export const schemaTypes = [
   propertyType,
   cityType,
   propertyTypeCategoryType,
+  filterPageSeoType,
 ]

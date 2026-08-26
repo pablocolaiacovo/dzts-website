@@ -3,7 +3,7 @@ import { test, expect } from "@playwright/test";
 test.describe("Property Detail Page", () => {
   test("navigate from listing to detail page", async ({ page }) => {
     await page.goto("/propiedades");
-    const firstCard = page.locator('a[href^="/propiedades/"]:not([href="/propiedades/"])').first();
+    const firstCard = page.locator('a[href^="/propiedades/"]:not([href="/propiedades/"]):not(.btn)').first();
     await expect(firstCard).toBeVisible();
     await firstCard.click();
     await expect(page).toHaveURL(/\/propiedades\/[^/]+\/?$/);
@@ -14,7 +14,7 @@ test.describe("Property Detail Page", () => {
     page,
   }) => {
     await page.goto("/propiedades");
-    await page.locator('a[href^="/propiedades/"]:not([href="/propiedades/"])').first().click();
+    await page.locator('a[href^="/propiedades/"]:not([href="/propiedades/"]):not(.btn)').first().click();
     await expect(page).toHaveURL(/\/propiedades\/[^/]+\/?$/);
     await page.waitForLoadState("networkidle");
 
@@ -42,7 +42,7 @@ test.describe("Property Detail Page", () => {
 
   test("detail page has JSON-LD structured data", async ({ page }) => {
     await page.goto("/propiedades");
-    await page.locator('a[href^="/propiedades/"]:not([href="/propiedades/"])').first().click();
+    await page.locator('a[href^="/propiedades/"]:not([href="/propiedades/"]):not(.btn)').first().click();
     await expect(page).toHaveURL(/\/propiedades\/[^/]+\/?$/);
     await page.waitForLoadState("networkidle");
 

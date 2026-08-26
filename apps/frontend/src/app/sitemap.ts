@@ -1,11 +1,15 @@
 import type { MetadataRoute } from "next";
 import { client } from "@/sanity/lib/client";
+import { buildFilterCombos } from "@/lib/filterRoutes";
 
 export const dynamic = "force-static";
 
-interface PropertySlug {
+interface PropertyRow {
   slug: string;
   _updatedAt: string;
+  operationType: string | null;
+  typeSlug: string | null;
+  citySlug: string | null;
 }
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
@@ -15,10 +19,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     return [];
   }
 
-  const properties = await client.fetch<PropertySlug[]>(`
+  const properties = await client.fetch<PropertyRow[]>(`
     *[_type == "property" && defined(slug.current) && published != false] {
       "slug": slug.current,
-      _updatedAt
+      _updatedAt,
+      operationType,
+      "typeSlug": propertyType->slug.current,
+      "citySlug": city->slug.current
     }
   `);
 
@@ -28,6 +35,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     changeFrequency: "weekly",
     priority: 0.8,
   }));
+
+  const comboUrls: MetadataRoute.Sitemap = buildFilterCombos(properties).map(
+    (segments) => ({
+      url: `${baseUrl}/propiedades/${segments.join("/")}`,
+      changeFrequency: "weekly",
+      priority: 0.7,
+    }),
+  );
 
   return [
     {
@@ -41,5 +56,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.9,
     },
     ...propertyUrls,
+    ...comboUrls,
   ];
 }
