@@ -314,7 +314,8 @@ The frontend is deployed as a static site to shared hosting:
 - `pnpm build` emits `apps/frontend/out/`; upload that directory to the host.
 - There is **no Node server** in production — no API routes, no middleware, no runtime caching, no server actions.
 - `images.unoptimized: true` disables the Next.js image optimizer (no server to run it). `next/image` still works and emits plain `<img>` tags.
-- Security headers (`X-Content-Type-Options`, `X-Frame-Options`, `Referrer-Policy`) and the trailing-slash redirect live in `apps/frontend/public/.htaccess`, which Next copies into `out/`. Replace with the equivalent nginx config if the host is nginx.
+- Security headers (`X-Content-Type-Options`, `X-Frame-Options`, `Referrer-Policy`), the Cache-Control policy, and the trailing-slash redirect live in `apps/frontend/public/.htaccess`, which Next copies into `out/`. Replace with the equivalent nginx config if the host is nginx.
+- Cache-Control policy (`.htaccess`): hashed assets under `/_next/static/` are `public, max-age=31536000, immutable` (filenames change on every deploy, so caching forever is safe); `/Images/` and `favicon.ico` are `public, max-age=604800` (7 days, not hashed); all `*.html` (including `index.html` served for directory requests like `/propiedades/`), `sitemap.xml`, `robots.txt`, and `llms.txt` are `no-cache` so deploys are visible immediately (ETag/Last-Modified make revalidation cheap).
 - `/propiedades` fetches **all** active properties at build time. Filtering and pagination happen client-side in `PropertiesListing.tsx` via `useSearchParams`.
 - Content updates require a **rebuild + redeploy**. This is automated via `.github/workflows/deploy.yml`: a Sanity webhook fires a `repository_dispatch: sanity-publish` event, the workflow runs `pnpm build`, and `apps/frontend/out/` is uploaded over FTP. See README "Automated Deploys" for the setup. There is no `/api/revalidate` route.
 
