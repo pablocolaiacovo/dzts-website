@@ -31,13 +31,22 @@ export async function generateMetadata(): Promise<Metadata> {
     getCachedSiteSeo(),
   ]);
 
-  // For the home page, don't set a title - use the layout's default "DZTS Inmobiliaria".
   // The title.template from layout.tsx only applies to child route segments,
-  // not to the root page.tsx which is at the same level as layout.tsx.
+  // not to the root page.tsx which is at the same level as layout.tsx. So a
+  // plain string title here would skip the template but still work; instead,
+  // when there's no Sanity metaTitle for the home page, fall back to the
+  // layout's default "DZTS Inmobiliaria" by removing the title entirely.
   const metadata = resolveMetadata(pageSeo, siteSeo, { canonicalUrl: "/" });
-  delete metadata.title;
-  if (metadata.openGraph) {
-    delete metadata.openGraph.title;
+  if (pageSeo?.metaTitle) {
+    metadata.title = { absolute: pageSeo.metaTitle };
+    if (metadata.openGraph) {
+      metadata.openGraph.title = pageSeo.metaTitle;
+    }
+  } else {
+    delete metadata.title;
+    if (metadata.openGraph) {
+      delete metadata.openGraph.title;
+    }
   }
   return metadata;
 }
