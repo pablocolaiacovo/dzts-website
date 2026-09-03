@@ -16,8 +16,10 @@ import { resolveMetadata } from "@/lib/seo";
 
 import Breadcrumb from "@/components/Breadcrumb";
 import ShareButton from "@/components/ShareButton";
+import TrackedLink from "@/components/TrackedLink";
 import ImageCarousel from "@/components/ImageCarousel";
 import MapSection from "@/components/MapSection";
+import { ANALYTICS_EVENT } from "@/lib/analytics";
 import "./property-detail.css";
 
 type Property = NonNullable<Awaited<ReturnType<typeof getCachedProperty>>>;
@@ -158,48 +160,60 @@ function PropertyFeaturesGrid({ features }: { features: PropertyFeature[] }) {
 
 function PropertyActions({
   slug,
+  title,
   whatsappShareUrl,
   whatsappConsultUrl,
 }: {
   slug: string;
+  title: string | null;
   whatsappShareUrl: string;
   whatsappConsultUrl: string | null;
 }) {
   return (
     <>
       <div className="d-flex gap-2 w-100">
-        <a
+        <TrackedLink
           href={`/propiedades/${slug}/ficha`}
           target="_blank"
           rel="noopener noreferrer"
           className="btn btn-outline-secondary text-dark py-2 fw-bold flex-fill text-center"
+          eventName={ANALYTICS_EVENT.fichaOpen}
+          eventParams={{ property_slug: slug }}
         >
           <i className="bi bi-file-earmark-text me-2" aria-hidden="true" />
           Ficha
-        </a>
-        <ShareButton />
-        <a
+        </TrackedLink>
+        <ShareButton propertySlug={slug} />
+        <TrackedLink
           href={whatsappShareUrl}
           target="_blank"
           rel="noopener noreferrer"
           className="btn btn-outline-success py-2 fw-bold flex-fill text-center"
           aria-label="Compartir por WhatsApp"
+          eventName={ANALYTICS_EVENT.share}
+          eventParams={{ method: "whatsapp", location: "property_detail", property_slug: slug }}
         >
           <i className="bi bi-whatsapp me-2" aria-hidden="true" />
           WhatsApp
-        </a>
+        </TrackedLink>
       </div>
       {whatsappConsultUrl && (
         <div className="mt-4">
-          <a
+          <TrackedLink
             href={whatsappConsultUrl}
             target="_blank"
             rel="noopener noreferrer"
             className="btn btn-success text-white px-4 py-3 fw-bold fs-5 w-100"
+            eventName={ANALYTICS_EVENT.whatsappContact}
+            eventParams={{
+              location: "property_detail",
+              property_slug: slug,
+              property_title: title ?? undefined,
+            }}
           >
             <i className="bi bi-whatsapp me-2" aria-hidden="true" />
             Consultar por WhatsApp
-          </a>
+          </TrackedLink>
         </div>
       )}
     </>
@@ -307,6 +321,7 @@ export default async function PropertyPage({
             </p>
             <PropertyActions
               slug={slug}
+              title={property.title}
               whatsappShareUrl={whatsappShareUrl}
               whatsappConsultUrl={whatsappConsultUrl}
             />

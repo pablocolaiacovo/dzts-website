@@ -52,8 +52,10 @@ const properties = await client.fetch(
   }`,
 );
 
+const normalizedBaseUrl = baseUrl.replace(/\/+$/, "");
+
 const propertyLinks = properties
-  .map((p) => `- [${p.title}](${baseUrl}/propiedades/${p.slug})`)
+  .map((p) => `- [${p.title}](${normalizedBaseUrl}/propiedades/${p.slug}/)`)
   .join("\n");
 
 const content = `# DZTS Inmobiliaria
@@ -64,8 +66,8 @@ DZTS Inmobiliaria es un sitio web de bienes raíces que ofrece propiedades en ve
 
 ## Páginas principales
 
-- [Inicio](${baseUrl}/): Página principal con buscador y propiedades destacadas
-- [Propiedades](${baseUrl}/propiedades): Listado completo de propiedades con filtros
+- [Inicio](${normalizedBaseUrl}/): Página principal con buscador y propiedades destacadas
+- [Propiedades](${normalizedBaseUrl}/propiedades/): Listado completo de propiedades con filtros
 
 ## Propiedades disponibles
 
