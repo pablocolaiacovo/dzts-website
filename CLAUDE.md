@@ -291,6 +291,7 @@ Two GitHub Actions workflows run on PRs to `dev` and `main`:
 - **MapSection** - Reusable component for displaying embedded Google Maps. Renders full-width iframe (450px height) when address is provided, returns null if no address exists.
 - **ShareButton** - Client component with Web Share API (mobile) / clipboard copy with "Link copiado" feedback (desktop). Used on the property detail page.
 - **FichaActions** - Client component with "Imprimir Ficha" (`window.print()`) and "Compartir" (same share logic as ShareButton) buttons. Used on the print-optimized ficha page.
+- **TrackedLink** - Client component wrapping a real `<a>` (all anchor props pass through) that fires `trackEvent()` on click without `preventDefault()`. Used for the WhatsApp float and the property detail page's Ficha/WhatsApp/consult links.
 
 ## Conventions
 
@@ -398,3 +399,4 @@ When modifying components, be aware these selectors are used by e2e tests:
 - WhatsApp consultation URL is built from `siteSettings.whatsappNumber` with a pre-filled message including the property name.
 - Sold/rented properties display a status banner ribbon (CSS-only, positioned absolute) overlaying the image carousel.
 - `TextImageSection` displays images in large circles (full column width, `border-radius: 50%`, `aspect-ratio: 1/1`).
+- `src/lib/analytics.ts` exports `trackEvent()` (wraps `sendGAEvent` from `@next/third-parties/google`) and the `ANALYTICS_EVENT` constants (`whatsappContact`, `share`, `fichaOpen`, `fichaPrint`) for GA4 conversion tracking. Safe no-op with no measurement id, on the server, or without `window.gtag`; never throws; strips `undefined` params.
