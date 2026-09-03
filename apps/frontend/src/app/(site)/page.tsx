@@ -155,7 +155,7 @@ export default async function Home() {
   const heroImageUrl = urlFor(homeContent!.heroImage! as SanityImageSource)
     .width(1920)
     .auto("format")
-    .quality(80)
+    .quality(75)
     .url();
   const heroLogoUrl = urlFor(homeContent!.heroLogo! as SanityImageSource)
     .width(400)
