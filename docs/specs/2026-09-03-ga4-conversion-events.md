@@ -1,7 +1,7 @@
 # GA4 Conversion Events
 
 - **Date**: 2026-09-03
-- **PR**: TBD
+- **PR**: [#149](https://github.com/pablocolaiacovo/dzts-website/pull/149)
 - **Status**: Implemented
 - **Owner**: implementer agent
 
