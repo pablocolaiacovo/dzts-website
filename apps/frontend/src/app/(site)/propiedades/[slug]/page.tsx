@@ -13,6 +13,7 @@ import {
   getAllPropertySlugs,
 } from "@/sanity/queries/propertyDetail";
 import { resolveMetadata } from "@/lib/seo";
+import { buildPropertyTitle, buildPropertyDescription } from "@/lib/propertySeo";
 
 import Breadcrumb from "@/components/Breadcrumb";
 import ShareButton from "@/components/ShareButton";
@@ -47,8 +48,8 @@ export async function generateMetadata({
     : undefined;
 
   return resolveMetadata(property.seo, siteSeo, {
-    title: property.title,
-    description: property.subtitle,
+    title: buildPropertyTitle(property),
+    description: buildPropertyDescription(property),
     ogImageUrl,
     canonicalUrl: `/propiedades/${slug}`,
   });

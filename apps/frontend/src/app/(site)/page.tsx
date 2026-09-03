@@ -18,7 +18,7 @@ import {
   getCachedOrganization,
   buildOrganizationJsonLd,
 } from "@/sanity/queries/siteSettings";
-import { resolveMetadata } from "@/lib/seo";
+import { resolveMetadata, withSiteName } from "@/lib/seo";
 import FeaturedProperties from "@/components/FeaturedProperties";
 import SearchProperties from "@/components/SearchProperties";
 import TextImageSection from "@/components/TextImageSection";
@@ -31,13 +31,23 @@ export async function generateMetadata(): Promise<Metadata> {
     getCachedSiteSeo(),
   ]);
 
-  // For the home page, don't set a title - use the layout's default "DZTS Inmobiliaria".
   // The title.template from layout.tsx only applies to child route segments,
-  // not to the root page.tsx which is at the same level as layout.tsx.
+  // not to the root page.tsx which is at the same level as layout.tsx, so a
+  // Sanity metaTitle here must carry the brand itself (via withSiteName).
+  // When there's no Sanity metaTitle, fall back to the layout's default
+  // title by removing the title entirely.
   const metadata = resolveMetadata(pageSeo, siteSeo, { canonicalUrl: "/" });
-  delete metadata.title;
-  if (metadata.openGraph) {
-    delete metadata.openGraph.title;
+  if (pageSeo?.metaTitle) {
+    const title = withSiteName(pageSeo.metaTitle);
+    metadata.title = { absolute: title };
+    if (metadata.openGraph) {
+      metadata.openGraph.title = title;
+    }
+  } else {
+    delete metadata.title;
+    if (metadata.openGraph) {
+      delete metadata.openGraph.title;
+    }
   }
   return metadata;
 }
