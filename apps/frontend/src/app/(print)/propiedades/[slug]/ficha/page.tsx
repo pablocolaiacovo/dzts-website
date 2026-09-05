@@ -64,7 +64,7 @@ export default async function FichaPage({
   return (
     <>
       <div className="ficha-container">
-        <FichaActions />
+        <FichaActions propertySlug={slug} />
         <header className="ficha-header">
           {property.reference && (
             <div className="ficha-reference">Ref: {property.reference}</div>

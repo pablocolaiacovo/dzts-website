@@ -6,7 +6,8 @@ const nextConfig: NextConfig = {
   reactCompiler: true,
 
   images: {
-    unoptimized: true,
+    loader: "custom",
+    loaderFile: "./src/lib/imageLoader.ts",
     remotePatterns: [
       { protocol: "https", hostname: "cdn.sanity.io" },
       { protocol: "https", hostname: "placehold.co" },

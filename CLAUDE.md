@@ -291,6 +291,7 @@ Two GitHub Actions workflows run on PRs to `dev` and `main`:
 - **MapSection** - Reusable component for displaying embedded Google Maps. Renders full-width iframe (450px height) when address is provided, returns null if no address exists.
 - **ShareButton** - Client component with Web Share API (mobile) / clipboard copy with "Link copiado" feedback (desktop). Used on the property detail page.
 - **FichaActions** - Client component with "Imprimir Ficha" (`window.print()`) and "Compartir" (same share logic as ShareButton) buttons. Used on the print-optimized ficha page.
+- **TrackedLink** - Client component wrapping a real `<a>` (all anchor props pass through) that fires `trackEvent()` on click without `preventDefault()`. Used for the WhatsApp float and the property detail page's Ficha/WhatsApp/consult links.
 
 ## Conventions
 
@@ -313,8 +314,9 @@ The frontend is deployed as a static site to shared hosting:
 - `next.config.ts` sets `output: "export"` and `trailingSlash: true`.
 - `pnpm build` emits `apps/frontend/out/`; upload that directory to the host.
 - There is **no Node server** in production — no API routes, no middleware, no runtime caching, no server actions.
-- `images.unoptimized: true` disables the Next.js image optimizer (no server to run it). `next/image` still works and emits plain `<img>` tags.
-- Security headers (`X-Content-Type-Options`, `X-Frame-Options`, `Referrer-Policy`) and the trailing-slash redirect live in `apps/frontend/public/.htaccess`, which Next copies into `out/`. Replace with the equivalent nginx config if the host is nginx.
+- `images.loader: "custom"` with `images.loaderFile: "./src/lib/imageLoader.ts"` replaces the default Next.js Image Optimization API (which needs a server we don't have) with the Sanity CDN's own on-the-fly resizing. `next/image` still emits a static `<img>` (no optimizer route to call at request time), but now with a real `srcset`: the loader rewrites each requested width into a `cdn.sanity.io` URL's `w` (and proportionally scaled `h`) query param, so the browser picks the right size instead of always downloading the largest one. URLs that aren't on `cdn.sanity.io` (local `/Images/...` assets, `placehold.co` placeholders) pass through unchanged.
+- Security headers (`X-Content-Type-Options`, `X-Frame-Options`, `Referrer-Policy`), the Cache-Control policy, and the trailing-slash redirect live in `apps/frontend/public/.htaccess`, which Next copies into `out/`. Replace with the equivalent nginx config if the host is nginx.
+- Cache-Control policy (`.htaccess`): hashed assets under `/_next/static/` are `public, max-age=31536000, immutable` (filenames change on every deploy, so caching forever is safe); `/Images/` and `favicon.ico` are `public, max-age=604800` (7 days, not hashed); all `*.html` (including `index.html` served for directory requests like `/propiedades/`), `sitemap.xml`, `robots.txt`, and `llms.txt` are `no-cache` so deploys are visible immediately (ETag/Last-Modified make revalidation cheap).
 - `/propiedades` fetches **all** active properties at build time. Filtering and pagination happen client-side in `PropertiesListing.tsx` via `useSearchParams`.
 - Content updates require a **rebuild + redeploy**. This is automated via `.github/workflows/deploy.yml`: a Sanity webhook fires a `repository_dispatch: sanity-publish` event, the workflow runs `pnpm build`, and `apps/frontend/out/` is uploaded over FTP. See README "Automated Deploys" for the setup. There is no `/api/revalidate` route.
 
@@ -398,3 +400,4 @@ When modifying components, be aware these selectors are used by e2e tests:
 - WhatsApp consultation URL is built from `siteSettings.whatsappNumber` with a pre-filled message including the property name.
 - Sold/rented properties display a status banner ribbon (CSS-only, positioned absolute) overlaying the image carousel.
 - `TextImageSection` displays images in large circles (full column width, `border-radius: 50%`, `aspect-ratio: 1/1`).
+- `src/lib/analytics.ts` exports `trackEvent()` (wraps `sendGAEvent` from `@next/third-parties/google`) and the `ANALYTICS_EVENT` constants (`whatsappContact`, `share`, `fichaOpen`, `fichaPrint`) for GA4 conversion tracking. Safe no-op with no measurement id, on the server, or without `window.gtag`; never throws; strips `undefined` params.
