@@ -1,7 +1,7 @@
 # UI Developer Agent
 
 - **Date**: 2026-09-09
-- **PR**: _pending_
+- **PR**: [#159](https://github.com/pablocolaiacovo/dzts-website/pull/159)
 - **Status**: Implemented
 - **Owner**: main agent (architect tier)
 
