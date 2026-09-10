@@ -1,0 +1,339 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Opción 1 — Barra Alta | DZTS Header</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ── tokens copied from apps/frontend/src/styles/variables.css ───────────── */
+:root {
+  --bs-primary: #01BCF3;
+  --bs-secondary: #ffffff;
+  --bs-font-family-base: "Inter", system-ui, -apple-system, sans-serif;
+  --bs-border-radius: 0.375rem;
+  --bs-link-color: #01BCF3;
+  --bs-link-hover-color: #029ac9;
+  --bs-dark: #000000;
+  --bs-light: #f8f9fa;
+  --header-nav-bg: #3d3d3d;
+
+  --font-size-xs: 0.75rem;   --font-size-sm: 0.875rem;  --font-size-base: 1rem;
+  --font-size-lg: 1.125rem;  --font-size-xl: 1.25rem;   --font-size-2xl: 1.5rem;
+  --font-size-3xl: 1.875rem; --font-size-4xl: 2.25rem;  --font-size-5xl: 3rem;
+
+  --line-height-tight: 1.25; --line-height-normal: 1.5; --line-height-relaxed: 1.625;
+  --letter-spacing-tight: -0.025em;
+}
+html { overflow-x: hidden; }
+body { font-family: var(--bs-font-family-base); font-size: var(--font-size-base); line-height: var(--line-height-normal); -webkit-font-smoothing: antialiased; }
+h1 { font-size: var(--font-size-4xl); font-weight: 700; line-height: var(--line-height-tight); letter-spacing: var(--letter-spacing-tight); }
+h2 { font-size: var(--font-size-3xl); font-weight: 700; line-height: var(--line-height-tight); letter-spacing: var(--letter-spacing-tight); }
+h3 { font-size: var(--font-size-2xl); font-weight: 600; line-height: var(--line-height-tight); }
+p  { font-size: var(--font-size-base); line-height: var(--line-height-relaxed); }
+@media (min-width: 768px) { h1 { font-size: var(--font-size-5xl); } h2 { font-size: var(--font-size-4xl); } h3 { font-size: var(--font-size-3xl); } }
+
+/* ════════════════════════════════════════════════════════════════════════
+   OPCIÓN 1 — "Barra Alta"
+   Una sola fila. Lockup completo (con bajada) en reposo; al hacer scroll
+   la barra se comprime fuerte y el lockup hace crossfade al recorte
+   compacto (sin bajada), que a esa altura ya sería ilegible.
+
+   Altura de arte (recortada, sin padding transparente):
+     móvil    reposo 56px (lockup completo)  → scroll 38.8px (compacto)
+     desktop  reposo 82px (lockup completo)  → scroll 47.7px (compacto)
+   Altura de barra:
+     móvil    80px → 55px      desktop 110px → 68px
+   ════════════════════════════════════════════════════════════════════════ */
+
+.sticky-header { position: sticky; top: 0; z-index: 1030; }
+
+.sticky-header .navbar {
+  background-color: var(--header-nav-bg);
+  --art-rest: 56px;         /* alto del lockup completo en reposo */
+  --art-scrolled: 52px;     /* alto equivalente del lockup al hacer scroll */
+  --pad-rest: 0.75rem;
+  --pad-scrolled: 0.5rem;
+  padding-top: var(--pad-rest);
+  padding-bottom: var(--pad-rest);
+  animation: shrink-navbar linear both;
+  animation-timeline: scroll(root);
+  animation-range: 0 120px;
+}
+@media (min-width: 992px) {
+  .sticky-header .navbar { --art-rest: 82px; --art-scrolled: 64px; --pad-rest: 0.875rem; --pad-scrolled: 0.625rem; }
+}
+@keyframes shrink-navbar { to { padding-top: var(--pad-scrolled); padding-bottom: var(--pad-scrolled); } }
+
+/* La marca es una caja apilada: los dos recortes ocupan la misma celda. */
+.header-logo {
+  display: grid;
+  grid-template-rows: minmax(0, 1fr);   /* si no, la fila se dimensiona al contenido
+                                            y el height:100% de la imagen no resuelve */
+  height: var(--art-rest);
+  margin-bottom: 0;
+  animation: shrink-logo linear both;
+  animation-timeline: scroll(root);
+  animation-range: 0 120px;
+}
+/* Al desaparecer la bajada sobra el 25.4% inferior de la caja: se recupera
+   con margen negativo para que la barra no quede desbalanceada. */
+@keyframes shrink-logo {
+  to { height: var(--art-scrolled); margin-bottom: calc(var(--art-scrolled) * -0.254); }
+}
+.header-logo img { grid-area: 1 / 1; width: auto; justify-self: start; align-self: start; }
+.logo-full    { height: 100%; }                 /* 1900×811  · 2.343:1 */
+.logo-compact { height: 74.6%; opacity: 0; }    /* 1900×605  · 3.140:1 — mismo ancho renderizado */
+
+.logo-full    { animation: mark-out linear both; animation-timeline: scroll(root); animation-range: 0 70px; }
+.logo-compact { animation: mark-in  linear both; animation-timeline: scroll(root); animation-range: 0 70px; }
+@keyframes mark-out { 0%,45% { opacity: 1; } 100% { opacity: 0; } }
+@keyframes mark-in  { 0%,45% { opacity: 0; } 100% { opacity: 1; } }
+
+.header-nav .nav-link { color: #fff; font-weight: 400; transition: color .2s ease; }
+.header-nav .nav-link:hover, .header-nav .nav-link:focus { color: var(--bs-primary); }
+.navbar-brand:focus-visible, .nav-link:focus-visible, .navbar-toggler:focus-visible {
+  outline: 2px solid var(--bs-primary); outline-offset: 3px; border-radius: 2px;
+}
+
+/* Navegadores sin scroll-driven animations (Firefox <144, Safari <26):
+   la barra quedaría fija en el estado alto. Se fija en un tamaño intermedio. */
+@supports not (animation-timeline: scroll(root)) {
+  .sticky-header .navbar { --art-rest: 48px; padding-top: .625rem; padding-bottom: .625rem; }
+  @media (min-width: 992px) { .sticky-header .navbar { --art-rest: 66px; } }
+  .logo-full { display: none; }
+  .logo-compact { opacity: 1; height: 100%; }
+}
+
+/* Reducción de movimiento: sin animación ligada al scroll; queda el estado
+   de reposo, pero acotado para no comer viewport de forma permanente. */
+@media (prefers-reduced-motion: reduce) {
+  .sticky-header .navbar, .header-logo, .logo-full, .logo-compact { animation: none; }
+  .sticky-header .navbar { --art-rest: 50px; padding-top: .625rem; padding-bottom: .625rem; }
+  @media (min-width: 992px) { .sticky-header .navbar { --art-rest: 70px; } }
+  .logo-full { display: none; }
+  .logo-compact { opacity: 1; height: 100%; }
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   HOME — la barra flota transparente sobre el hero y se solidifica al
+   scrollear. `is-home` sale de usePathname() === "/" en el componente
+   compartido; no hace falta un Header aparte.
+   Así la cabecera grande y la marca del hero no leen como dos bloques
+   apilados: sin plancha de fondo, la cabecera forma parte del hero.
+   ════════════════════════════════════════════════════════════════════════ */
+/* fixed sólo en / para que la barra transparente no ocupe alto de flujo */
+.sticky-header.is-home { position: fixed; inset: 0 0 auto 0; }
+.sticky-header.is-home .navbar {
+  background-color: transparent;
+  background-image: linear-gradient(180deg, rgba(0,0,0,.55), rgba(0,0,0,0));
+  animation: shrink-navbar linear both, solidify linear both;
+  animation-timeline: scroll(root), scroll(root);
+  animation-range: 0 120px, 0 140px;
+}
+@keyframes solidify {
+  to { background-color: var(--header-nav-bg);
+       background-image: linear-gradient(180deg, rgba(0,0,0,0), rgba(0,0,0,0)); }
+}
+@supports not (animation-timeline: scroll(root)) { .sticky-header.is-home .navbar { background-color: var(--header-nav-bg); background-image: none; } }
+@media (prefers-reduced-motion: reduce) { .sticky-header.is-home .navbar { background-color: var(--header-nav-bg); background-image: none; } }
+
+/* ── contenido de relleno ────────────────────────────────────────────────── */
+.hero {
+  /* la barra es fixed en /: el contenido del hero reserva su alto para que la
+     marca del hero no se cruce con el logo de la cabecera en pantallas cortas */
+  --header-h: 80px;
+  min-height: 100svh; padding-top: var(--header-h);
+  background-color: #1a1a1a;
+  background-image: linear-gradient(rgba(0,0,0,.5), rgba(0,0,0,.5)), url("https://placehold.co/1600x900/2b2b2b/2b2b2b.png");
+  background-size: cover; background-position: center;
+}
+@media (min-width: 992px) { .hero { --header-h: 110px; } }
+/* SUSTITUTO del asset real de heroLogo (dzts con degradé cian, sin
+   "inmobiliaria" ni bajada). Acá se recorta el "dzts" del PNG del cliente y se
+   usa como máscara sobre un degradé cian para aproximar el original.
+   En la implementación es un next/image común, sin priority. */
+.hero-mark {
+  width: min(70vw, 280px); aspect-ratio: 440 / 162; margin: 0 auto;
+  -webkit-mask: url("logo-mark.png") center / contain no-repeat;
+          mask: url("logo-mark.png") center / contain no-repeat;
+  background: linear-gradient(180deg, #7fe6ff 0%, #01BCF3 55%, #0189b4 100%);
+}
+@media (min-width: 768px) { .hero-mark { width: min(52vw, 780px); } }
+.btn-custom {
+  padding: .75rem 1.25rem; font-size: 1rem; border-radius: var(--bs-border-radius);
+  color: var(--bs-primary); background-color: var(--bs-secondary);
+  border: 1px solid var(--bs-primary); font-weight: 500; transition: background-color .2s, color .2s;
+}
+.btn-custom:hover { background-color: var(--bs-primary); color: var(--bs-secondary); }
+.prop-card .card-bar { height: 4px; background: var(--bs-primary); }
+.prop-price { color: var(--bs-primary); font-weight: 700; }
+.site-footer { background-color: var(--header-nav-bg); color: #fff; padding: 2rem 0; }
+.site-footer img { max-height: 50px; width: auto; }
+
+.spec {
+  position: fixed; right: .75rem; bottom: .75rem; z-index: 2000;
+  background: rgba(0,0,0,.85); color: #fff; font-size: 11px; line-height: 1.4;
+  padding: .5rem .625rem; border-radius: var(--bs-border-radius);
+  font-variant-numeric: tabular-nums; pointer-events: none;
+}
+.spec b { color: var(--bs-primary); font-weight: 600; }
+
+@media (prefers-color-scheme: dark) {
+  body { background-color: #121212; color: #e9ecef; }
+  .bg-body-alt { background-color: #1c1c1c !important; }
+  .card { background-color: #1f1f1f; color: #e9ecef; }
+  .card .bg-light { background-color: #262626 !important; }
+  .text-body-secondary { color: #adb5bd !important; }
+}
+@media (prefers-color-scheme: light) { .bg-body-alt { background-color: var(--bs-light) !important; } }
+</style>
+</head>
+<body>
+
+<header class="sticky-header is-home">
+  <nav class="navbar navbar-expand-lg navbar-dark" aria-label="Main navigation">
+    <div class="container">
+      <a href="#" class="navbar-brand header-logo p-0 me-3" aria-label="DZTS Inmobiliaria - Inicio">
+        <img class="logo-full" src="logo-full.png" alt="DZTS Inmobiliaria">
+        <img class="logo-compact" src="logo-compact.png" alt="" aria-hidden="true">
+      </a>
+
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavigation"
+              aria-controls="mainNavigation" aria-expanded="false" aria-label="Toggle navigation menu">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="mainNavigation">
+        <ul class="navbar-nav header-nav ms-auto mb-2 mb-lg-0 gap-lg-3">
+          <li class="nav-item"><a class="nav-link" href="#">Inicio</a></li>
+          <li class="nav-item"><a class="nav-link" href="#">Propiedades</a></li>
+          <li class="nav-item"><a class="nav-link" href="#">Servicios</a></li>
+          <li class="nav-item"><a class="nav-link" href="#">Nosotros</a></li>
+          <li class="nav-item"><a class="nav-link" href="#">Contacto</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+</header>
+
+<section class="hero d-flex align-items-center justify-content-center text-white">
+  <div class="container text-center py-4 py-md-5">
+    <div class="hero-mark mb-3 mb-md-4" role="img" aria-label="dzts"></div>
+    <h1 class="mb-3 mb-md-4">Encontrá la propiedad a medida</h1>
+    <div class="row g-2 g-md-3 justify-content-center pb-3 pb-md-4">
+      <div class="col-12 col-md-3"><select class="form-select"><option>Operación</option><option>Venta</option><option>Alquiler</option></select></div>
+      <div class="col-12 col-md-3"><select class="form-select"><option>Propiedad</option><option>Casa</option><option>Departamento</option></select></div>
+      <div class="col-12 col-md-3"><select class="form-select"><option>Localidad</option><option>Córdoba</option><option>Villa Allende</option></select></div>
+      <div class="col-12 col-md-3"><select class="form-select"><option>Dormitorios</option><option>2</option><option>3</option></select></div>
+    </div>
+    <button type="button" class="btn-custom">Buscar</button>
+    <p class="mt-5 mb-0 small text-white-50"><i class="bi bi-chevron-down"></i> Bajá para ver cómo se comprime la barra</p>
+  </div>
+</section>
+
+<main>
+  <section class="py-5">
+    <div class="container">
+      <h2 class="mb-3">Propiedades destacadas</h2>
+      <p class="text-body-secondary mb-4">Una selección de las oportunidades que sumamos esta semana. Consultá por cualquiera de ellas y te respondemos el mismo día.</p>
+      <div class="row g-4">
+        <div class="col-12 col-md-6 col-lg-4">
+          <article class="card prop-card rounded-4 shadow-sm border-0 h-100 overflow-hidden">
+            <img src="https://placehold.co/600x400/d9d9d9/8a8a8a.png?text=Propiedad" class="card-img-top" alt="">
+            <div class="card-bar"></div>
+            <div class="card-body bg-light">
+              <span class="badge rounded-pill bg-success mb-2">Venta</span>
+              <h3 class="h5 mb-1">Casa en Villa Allende</h3>
+              <p class="small text-body-secondary mb-2">3 dormitorios · 2 baños · 180 m²</p>
+              <p class="prop-price mb-0">US$ 185.000</p>
+            </div>
+          </article>
+        </div>
+        <div class="col-12 col-md-6 col-lg-4">
+          <article class="card prop-card rounded-4 shadow-sm border-0 h-100 overflow-hidden">
+            <img src="https://placehold.co/600x400/d9d9d9/8a8a8a.png?text=Propiedad" class="card-img-top" alt="">
+            <div class="card-bar"></div>
+            <div class="card-body bg-light">
+              <span class="badge rounded-pill bg-warning text-dark mb-2">Alquiler</span>
+              <h3 class="h5 mb-1">Departamento en Nueva Córdoba</h3>
+              <p class="small text-body-secondary mb-2">1 dormitorio · 1 baño · 45 m²</p>
+              <p class="prop-price mb-0">AR$ 340.000</p>
+            </div>
+          </article>
+        </div>
+        <div class="col-12 col-md-6 col-lg-4">
+          <article class="card prop-card rounded-4 shadow-sm border-0 h-100 overflow-hidden">
+            <img src="https://placehold.co/600x400/d9d9d9/8a8a8a.png?text=Propiedad" class="card-img-top" alt="">
+            <div class="card-bar"></div>
+            <div class="card-body bg-light">
+              <span class="badge rounded-pill bg-success mb-2">Venta</span>
+              <h3 class="h5 mb-1">Lote en Mendiolaza</h3>
+              <p class="small text-body-secondary mb-2">600 m² · Barrio cerrado</p>
+              <p class="prop-price mb-0">US$ 62.000</p>
+            </div>
+          </article>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="py-5 bg-body-alt">
+    <div class="container">
+      <h2 class="mb-3">Nuestros servicios</h2>
+      <p>Acompañamos cada operación de principio a fin: tasación, publicación, visitas, negociación y escrituración. Trabajamos con propiedades en Córdoba capital y en toda la zona de Sierras Chicas, con foco en propietarios que buscan una gestión ordenada y sin sorpresas.</p>
+      <p>Nuestro equipo se apoya en un registro propio de operaciones cerradas para tasar con criterio: comparamos superficie, antigüedad, estado y ubicación real, no promedios de portal. Eso hace que las propiedades que publicamos se muevan más rápido y con menos ajustes de precio.</p>
+      <p>Si estás pensando en vender o alquilar, la primera visita de tasación no tiene costo. Coordinamos el día y te dejamos un informe con el rango de precio sugerido y el tiempo estimado de venta.</p>
+      <p>Para quienes buscan comprar, armamos una búsqueda dirigida: nos contás qué necesitás y te avisamos apenas entra algo que encaje, incluso antes de que se publique.</p>
+      <p>Administramos alquileres con seguimiento mensual de cobranzas, control de expensas y renovaciones anticipadas para que el contrato no se te venza sin aviso.</p>
+    </div>
+  </section>
+
+  <section class="py-5">
+    <div class="container">
+      <h2 class="mb-3">Nosotros</h2>
+      <p>DZTS Inmobiliaria nació en Córdoba con una idea simple: que comprar o alquilar una propiedad no tenga que ser un trámite hostil. Somos un equipo chico, con matrícula, que atiende personalmente cada consulta.</p>
+      <p>En estos años acompañamos a más de cuatrocientas familias en su mudanza y a decenas de inversores en la compra de unidades para renta. Nos importa que la operación cierre bien para las dos partes.</p>
+      <p>Nos vas a encontrar en nuestra oficina de lunes a viernes de 9 a 18, y los sábados por la mañana con cita previa. También respondemos por WhatsApp fuera de horario.</p>
+      <p>Cada propiedad que publicamos pasa por una visita nuestra: sacamos las fotos, verificamos la documentación y confirmamos el estado real antes de mostrarla. Preferimos publicar menos y publicar bien.</p>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="container d-flex flex-column flex-md-row align-items-center justify-content-between gap-3">
+    <img src="logo-full.png" alt="DZTS Inmobiliaria">
+    <p class="mb-0 small text-white-50">© 2026 DZTS Inmobiliaria — Córdoba, Argentina</p>
+  </div>
+</footer>
+
+<div class="spec" id="spec"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/js/bootstrap.bundle.min.js"></script>
+<script>
+(function () {
+  const bar = document.querySelector(".sticky-header .navbar");
+  const full = document.querySelector(".logo-full");
+  const compact = document.querySelector(".logo-compact");
+  const el = document.getElementById("spec");
+  const mark = document.querySelector(".hero-mark");
+  function update() {
+    const barH = bar.getBoundingClientRect().height;
+    const fo = parseFloat(getComputedStyle(full).opacity);
+    const shown = fo > 0.5 ? full : compact;
+    const a = shown.getBoundingClientRect();
+    const m = mark.getBoundingClientRect();
+    el.innerHTML = "<b>Opción 1 · Barra Alta</b><br>barra " + Math.round(barH) + "px<br>arte " +
+      Math.round(a.height) + " × " + Math.round(a.width) + "px<br>" +
+      (fo > 0.5 ? "lockup completo" : "lockup compacto") +
+      "<br>hero " + Math.round(m.width) + " × " + Math.round(m.height) + "px";
+  }
+  (function loop() { update(); requestAnimationFrame(loop); })();
+})();
+</script>
+</body>
+</html>
