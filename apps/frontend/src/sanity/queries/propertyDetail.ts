@@ -11,6 +11,7 @@ export const PROPERTY_QUERY = defineQuery(`
     subtitle,
     reference,
     address,
+    neighborhood,
     description,
     price,
     "propertyType": propertyType->name,
@@ -56,6 +57,7 @@ export interface PropertyDetail {
   subtitle?: string | null;
   reference?: string | null;
   address?: string | null;
+  neighborhood?: string | null;
   description?: PortableTextBlock[] | null;
   price?: number | null;
   propertyType?: string | null;
