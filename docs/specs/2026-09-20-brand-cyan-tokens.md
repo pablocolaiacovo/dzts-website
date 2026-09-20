@@ -40,13 +40,20 @@ Where cyan is the background (primary buttons, active pagination), the label use
 - `apps/frontend/src/styles/variables.css`:
   - New scale tokens in `:root`: `--brand-cyan`, `--brand-cyan-600`, `--brand-cyan-700`, `--brand-cyan-800`, `--brand-cyan-100`, `--brand-on-cyan`.
   - `--bs-primary`, `--bs-link-color` and `--bs-link-hover-color` now reference the scale instead of loose hex values; `--bs-primary-rgb`, `--bs-link-color-rgb`, `--bs-link-hover-color-rgb` and `--bs-focus-ring-color` were added (they did not exist before).
-  - New selector block, placed after `:root` and before `html {}`: `.btn-primary`, `.btn-outline-primary`, `.text-primary`, the focus state of `.form-control`/`.form-select`/`.form-check-input`, `.form-check-input:checked`, `.pagination`, and `.nav-link:focus-visible`.
+  - New selector block, placed after `:root` and before `html {}`: `.btn-primary`, `.btn-outline-primary`, `.text-primary`, `.badge.bg-primary`, the focus state of `.form-control`/`.form-select`/`.form-check-input`, `.form-check-input:checked`, `.pagination`, and `.nav-link:focus-visible`.
   - New `@media (prefers-color-scheme: dark)` block, separate from the existing `@media (prefers-reduced-motion)` at the end of the file: on dark grounds the deep cyan goes muddy, so links and `.text-primary` revert to `--brand-cyan` and the link hover moves to `--brand-cyan-100`.
-- No component or any other file was modified.
+- `apps/frontend/src/app/(site)/propiedades/[slug]/page.tsx`: the property-type badge moved from `bg-info text-white` to `bg-primary`. See "Two badge fixes" below.
+
+## Two badge fixes
+
+Both surfaced only when the change was viewed running; neither was visible from lint, typecheck or a reading of the diff.
+
+1. **A regression this change introduced.** `.badge` hardcodes `--bs-badge-color: #fff`, which the token work does not reach. The filter-count badge (`badge bg-primary` in `PropertiesFilters.tsx`) therefore went from white-on-blue at 4.6:1 to white-on-cyan at 2.2:1 — the change made it worse than it was. Fixed with `.badge.bg-primary { --bs-badge-color: var(--brand-on-cyan) }`, the same dark-on-cyan treatment as `.btn-primary`. `ActiveFilterBadges` is unaffected: its `.text-primary` carries `!important` and still wins.
+2. **A pre-existing problem, folded in.** The property-type badge on the detail page used `bg-info text-white` — Bootstrap's `#0dcaf0` at 1.9:1. It predates this change, but `bg-info` sits within a few points of the brand cyan, so the badge read as brand-colored while being the only illegible one on the page, directly beside a legible green `Venta` badge. Moving it to `bg-primary` puts it on the real brand cyan with a dark label.
 
 ## Operational notes
 
 - Grep across `apps/frontend/src` for every `primary` consumer (`text-primary`, `bg-primary`, `border-primary`, `btn-primary`, `btn-outline-primary`, `link-primary`, `text-bg-primary`) found no use of `link-primary` or `text-bg-primary`. The rest are covered: `bg-primary`/`border-primary` (including the `bg-opacity-10` badge in `ActiveFilterBadges`) read `--bs-primary-rgb`, now set to `1, 188, 243`; the others are rewritten explicitly.
 - On a future Bootstrap upgrade, check whether the new version compiles primary hex into rules this change did not audit — `.btn-check`, `.list-group-item-primary`, `.alert-primary`, `.nav-pills` and `.form-range` are the likely candidates. None are used today.
 - The scale is derived from the base cyan by mixing with black (18% / 38% / 52% for `-600` / `-700` / `-800`) and with white (88% for `-100`). Re-deriving it for a different base color follows the same ratios.
-- `lint` and `tsc --noEmit` ran clean. `next build` and the e2e suite were not run: the machine had no `.env.local`, so the static export fails at `Dataset not found` when fetching Sanity content. That is an environment gap, not a regression — this change is pure CSS with no content dependency — but it does mean the result has not yet been seen rendered. Verify visually on `pnpm dev` before merging.
+- Verified on `pnpm dev` against the production dataset: search-select focus rings, checked radios and checkboxes, card rules/titles/prices, active-filter badges, `Aplicar filtros`, breadcrumb and body links all render in the brand scale. Both badge issues above were found during that pass — worth remembering that neither lint nor typecheck can catch a contrast regression.

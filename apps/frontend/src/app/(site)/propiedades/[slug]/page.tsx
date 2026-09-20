@@ -107,7 +107,7 @@ function PropertyHeader({
           </span>
         )}
         {property.propertyType && (
-          <span className="badge rounded-pill bg-info text-white fs-6">
+          <span className="badge rounded-pill bg-primary fs-6">
             {property.propertyType}
           </span>
         )}
