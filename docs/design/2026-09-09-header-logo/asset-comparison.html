@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Asset del logo — análisis | DZTS Header</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bs-primary: #01BCF3; --bs-secondary: #ffffff;
+  --bs-font-family-base: "Inter", system-ui, -apple-system, sans-serif;
+  --bs-border-radius: 0.375rem; --bs-link-color: #01BCF3; --bs-link-hover-color: #029ac9;
+  --bs-dark: #000000; --bs-light: #f8f9fa; --header-nav-bg: #3d3d3d;
+  --font-size-sm: 0.875rem; --font-size-base: 1rem; --font-size-3xl: 1.875rem; --font-size-4xl: 2.25rem;
+  --line-height-tight: 1.25; --line-height-relaxed: 1.625; --letter-spacing-tight: -0.025em;
+}
+body { font-family: var(--bs-font-family-base); line-height: 1.5; }
+h1 { font-size: var(--font-size-4xl); font-weight: 700; line-height: var(--line-height-tight); letter-spacing: var(--letter-spacing-tight); }
+h2 { font-size: var(--font-size-3xl); font-weight: 700; line-height: var(--line-height-tight); letter-spacing: var(--letter-spacing-tight); }
+p { line-height: var(--line-height-relaxed); }
+.bar { background: var(--header-nav-bg); border-radius: var(--bs-border-radius); padding: .75rem 1rem; overflow: hidden; }
+.box { outline: 1px dashed rgba(255,255,255,.35); outline-offset: 0; }
+.box img { display: block; }
+code { color: var(--bs-link-hover-color); }
+table { font-size: var(--font-size-sm); }
+.ok { color: #198754; } .warn { color: #b8860b; } .bad { color: #dc3545; }
+@media (prefers-color-scheme: dark) {
+  body { background: #121212; color: #e9ecef; }
+  .table { --bs-table-color: #e9ecef; --bs-table-bg: transparent; --bs-table-border-color: #3a3a3a; }
+  .ok { color: #4ade80; } .warn { color: #fbbf24; } .bad { color: #f87171; }
+  code { color: #7dd3fc; }
+}
+</style>
+</head>
+<body>
+<div class="container py-5" style="max-width: 900px">
+
+<h1 class="mb-3">El asset del logo</h1>
+<p class="mb-5">Medido sobre <code>logo-source.png</code> (3543×1993, RGBA). El arte real ocupa el rectángulo
+x&nbsp;898–2797, y&nbsp;645–1455 → <strong>1900×811 px</strong>. Todo lo demás es alfa 0.</p>
+
+<h2 class="h4 mb-3">1. Cuánto padding hay</h2>
+<div class="table-responsive mb-4">
+<table class="table table-sm align-middle">
+  <thead><tr><th>Zona</th><th>px</th><th>% del canvas</th></tr></thead>
+  <tbody>
+    <tr><td>Padding izquierdo</td><td>898</td><td>25,4 %</td></tr>
+    <tr><td>Padding derecho</td><td>745</td><td>21,0 %</td></tr>
+    <tr><td>Padding superior</td><td>645</td><td>32,4 %</td></tr>
+    <tr><td>Padding inferior</td><td>537</td><td>26,9 %</td></tr>
+    <tr class="fw-semibold"><td>Arte visible</td><td>1900×811</td><td>53,6 % × 40,7 % → <strong>21,8 % del área</strong></td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 class="h4 mb-3">2. Qué se gana al recortar (misma caja de 60px)</h2>
+<p class="text-body-secondary">Las tres imágenes se renderizan con <code>max-height: 60px</code>, exactamente como hoy.
+El recuadro punteado es la caja de 60px.</p>
+<div class="bar mb-2 d-flex align-items-center gap-4 flex-wrap">
+  <div class="box"><img src="logo-source.png" style="max-height:60px;width:auto"></div>
+  <div class="box"><img src="logo-full.png" style="max-height:60px;width:auto"></div>
+  <div class="box"><img src="logo-compact.png" style="max-height:60px;width:auto"></div>
+</div>
+<div class="table-responsive mb-5">
+<table class="table table-sm">
+  <thead><tr><th>Archivo</th><th>Proporción</th><th>Arte a 60px de caja</th><th>Peso PNG</th></tr></thead>
+  <tbody>
+    <tr><td><code>logo-source.png</code> (actual)</td><td>1,778:1</td><td class="bad">24,4 px de arte</td><td>39 KB</td></tr>
+    <tr><td><code>logo-full.png</code> (recortado)</td><td>2,343:1</td><td class="ok">60 px de arte — <strong>+146 %</strong></td><td>10 KB</td></tr>
+    <tr><td><code>logo-compact.png</code> (sin bajada)</td><td>3,140:1</td><td class="ok">60 px de palabra-marca</td><td>7,5 KB</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 class="h4 mb-3">3. Bandas del lockup</h2>
+<div class="table-responsive mb-5">
+<table class="table table-sm">
+  <thead><tr><th>Banda</th><th>Color</th><th>% del alto del arte</th><th>Posición vertical</th></tr></thead>
+  <tbody>
+    <tr><td>«dzts™»</td><td>#ffffff</td><td>39,9 %</td><td>0 – 39,9 %</td></tr>
+    <tr><td>«inmobiliaria»</td><td>#00bcf2 <span class="text-body-secondary">(= <code>--bs-primary</code>)</span></td><td>29,0 %</td><td>45,6 – 74,6 %</td></tr>
+    <tr><td>«by César Torres»</td><td>#ffffff</td><td>15,8 %</td><td>84,2 – 100 %</td></tr>
+  </tbody>
+</table>
+</div>
+<p class="mb-5">De ahí sale la constante clave: la palabra-marca sin bajada es el <strong>74,6 % superior</strong> del arte.
+Un recorte compacto de alto <em>H</em> muestra las palabras al mismo tamaño que un lockup completo de alto <em>H / 0,746</em>.</p>
+
+<h2 class="h4 mb-3">4. Dónde deja de leerse la bajada</h2>
+<p class="text-body-secondary">Cada fila es el lockup completo al alto de arte indicado.</p>
+<div class="bar mb-3">
+  <div class="d-flex align-items-end gap-4 flex-wrap">
+    <div class="text-center"><img src="logo-full.png" style="height:40px;width:auto"><div class="text-white-50" style="font-size:11px">40px <span class="bad">·  6,3px</span></div></div>
+    <div class="text-center"><img src="logo-full.png" style="height:50px;width:auto"><div class="text-white-50" style="font-size:11px">50px <span class="bad">·  7,9px</span></div></div>
+    <div class="text-center"><img src="logo-full.png" style="height:60px;width:auto"><div class="text-white-50" style="font-size:11px">60px <span class="warn">·  9,5px</span></div></div>
+    <div class="text-center"><img src="logo-full.png" style="height:72px;width:auto"><div class="text-white-50" style="font-size:11px">72px <span class="warn">· 11,4px</span></div></div>
+    <div class="text-center"><img src="logo-full.png" style="height:82px;width:auto"><div class="text-white-50" style="font-size:11px">82px <span class="ok">· 13,0px</span></div></div>
+    <div class="text-center"><img src="logo-full.png" style="height:96px;width:auto"><div class="text-white-50" style="font-size:11px">96px <span class="ok">· 15,2px</span></div></div>
+  </div>
+</div>
+<p class="mb-5">La bajada es tipografía fina en blanco sobre <code>#3d3d3d</code>. Bajo ~11px de banda (≈70px de arte)
+el trazo cae por debajo de 1&nbsp;px y el antialiasing la vuelve una textura gris. <strong>No usar la bajada por debajo
+de 70px de arte</strong>; a partir de ahí conviene el recorte compacto.</p>
+
+<h2 class="h4 mb-3">5. Qué pedirle al cliente</h2>
+<div class="table-responsive mb-4">
+<table class="table table-sm align-middle">
+  <thead><tr><th>Prioridad</th><th>Entregable</th><th>Formato</th></tr></thead>
+  <tbody>
+    <tr><td class="fw-semibold">1</td><td>Lockup completo, recortado al arte, sin margen</td><td>SVG con textos convertidos a curvas</td></tr>
+    <tr><td class="fw-semibold">2</td><td>Lockup compacto (sin «by César Torres»), recortado</td><td>SVG con textos convertidos a curvas</td></tr>
+    <tr><td>3</td><td>Variante en tinta oscura para fondos claros (ficha impresa, PDF)</td><td>SVG</td></tr>
+    <tr><td>—</td><td><em>Si no hay vectorial:</em> los mismos dos recortes en PNG-24 con alfa</td><td>PNG ~1900×811 y ~1900×605</td></tr>
+  </tbody>
+</table>
+</div>
+<p class="mb-5">El PNG recortado a 1900×811 pesa 10&nbsp;KB, un cuarto del original con padding. Igual conviene SVG:
+la marca es geometría plana de dos colores, va a pesar ~4&nbsp;KB y se ve nítida a cualquier alto.
+<strong>Ojo:</strong> Sanity no transforma SVG — <code>urlFor(logo).width(300)</code> devuelve el archivo original tal cual.
+Para un logo eso está bien, pero implica que no hay <code>lqip</code> ni <code>srcset</code> real.</p>
+
+<h2 class="h4 mb-3">6. Si el cliente no puede reexportar</h2>
+<p>Hay dos caminos, en este orden:</p>
+<ol class="mb-4">
+  <li class="mb-2"><strong>Herramienta de recorte del Studio.</strong> El campo <code>logo</code> ya tiene
+    <code>options: {&nbsp;hotspot:&nbsp;true&nbsp;}</code>, así que el editor puede recortar sin tocar el archivo.
+    <span class="bad">Hoy no funcionaría:</span> <code>SITE_SETTINGS_QUERY</code> proyecta
+    <code>logo { asset->{…}, alt }</code> y no trae <code>crop</code> ni <code>hotspot</code>, así que
+    <code>urlFor()</code> no tiene qué aplicar. Hay que agregar esos dos campos a la proyección.</li>
+  <li class="mb-2"><strong><code>urlFor(logo).rect(...)</code> con fracciones.</strong> Las proporciones del lockup
+    son estables; las del padding no. Sirve como parche temporal calculando el rect desde
+    <code>asset.metadata.dimensions</code>, pero se rompe en silencio si el cliente sube otro archivo.</li>
+</ol>
+<p class="mb-5"><strong>Lo que no conviene:</strong> compensar el padding desde CSS con <code>transform: scale()</code>,
+márgenes negativos o <code>clip-path</code>. Deja hardcodeados en la hoja de estilos los porcentajes de <em>este</em>
+archivo, se rompe sin aviso al reemplazar el logo, y sigue descargando píxeles transparentes.</p>
+
+<h2 class="h4 mb-3">7. El asset del hero (<code>homePage.heroLogo</code>)</h2>
+<p>Es un asset distinto: sólo «dzts» con degradé cian, sin «inmobiliaria» ni bajada. No lo tenemos acá;
+en los prototipos se aproxima recortando el «dzts» del PNG del cliente (<code>logo-mark.png</code>, 880×324, 2,716:1)
+y usándolo como <code>mask-image</code> sobre un degradé cian.</p>
+
+<div class="table-responsive mb-4">
+<table class="table table-sm align-middle">
+  <thead><tr><th>Problema</th><th>Detalle</th></tr></thead>
+  <tbody>
+    <tr>
+      <td class="fw-semibold bad">Tope de 400 px</td>
+      <td><code>apps/frontend/src/app/(site)/page.tsx:160</code> pide
+        <code>urlFor(heroLogo).width(400)</code>. Si la marca pasa a 600–780 px de ancho CSS,
+        en pantallas 2× se ve borrosa. <strong>Hay que subir ese ancho</strong> (≈1600) o pasar a
+        <code>sizes</code> + el loader de Sanity, que ya arma <code>srcset</code>.</td>
+    </tr>
+    <tr>
+      <td class="fw-semibold warn">Caja fija + <code>fill</code></td>
+      <td><code>.logo-container</code> es 12,5rem×6,25rem / 25rem×12,5rem con <code>object-fit: contain</code>.
+        La caja tiene proporción 2:1 y la marca 2,716:1, así que sobra alto: la marca nunca llena la caja.
+        Con un asset recortado conviene una imagen con ancho intrinseco y
+        <code>aspect-ratio</code>, sin <code>fill</code>.</td>
+    </tr>
+    <tr>
+      <td class="fw-semibold warn">Padding desconocido</td>
+      <td>Si el asset del hero tiene el mismo margen transparente que el del header, se repite el
+        problema: hay que pedirlo recortado igual.</td>
+    </tr>
+    <tr>
+      <td class="fw-semibold">LCP</td>
+      <td>La foto de fondo se queda con <code>priority</code> (regla del proyecto: una sola por página).
+        La marca del hero, al crecer, es candidata a LCP: darle <code>loading="eager"</code> y
+        <code>sizes</code> explícito, sin <code>priority</code> ni <code>fetchPriority</code>.</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<p class="mb-4"><strong>¿Mismo lockup en header y hero?</strong> No. Conviene mantener las dos piezas
+distintas: el header lleva el lockup (marca + rubro, identifica el sitio en todas las páginas) y el hero lleva
+sólo «dzts» a gran tamaño (gesto gráfico, no informativo — el <code>h1</code> de abajo ya dice qué es).
+Repetir el lockup completo en los dos lugares, a 80px y a 250px, con 100px de separación, es lo que
+haría ver la home cargada.</p>
+
+<p class="mb-5"><strong>Qué pedir para el hero:</strong> el mismo «dzts» con degradé, en SVG con el degradé
+como <code>linearGradient</code> y los textos en curvas, recortado al arte. Si no hay vectorial: PNG-24 con alfa
+de ~1600 px de ancho (2× del render máximo de 780 px).</p>
+
+<p class="text-body-secondary small mb-0">
+  <code>logo-source.png</code> es el archivo entregado por el cliente.
+  <code>logo-full.png</code> y <code>logo-compact.png</code> se generaron recortando al bounding box del canal alfa
+  y reduciendo a la mitad (950 px de ancho); <code>logo-mark.png</code> es el recorte del «dzts».
+  Los tres son sólo para estos prototipos.
+</p>
+
+</div>
+</body>
+</html>
