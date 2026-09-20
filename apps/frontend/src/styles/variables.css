@@ -110,6 +110,11 @@
   color: var(--brand-cyan-700) !important;
 }
 
+/* .badge fija --bs-badge-color: #fff, que sobre cyan da 2,2:1 */
+.badge.bg-primary {
+  --bs-badge-color: var(--brand-on-cyan);
+}
+
 .form-control:focus,
 .form-select:focus,
 .form-check-input:focus {
