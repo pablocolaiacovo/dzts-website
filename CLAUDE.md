@@ -308,7 +308,7 @@ Two GitHub Actions workflows run on PRs to `dev` and `main`:
 - Components in `/app` are Server Components unless marked with `"use client"`
 - Use Next.js Metadata API for SEO (exported `metadata` object). The root layout uses a `title.template` (`"%s | DZTS Inmobiliaria"`), so child pages only set the page-specific part (e.g., `title: "Propiedades"`, not `"Propiedades | DZTS Inmobiliaria"`).
 - Use `next/image` for optimized images
-- Dark mode supported via `prefers-color-scheme` CSS media query.
+- No dark mode: there is no `prefers-color-scheme` color CSS anywhere in the frontend, and the brand palette is calibrated against a white background. Don't add a partial dark block — swapping text colors without darkening the background serves bright cyan on white at 2.2:1.
 - Don't add too many comments to the code.
 - Use double quotes for strings (Prettier is pre-configured for this).
 - Use mobile first for css.
