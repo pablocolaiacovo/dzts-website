@@ -45,14 +45,16 @@ An earlier draft of this change added an `@media (prefers-color-scheme: dark)` b
   - New scale tokens in `:root`: `--brand-cyan`, `--brand-cyan-600`, `--brand-cyan-700`, `--brand-cyan-800`, `--brand-on-cyan`.
   - `--bs-primary`, `--bs-link-color` and `--bs-link-hover-color` now reference the scale instead of loose hex values; `--bs-primary-rgb`, `--bs-link-color-rgb`, `--bs-link-hover-color-rgb` and `--bs-focus-ring-color` were added (they did not exist before).
   - New selector block, placed after `:root` and before `html {}`: `.btn-primary`, `.btn-outline-primary`, `.text-primary`, `.badge.bg-primary`, the focus state of `.form-control`/`.form-select`/`.form-check-input`, `.form-check-input:checked`, `.pagination`, and `.nav-link:focus-visible`.
-- `apps/frontend/src/app/(site)/propiedades/[slug]/page.tsx`: the property-type badge moved from `bg-info text-white` to `bg-primary`. See "Two badge fixes" below.
+- `apps/frontend/src/app/(site)/propiedades/[slug]/page.tsx`: the property-type badge moved from `bg-info text-white` to `bg-primary`. See "Contrast fixes found by running the site" below.
+- `apps/frontend/src/components/ShareButton.tsx`: the "Compartir" button moved from `btn-info text-white` to `btn-outline-primary`. See item 3 below.
 
-## Two badge fixes
+## Contrast fixes found by running the site
 
-Both surfaced only when the change was viewed running; neither was visible from lint, typecheck or a reading of the diff.
+All three surfaced only when the change was viewed running; none was visible from lint, typecheck or a reading of the diff.
 
 1. **A regression this change introduced.** `.badge` hardcodes `--bs-badge-color: #fff`, which the token work does not reach. The filter-count badge (`badge bg-primary` in `PropertiesFilters.tsx`) therefore went from white-on-blue at 4.6:1 to white-on-cyan at 2.2:1 — the change made it worse than it was. Fixed with `.badge.bg-primary { --bs-badge-color: var(--brand-on-cyan) }`, the same dark-on-cyan treatment as `.btn-primary`. `ActiveFilterBadges` is unaffected: its `.text-primary` carries `!important` and still wins.
 2. **A pre-existing problem, folded in.** The property-type badge on the detail page used `bg-info text-white` — Bootstrap's `#0dcaf0` at 1.9:1. It predates this change, but `bg-info` sits within a few points of the brand cyan, so the badge read as brand-colored while being the only illegible one on the page, directly beside a legible green `Venta` badge. Moving it to `bg-primary` puts it on the real brand cyan with a dark label.
+3. **A pre-existing problem on the property detail page's "Compartir" button, also not a badge.** `ShareButton` used `btn btn-info text-white`, the same Bootstrap `#0dcaf0`/white pairing, measuring 1.95:1. Beyond contrast, it was a visual-hierarchy problem: the button sits in an action row alongside "Ficha" (`btn-outline-secondary`) and "WhatsApp" (`btn-outline-success`), with "Consultar por WhatsApp" (`btn-success`, filled) directly below. A filled `btn-info` made "Compartir" the only solid button in a row of secondary actions, competing with the real green CTA for attention. Changed to `btn-outline-primary` (5.3:1, via `--brand-cyan-700` through `--bs-btn-color`), which both fixes the contrast and matches the outline treatment of its two row neighbors, leaving the green button as the page's one solid CTA.
 
 ## Operational notes
 
