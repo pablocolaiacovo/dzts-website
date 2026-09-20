@@ -77,7 +77,7 @@ export default async function FichaPage({
               </span>
             )}
             {property.propertyType && (
-              <span className="badge rounded-pill fs-6 bg-secondary text-dark">
+              <span className="badge rounded-pill fs-6 bg-secondary text-white">
                 {property.propertyType}
               </span>
             )}
