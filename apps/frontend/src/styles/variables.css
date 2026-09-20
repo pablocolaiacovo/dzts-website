@@ -28,7 +28,6 @@
   --brand-cyan-600: #019AC7;  /* hover de rellenos */
   --brand-cyan-700: #017597;  /* texto y links sobre blanco */
   --brand-cyan-800: #005A75;  /* estado presionado */
-  --brand-cyan-100: #E0F7FF;  /* fondos suaves */
   --brand-on-cyan:  #10222B;  /* texto sobre cyan */
 
   /* Los tokens que Bootstrap realmente lee */

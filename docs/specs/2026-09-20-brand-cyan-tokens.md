@@ -42,7 +42,7 @@ An earlier draft of this change added an `@media (prefers-color-scheme: dark)` b
 ## Implementation
 
 - `apps/frontend/src/styles/variables.css`:
-  - New scale tokens in `:root`: `--brand-cyan`, `--brand-cyan-600`, `--brand-cyan-700`, `--brand-cyan-800`, `--brand-cyan-100`, `--brand-on-cyan`.
+  - New scale tokens in `:root`: `--brand-cyan`, `--brand-cyan-600`, `--brand-cyan-700`, `--brand-cyan-800`, `--brand-on-cyan`.
   - `--bs-primary`, `--bs-link-color` and `--bs-link-hover-color` now reference the scale instead of loose hex values; `--bs-primary-rgb`, `--bs-link-color-rgb`, `--bs-link-hover-color-rgb` and `--bs-focus-ring-color` were added (they did not exist before).
   - New selector block, placed after `:root` and before `html {}`: `.btn-primary`, `.btn-outline-primary`, `.text-primary`, `.badge.bg-primary`, the focus state of `.form-control`/`.form-select`/`.form-check-input`, `.form-check-input:checked`, `.pagination`, and `.nav-link:focus-visible`.
 - `apps/frontend/src/app/(site)/propiedades/[slug]/page.tsx`: the property-type badge moved from `bg-info text-white` to `bg-primary`. See "Two badge fixes" below.
@@ -58,6 +58,6 @@ Both surfaced only when the change was viewed running; neither was visible from 
 
 - Grep across `apps/frontend/src` for every `primary` consumer (`text-primary`, `bg-primary`, `border-primary`, `btn-primary`, `btn-outline-primary`, `link-primary`, `text-bg-primary`) found no use of `link-primary` or `text-bg-primary`. The rest are covered: `bg-primary`/`border-primary` (including the `bg-opacity-10` badge in `ActiveFilterBadges`) read `--bs-primary-rgb`, now set to `1, 188, 243`; the others are rewritten explicitly.
 - On a future Bootstrap upgrade, check whether the new version compiles primary hex into rules this change did not audit — `.btn-check`, `.list-group-item-primary`, `.alert-primary`, `.nav-pills` and `.form-range` are the likely candidates. None are used today.
-- The scale is derived from the base cyan by mixing with black (18% / 38% / 52% for `-600` / `-700` / `-800`) and with white (88% for `-100`). Re-deriving it for a different base color follows the same ratios.
+- The scale is derived from the base cyan by mixing with black (18% / 38% / 52% for `-600` / `-700` / `-800`). Re-deriving it for a different base color follows the same ratios.
 - Verified on `pnpm dev` against the production dataset: search-select focus rings, checked radios and checkboxes, card rules/titles/prices, active-filter badges, `Aplicar filtros`, breadcrumb and body links all render in the brand scale. Both badge issues above were found during that pass — worth remembering that neither lint nor typecheck can catch a contrast regression.
 - `CLAUDE.md` line 311 states "Dark mode supported via `prefers-color-scheme` CSS media query." That is stale documentation — no such support exists in the frontend today (see "No dark-mode block" above). Left as-is per instruction; not corrected in this change.
