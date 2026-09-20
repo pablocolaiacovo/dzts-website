@@ -35,13 +35,16 @@ Where cyan is the background (primary buttons, active pagination), the label use
 
 `variables.css` is imported after Bootstrap in `apps/frontend/src/app/layout.tsx`, so rules there win on cascade order without `!important` — the one exception being `.text-primary`, where Bootstrap's own utility is `!important` and ours has to match. The class names already in the JSX (`btn btn-primary`, `text-primary`, …) get re-skinned from a single stylesheet.
 
+### No dark-mode block
+
+An earlier draft of this change added an `@media (prefers-color-scheme: dark)` block that swapped `--bs-link-color` and `.text-primary` back to the full-brightness `--brand-cyan` on dark grounds, on the assumption (from `CLAUDE.md`) that the site supports dark mode. It does not: `grep -rn "prefers-color-scheme" apps/frontend/src apps/frontend/public` returns zero matches outside that one block — there is no CSS anywhere that darkens the background for `prefers-color-scheme: dark`. A visitor with the OS in dark mode still gets the site's normal white background, but that block would have pushed their links, headings and prices to `--brand-cyan` (`#01BCF3`), which measures 2.2:1 on white — the exact contrast failure this whole change exists to fix, reintroduced for every dark-mode user. The block was removed. If the site gets real dark-mode support later, the cyan scale needs its own pass against a dark background; it is not something a standalone media query on top of the light-mode scale can fix.
+
 ## Implementation
 
 - `apps/frontend/src/styles/variables.css`:
   - New scale tokens in `:root`: `--brand-cyan`, `--brand-cyan-600`, `--brand-cyan-700`, `--brand-cyan-800`, `--brand-cyan-100`, `--brand-on-cyan`.
   - `--bs-primary`, `--bs-link-color` and `--bs-link-hover-color` now reference the scale instead of loose hex values; `--bs-primary-rgb`, `--bs-link-color-rgb`, `--bs-link-hover-color-rgb` and `--bs-focus-ring-color` were added (they did not exist before).
   - New selector block, placed after `:root` and before `html {}`: `.btn-primary`, `.btn-outline-primary`, `.text-primary`, `.badge.bg-primary`, the focus state of `.form-control`/`.form-select`/`.form-check-input`, `.form-check-input:checked`, `.pagination`, and `.nav-link:focus-visible`.
-  - New `@media (prefers-color-scheme: dark)` block, separate from the existing `@media (prefers-reduced-motion)` at the end of the file: on dark grounds the deep cyan goes muddy, so links and `.text-primary` revert to `--brand-cyan` and the link hover moves to `--brand-cyan-100`.
 - `apps/frontend/src/app/(site)/propiedades/[slug]/page.tsx`: the property-type badge moved from `bg-info text-white` to `bg-primary`. See "Two badge fixes" below.
 
 ## Two badge fixes
@@ -57,3 +60,4 @@ Both surfaced only when the change was viewed running; neither was visible from 
 - On a future Bootstrap upgrade, check whether the new version compiles primary hex into rules this change did not audit — `.btn-check`, `.list-group-item-primary`, `.alert-primary`, `.nav-pills` and `.form-range` are the likely candidates. None are used today.
 - The scale is derived from the base cyan by mixing with black (18% / 38% / 52% for `-600` / `-700` / `-800`) and with white (88% for `-100`). Re-deriving it for a different base color follows the same ratios.
 - Verified on `pnpm dev` against the production dataset: search-select focus rings, checked radios and checkboxes, card rules/titles/prices, active-filter badges, `Aplicar filtros`, breadcrumb and body links all render in the brand scale. Both badge issues above were found during that pass — worth remembering that neither lint nor typecheck can catch a contrast regression.
+- `CLAUDE.md` line 311 states "Dark mode supported via `prefers-color-scheme` CSS media query." That is stale documentation — no such support exists in the frontend today (see "No dark-mode block" above). Left as-is per instruction; not corrected in this change.

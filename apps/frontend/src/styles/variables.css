@@ -139,19 +139,6 @@
   box-shadow: 0 0 0 .25rem rgba(1, 188, 243, .25);
 }
 
-/* Sobre fondo oscuro el cyan profundo se apaga */
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bs-link-color: var(--brand-cyan);
-    --bs-link-color-rgb: 1, 188, 243;
-    --bs-link-hover-color: var(--brand-cyan-100);
-  }
-
-  .text-primary {
-    color: var(--brand-cyan) !important;
-  }
-}
-
 html {
   overflow-x: hidden;
 }
