@@ -23,12 +23,24 @@
  */
 
 :root {
-  --bs-primary: #01BCF3;
+  /* Escala de marca, derivada del cyan del logo */
+  --brand-cyan:     #01BCF3;  /* logo, rellenos, barras */
+  --brand-cyan-600: #019AC7;  /* hover de rellenos */
+  --brand-cyan-700: #017597;  /* texto y links sobre blanco */
+  --brand-cyan-800: #005A75;  /* estado presionado */
+  --brand-on-cyan:  #10222B;  /* texto sobre cyan */
+
+  /* Los tokens que Bootstrap realmente lee */
+  --bs-primary: var(--brand-cyan);
+  --bs-primary-rgb: 1, 188, 243;
   --bs-secondary: #ffffff;
   --bs-font-family-base: "Inter", system-ui, -apple-system, sans-serif;
   --bs-border-radius: 0.375rem;
-  --bs-link-color: #01BCF3;
-  --bs-link-hover-color: #029ac9;
+  --bs-link-color: var(--brand-cyan-700);
+  --bs-link-color-rgb: 1, 117, 151;
+  --bs-link-hover-color: var(--brand-cyan-800);
+  --bs-link-hover-color-rgb: 0, 90, 117;
+  --bs-focus-ring-color: rgba(1, 188, 243, .3);
   --bs-dark: #000000;
   --bs-light: #f8f9fa;
   --header-nav-bg: #3d3d3d;
@@ -50,6 +62,80 @@
   --letter-spacing-tight: -0.025em;
   --letter-spacing-normal: 0;
   --letter-spacing-wide: 0.025em;
+}
+
+/*
+ * ==========================================================================
+ * Marca: sobrescrituras de Bootstrap
+ * ==========================================================================
+ * Bootstrap 5.3 compila estas reglas con #0d6efd en hex, por lo que definir
+ * --bs-primary no alcanza. Se reescriben acá para que usen la escala de
+ * marca de arriba.
+ * ==========================================================================
+ */
+
+.btn-primary {
+  --bs-btn-color: var(--brand-on-cyan);
+  --bs-btn-bg: var(--brand-cyan);
+  --bs-btn-border-color: var(--brand-cyan);
+  --bs-btn-hover-color: var(--brand-on-cyan);
+  --bs-btn-hover-bg: var(--brand-cyan-600);
+  --bs-btn-hover-border-color: var(--brand-cyan-600);
+  --bs-btn-active-color: var(--brand-on-cyan);
+  --bs-btn-active-bg: var(--brand-cyan-800);
+  --bs-btn-active-border-color: var(--brand-cyan-800);
+  --bs-btn-disabled-color: var(--brand-on-cyan);
+  --bs-btn-disabled-bg: var(--brand-cyan);
+  --bs-btn-disabled-border-color: var(--brand-cyan);
+  --bs-btn-focus-shadow-rgb: 1, 188, 243;
+}
+
+.btn-outline-primary {
+  --bs-btn-color: var(--brand-cyan-700);
+  --bs-btn-border-color: var(--brand-cyan);
+  --bs-btn-hover-color: var(--brand-on-cyan);
+  --bs-btn-hover-bg: var(--brand-cyan);
+  --bs-btn-hover-border-color: var(--brand-cyan);
+  --bs-btn-active-color: var(--brand-on-cyan);
+  --bs-btn-active-bg: var(--brand-cyan);
+  --bs-btn-active-border-color: var(--brand-cyan);
+  --bs-btn-disabled-color: var(--brand-cyan-700);
+  --bs-btn-disabled-border-color: var(--brand-cyan);
+  --bs-btn-focus-shadow-rgb: 1, 188, 243;
+}
+
+/* .text-primary usa --bs-primary-rgb: con el cyan del logo quedaría en 2,2:1 */
+.text-primary {
+  color: var(--brand-cyan-700) !important;
+}
+
+/* .badge fija --bs-badge-color: #fff, que sobre cyan da 2,2:1 */
+.badge.bg-primary {
+  --bs-badge-color: var(--brand-on-cyan);
+}
+
+.form-control:focus,
+.form-select:focus,
+.form-check-input:focus {
+  border-color: var(--brand-cyan);
+  box-shadow: 0 0 0 .25rem rgba(1, 188, 243, .25);
+}
+
+.form-check-input:checked,
+.form-check-input[type="checkbox"]:indeterminate {
+  background-color: var(--brand-cyan);
+  border-color: var(--brand-cyan);
+}
+
+.pagination {
+  --bs-pagination-active-color: var(--brand-on-cyan);
+  --bs-pagination-active-bg: var(--brand-cyan);
+  --bs-pagination-active-border-color: var(--brand-cyan);
+  --bs-pagination-focus-box-shadow: 0 0 0 .25rem rgba(1, 188, 243, .25);
+}
+
+.nav-link:focus-visible {
+  box-shadow: 0 0 0 .25rem rgba(1, 188, 243, .25);
 }
 
 html {
