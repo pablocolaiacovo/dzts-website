@@ -65,7 +65,8 @@ The main Opus agent delegates coding tasks to lighter models via custom agents i
 | **DevOps** | `devops` | Sonnet | GitHub Actions workflows, CI failures, releases (dev → main), Dependabot PRs, deploy issues |
 | **Triage** | `triage` | Opus | PR/issue triage: merge-readiness assessment, priority ranking, recommended merge order, release backlog reports |
 | **UI Developer** | `ui-developer` | Opus | Visual design options, HTML prototypes, implementing the approved design as components + CSS within the brand style |
-| **Architect** | _(main agent)_ | Opus | Multi-system debugging, architecture decisions, planning, PR reviews, new patterns |
+| **Reviewer** | `reviewer` | Opus | PR code reviews: correctness bugs, static-export violations, Sanity data handling, conventions, missing tests/specs |
+| **Architect** | _(main agent)_ | Opus | Multi-system debugging, architecture decisions, planning, new patterns |
 
 ### Delegate to `implementer` (Sonnet) when:
 
@@ -113,13 +114,23 @@ The triage agent **decides and recommends — it never merges, closes, or edits 
 
 The architect writes the brief (requirements, constraints, target page/component); the agent proposes options in phase 1 and implements only the chosen one in phase 2. It is **UI-only**: no Sanity queries/schema, caching, workflows, or e2e tests — it reports data or selector needs back for routing to `implementer`. Plain component/CSS changes with an already-decided look still go to `implementer`.
 
+### Delegate to `reviewer` (Opus) when:
+
+- Reviewing a PR's diff (or a local branch/diff) before merge
+- Auditing a change for correctness bugs, static-export violations (API routes, middleware, server actions, missing `generateStaticParams`), and Sanity `null` handling
+- Checking a schema change ships the regenerated `apps/frontend/src/sanity/types.ts`
+- Checking convention, SEO/a11y, and security regressions, plus missing e2e selector updates, unit tests, or `docs/specs/` entries
+- Posting inline review comments on a PR (only when explicitly asked)
+
+The reviewer **judges and explains — it never pushes, approves, or merges**. It returns a severity-ranked review (🔴 blocking / 🟡 should fix / ⚪ nit) with `path:line` findings and suggested fixes. Fixes route onward to `implementer`/`quick-fix` (app code), `devops` (workflows), or `ui-developer` (design); findings that hinge on an architecture decision come back to the main agent. It differs from `triage`: triage decides *which* PRs are ready and in what order, the reviewer decides *whether one PR's code is right*.
+
 ### Keep on Opus (handle directly) when:
 
 - Task touches 3+ files with interdependencies
 - Architecture or design decisions are needed
 - Debugging complex issues that require reasoning across multiple systems
 - Planning mode
-- PR reviews or code audits
+- Reviews whose findings require an architecture decision (the reviewer escalates these back)
 - Tasks where the user is asking for opinions/recommendations
 - New patterns not yet established in the codebase
 
