@@ -83,10 +83,10 @@ async function MapSectionWrapper() {
 
 function FeaturedPropertiesFallback({ heading }: { heading?: string | null }) {
   return (
-    <div className="container py-4">
-      <h2 className="text-center mb-5 fw-bold">
+    <div className="container py-4" aria-hidden="true">
+      <div className="h2 text-center mb-5 fw-bold">
         {heading || "Propiedades destacadas"}
-      </h2>
+      </div>
       <div className="row justify-content-center g-4">
         {[0, 1, 2].map((index) => (
           <div

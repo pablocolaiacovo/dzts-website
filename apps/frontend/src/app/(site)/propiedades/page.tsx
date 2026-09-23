@@ -21,7 +21,7 @@ export async function generateMetadata(): Promise<Metadata> {
     getCachedSiteSeo(),
   ]);
 
-  return resolveMetadata(pageSeo, siteSeo, { canonicalUrl: "/propiedades" });
+  return resolveMetadata(pageSeo, siteSeo, { canonicalUrl: "/propiedades/" });
 }
 
 const PROPERTIES_QUERY = defineQuery(`
@@ -79,7 +79,7 @@ export default async function PropiedadesPage() {
       <Breadcrumb
         items={[
           { label: "Inicio", href: "/", isHome: true },
-          { label: "Propiedades", href: "/propiedades" },
+          { label: "Propiedades", href: "/propiedades/" },
         ]}
       />
       <h1 className="text-center mb-4 fw-bold">{heading}</h1>
