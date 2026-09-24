@@ -1,12 +1,15 @@
 export default function PropiedadesLoading() {
   return (
-    <main className="container-fluid px-3 px-lg-4 py-4 py-md-5">
+    <main
+      className="container-fluid px-3 px-lg-4 py-4 py-md-5"
+      aria-hidden="true"
+    >
       <nav aria-label="breadcrumb" className="mb-3">
         <div className="placeholder-glow">
           <span className="placeholder col-3"></span>
         </div>
       </nav>
-      <h1 className="text-center mb-4 fw-bold">Propiedades</h1>
+      <div className="h1 text-center mb-4 fw-bold">Propiedades</div>
 
       <div className="row g-4">
         {/* Filter sidebar skeleton - desktop only */}
