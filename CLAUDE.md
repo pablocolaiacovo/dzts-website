@@ -66,6 +66,7 @@ The main Opus agent delegates coding tasks to lighter models via custom agents i
 | **Triage** | `triage` | Opus | PR/issue triage: merge-readiness assessment, priority ranking, recommended merge order, release backlog reports |
 | **UI Developer** | `ui-developer` | Opus | Visual design options, HTML prototypes, implementing the approved design as components + CSS within the brand style |
 | **Reviewer** | `reviewer` | Opus | PR code reviews: correctness bugs, static-export violations, Sanity data handling, conventions, missing tests/specs |
+| **SEO Auditor** | `seo-auditor` | Sonnet | Site audits: technical SEO, structured data, Lighthouse/Core Web Vitals, headers, progress vs. the previous audit |
 | **Architect** | _(main agent)_ | Opus | Multi-system debugging, architecture decisions, planning, new patterns |
 
 ### Delegate to `implementer` (Sonnet) when:
@@ -123,6 +124,15 @@ The architect writes the brief (requirements, constraints, target page/component
 - Posting inline review comments on a PR (only when explicitly asked)
 
 The reviewer **judges and explains — it never pushes, approves, or merges**. It returns a severity-ranked review (🔴 blocking / 🟡 should fix / ⚪ nit) with `path:line` findings and suggested fixes. Fixes route onward to `implementer`/`quick-fix` (app code), `devops` (workflows), or `ui-developer` (design); findings that hinge on an architecture decision come back to the main agent. It differs from `triage`: triage decides *which* PRs are ready and in what order, the reviewer decides *whether one PR's code is right*.
+
+### Delegate to `seo-auditor` (Sonnet) when:
+
+- Auditing the production site or a full local build for technical SEO, structured data, or performance
+- Re-checking pending items from a previous audit after a release
+- Verifying Cache-Control/security headers and sitemap/robots on production
+- Measuring Lighthouse/Core Web Vitals before/after a performance change
+
+The auditor **measures and reports — it never edits code, Sanity content, or GitHub**. Fixes route onward to `implementer`/`quick-fix`/`ui-developer`/`devops`; content fixes route to the user. Content strategy (new page types, competitor gaps) comes back to the main agent. It differs from `reviewer`: the reviewer judges a PR diff before merge, the auditor measures the deployed site.
 
 ### Keep on Opus (handle directly) when:
 
