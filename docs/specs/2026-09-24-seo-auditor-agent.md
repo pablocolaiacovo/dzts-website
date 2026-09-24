@@ -1,7 +1,7 @@
 # SEO Auditor Agent
 
 - **Date**: 2026-09-24
-- **PR**: _TBD_
+- **PR**: [#177](https://github.com/pablocolaiacovo/dzts-website/pull/177)
 - **Status**: Implemented
 - **Owner**: main agent (architect tier)
 
