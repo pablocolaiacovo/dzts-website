@@ -1,11 +1,20 @@
+import "./MapSection.css";
+
 interface MapSectionProps {
   address?: string | null;
   embedUrl?: string | null;
   title: string;
   id?: string;
+  variant?: "default" | "footer";
 }
 
-export default function MapSection({ address, embedUrl, title, id }: MapSectionProps) {
+export default function MapSection({
+  address,
+  embedUrl,
+  title,
+  id,
+  variant = "default",
+}: MapSectionProps) {
   const mapSrc = embedUrl
     ? embedUrl
     : address
@@ -15,17 +24,18 @@ export default function MapSection({ address, embedUrl, title, id }: MapSectionP
   if (!mapSrc) return null;
 
   return (
-    <div className="w-100" id={id} style={id ? { scrollMarginTop: "60px" } : undefined}>
-      <div style={{ width: "100%", height: "450px" }}>
-        <iframe
-          src={mapSrc}
-          style={{ border: 0, width: "100%", height: "100%" }}
-          allowFullScreen
-          loading="lazy"
-          referrerPolicy="no-referrer-when-downgrade"
-          title={title}
-        />
-      </div>
+    <div
+      className={`map-section w-100${variant === "footer" ? " map-section-footer" : ""}`}
+      id={id}
+    >
+      <iframe
+        src={mapSrc}
+        className="d-block w-100 h-100 border-0"
+        allowFullScreen
+        loading="lazy"
+        referrerPolicy="no-referrer-when-downgrade"
+        title={title}
+      />
     </div>
   );
 }

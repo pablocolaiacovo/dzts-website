@@ -30,7 +30,12 @@ async function SiteShell({ children }: { children: React.ReactNode }) {
         phone={siteSettings?.phone}
         email={siteSettings?.email}
         address={siteSettings?.address}
+        officeHours={siteSettings?.officeHours}
         creditLine={siteSettings?.creditLine}
+        footerTagline={siteSettings?.footerTagline}
+        licenseNumber={siteSettings?.licenseNumber}
+        whatsappNumber={siteSettings?.whatsappNumber}
+        whatsappMessage={siteSettings?.whatsappMessage}
       />
       {siteSettings?.whatsappNumber && (
         <WhatsAppButton

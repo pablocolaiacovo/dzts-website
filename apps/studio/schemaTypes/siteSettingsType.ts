@@ -155,6 +155,14 @@ export const siteSettingsType = defineType({
         }),
     }),
     defineField({
+      name: "officeHours",
+      title: "Horario de atención",
+      type: "string",
+      group: "contact",
+      description:
+        "Texto libre, se muestra en una línea (ej: Lun a Vie 9 a 18 h · Sáb 10 a 13 h)",
+    }),
+    defineField({
       name: "whatsappNumber",
       title: "WhatsApp",
       type: "string",
@@ -300,6 +308,26 @@ export const siteSettingsType = defineType({
           type: "url",
         }),
       ],
+    }),
+    defineField({
+      name: "footerTagline",
+      title: "Frase del footer",
+      type: "text",
+      group: "footer",
+      rows: 2,
+      description:
+        "Frase breve que acompaña al logo en el pie de página (ej: Compra, venta y alquiler de propiedades…)",
+      validation: (rule) =>
+        rule
+          .max(160)
+          .warning("La frase es larga; se recomienda un máximo de 160 caracteres."),
+    }),
+    defineField({
+      name: "licenseNumber",
+      title: "Matrícula",
+      type: "string",
+      group: "footer",
+      description: "Se muestra junto al © en el pie de página (ej: Matrícula CUCICBA N.º 0000)",
     }),
 
     defineField({

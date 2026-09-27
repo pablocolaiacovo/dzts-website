@@ -1118,6 +1118,13 @@
         },
         "optional": true
       },
+      "officeHours": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "string"
+        },
+        "optional": true
+      },
       "whatsappNumber": {
         "type": "objectAttribute",
         "value": {
@@ -1360,6 +1367,20 @@
               "optional": true
             }
           }
+        },
+        "optional": true
+      },
+      "footerTagline": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "string"
+        },
+        "optional": true
+      },
+      "licenseNumber": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "string"
         },
         "optional": true
       },
