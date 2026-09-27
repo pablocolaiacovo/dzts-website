@@ -87,7 +87,6 @@ export default function Header({
 }: HeaderProps) {
   const navCollapseRef = useRef<HTMLDivElement>(null);
   const pathname = usePathname();
-  const isHome = pathname === "/";
 
   const collapseNav = () => {
     const navElement = navCollapseRef.current;
@@ -104,7 +103,7 @@ export default function Header({
 
   return (
     <>
-      <header className={`sticky-header${isHome ? " is-home" : ""}`}>
+      <header className="sticky-header">
         <nav
           className="navbar navbar-expand-lg navbar-dark"
           aria-label="Main navigation"

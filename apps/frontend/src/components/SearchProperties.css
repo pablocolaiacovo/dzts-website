@@ -1,15 +1,3 @@
-.hero {
-  /* la cabecera es fixed en /: el hero reserva su alto para que el contenido
-     no se cruce con el logo del header en pantallas cortas */
-  padding-top: 80px;
-}
-
-@media (min-width: 992px) {
-  .hero {
-    padding-top: 110px;
-  }
-}
-
 .logo-container {
   position: relative;
   width: 18.75rem;

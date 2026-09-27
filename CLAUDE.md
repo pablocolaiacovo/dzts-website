@@ -308,7 +308,7 @@ Two GitHub Actions workflows run on PRs to `dev` and `main`:
 - LCP image priority is on the home hero background (`SearchProperties`), not on the header logo.
 - Reduced motion: smooth scroll falls back to `behavior: "auto"`, carousel auto-advance is disabled, and global CSS reduces animations when `prefers-reduced-motion` is set.
 - Header nav background uses `--header-nav-bg` from `apps/frontend/src/styles/variables.css` (no inline style).
-- Header ("Barra Alta"): `siteSettings.headerLogo` (tall lockup, with "inmobiliaria" tagline) crossfades into `siteSettings.logo` (compact) via scroll-driven animation as the bar shrinks; falls back to compact-only, unanimated, when `headerLogo` has no asset yet. On `/`, the header is `position: fixed` and transparent over the hero, solidifying on scroll (`is-home` class, from `usePathname() === "/"` in `Header.tsx`); other pages keep the sticky in-flow header. See `docs/specs/2026-09-27-header-barra-alta.md`.
+- Header ("Barra Alta"): `siteSettings.headerLogo` (tall lockup, with "inmobiliaria" tagline) crossfades into `siteSettings.logo` (compact) via scroll-driven animation as the bar shrinks; falls back to compact-only, unanimated, when `headerLogo` has no asset yet. The header is always `position: sticky` and a solid `--header-nav-bg` background on every page, including `/`. See `docs/specs/2026-09-27-header-barra-alta.md`.
 - Map iframe titles are passed via the `MapSection` `title` prop for contextual SEO.
 - Sanity CDN preconnect is included in `apps/frontend/src/app/layout.tsx`.
 - `global-error.tsx` exists as a root error boundary with its own `<html>` and `<body>`.

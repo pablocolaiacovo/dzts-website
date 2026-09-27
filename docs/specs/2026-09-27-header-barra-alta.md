@@ -9,11 +9,10 @@
 
 Replace the header's fixed-size single logo with a two-state lockup: a tall
 lockup (with the "inmobiliaria" tagline) shown at rest, that shrinks and
-crossfades into the current compact logo as the visitor scrolls. On the home
-page, the bar should float transparent over the hero instead of sitting on a
-flat background bar, so the header reads as part of the hero rather than a
-stacked block on top of it. Approved from a set of HTML prototypes; this spec
-ports the chosen "Opción 1 — Barra Alta" prototype into the codebase.
+crossfades into the current compact logo as the visitor scrolls. Approved
+from a set of HTML prototypes; this spec ports the chosen "Opción 1 — Barra
+Alta" prototype into the codebase. The header keeps a solid background and
+`position: sticky` on every page, including `/`.
 
 ## Decisions
 
@@ -41,25 +40,18 @@ balanced — ported as-is from the prototype's measurements.
 show only `.logo-compact` (`.logo-full { display: none }`), rather than
 leaving the bar stuck at the "rest" (tallest) size forever.
 
-### `is-home`: transparent, fixed header over the hero
+### Always-solid, sticky header on every page (including home)
 
-`Header.tsx` computes `isHome = usePathname() === "/"` and adds `is-home` to
-`.sticky-header` instead of branching into a separate component. On `/`, the
-header is `position: fixed` (transparent background + a top-down dark
-gradient for contrast over the hero image) and solidifies to
-`var(--header-nav-bg)` via a second scroll-driven animation as the user
-scrolls. Both `@supports not` and reduced-motion make it solid immediately
-instead of leaving it transparent statically. Non-home pages keep the
-existing `position: sticky` in-flow header — the only change there is the
-taller art size and the two-logo crossfade.
+A transparent, `position: fixed` header that floated over the home hero and
+solidified on scroll was tried and rejected by the client — they wanted the
+bar visually consistent across all pages, not different on `/`. The header
+is `position: sticky` and a solid `var(--header-nav-bg)` background
+everywhere, including `/`; the only change on any page is the taller art
+size and the two-logo crossfade.
 
-Because the home header is `fixed`, the hero section (`SearchProperties`,
-which owns the `.hero` class) needs `padding-top` equal to the header's own
-height (80px mobile / 110px `lg`+) so hero content doesn't render under the
-bar. `TextImageSection`'s anchored sections (`/#servicios`, `/#nosotros`) got
-their `scroll-margin-top` bumped from a flat 60px to 80px/100px
-(mobile/`lg`+) to clear the new *scrolled* bar height, which is taller than
-before (~68px/~84px) now that the art is bigger.
+`TextImageSection`'s anchored sections (`/#servicios`, `/#nosotros`) keep
+their `scroll-margin-top` at 80px/100px (mobile/`lg`+) to clear the taller
+*scrolled* bar height (~68px/~84px) now that the art is bigger.
 
 ### New `headerLogo` field instead of reusing `logo`
 
@@ -93,8 +85,8 @@ while it's mid-migration.
   edits needed).
 - `apps/frontend/src/app/(site)/layout.tsx` — passes `headerLogo` through to
   `Header`.
-- `apps/frontend/src/components/Header.tsx` — `isHome` from `usePathname()`;
-  renders `.logo-full` (only when `headerLogo` has an asset) and
+- `apps/frontend/src/components/Header.tsx` — renders `.logo-full` (only
+  when `headerLogo` has an asset) and
   `.logo-compact` (`alt=""` + `aria-hidden` when the full logo is also
   present, so the link's accessible name — from the full logo's `alt` — isn't
   duplicated); both sized via `urlFor(...).width(400)` (~2x the largest
@@ -104,12 +96,9 @@ while it's mid-migration.
 - `apps/frontend/src/components/Header.css` — full rewrite: `--art-rest` /
   `--art-scrolled` / `--pad-rest` / `--pad-scrolled` custom properties on
   `.sticky-header .navbar`, the `.header-logo` grid + `shrink-logo`/`mark-
-  in`/`mark-out` keyframes, `logo-compact-only` fallback modifier, `@supports
-  not` and `prefers-reduced-motion` fallbacks, and the `is-home` transparent/
-  solidify rules.
-- `apps/frontend/src/components/SearchProperties.css` — `.hero` gets
-  `padding-top: 80px` (mobile) / `110px` (`lg`+) to clear the fixed home
-  header.
+  in`/`mark-out` keyframes, `logo-compact-only` fallback modifier, and
+  `@supports not` / `prefers-reduced-motion` fallbacks. The header stays
+  `position: sticky` with a solid background on every page.
 - `apps/frontend/src/components/TextImageSection.css` — `.section-block`
   `scroll-margin-top` raised from `60px` to `80px`/`100px` (mobile/`lg`+).
 - `docs/specs/2026-09-27-header-barra-alta.md` — this file.
@@ -133,5 +122,5 @@ while it's mid-migration.
   dataset's live schema. Re-run `pnpm build` against a dataset that has
   properties (or in CI, which uses the `preview` environment) to confirm the
   static export end-to-end.
-- Anchors and the sticky (non-home) header are otherwise unaffected beyond
-  the taller bar — no other component reads `--art-rest`/`--art-scrolled`.
+- Anchors and the sticky header are otherwise unaffected beyond the taller
+  bar — no other component reads `--art-rest`/`--art-scrolled`.
