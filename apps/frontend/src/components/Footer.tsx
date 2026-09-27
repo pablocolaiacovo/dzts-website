@@ -3,6 +3,7 @@ import Link from "next/link";
 import TrackedLink from "@/components/TrackedLink";
 import { ANALYTICS_EVENT } from "@/lib/analytics";
 import { buildWhatsAppUrl } from "@/lib/whatsapp";
+import { extractUrl } from "@/lib/url";
 import { urlFor } from "@/sanity/lib/image";
 import type { SITE_SETTINGS_QUERY_RESULT } from "@/sanity/types";
 import "./Footer.css";
@@ -64,12 +65,20 @@ export default function Footer({
     (link): link is NonNullable<typeof link> & { url: string; platform: string } =>
       Boolean(link?.url && link.platform && platformIcons[link.platform]),
   );
-  const links = (footerLinks ?? []).filter(
-    (link): link is NonNullable<typeof link> & { label: string; url: string } =>
-      Boolean(link?.label && link.url),
-  );
+  const links = (footerLinks ?? []).flatMap((link) => {
+    const resolvedUrl = extractUrl(link?.url);
+    return link?.label && resolvedUrl ? [{ ...link, resolvedUrl }] : [];
+  });
   const certs = (certificationLogos ?? []).flatMap((cert) =>
-    cert.image?.asset ? [{ ...cert, src: urlFor(cert.image).width(100).url() }] : [],
+    cert.image?.asset
+      ? [
+          {
+            ...cert,
+            src: urlFor(cert.image).width(100).url(),
+            resolvedUrl: extractUrl(cert.url),
+          },
+        ]
+      : [],
   );
 
   const hasBrand = Boolean(logoUrl || footerTagline || socials.length > 0);
@@ -179,10 +188,10 @@ export default function Footer({
                       <ul className="footer-list footer-links mb-4">
                         {links.map((link) => (
                           <li key={link._key}>
-                            {link.url.startsWith("/") ? (
-                              <Link href={link.url}>{link.label}</Link>
+                            {link.resolvedUrl.startsWith("/") ? (
+                              <Link href={link.resolvedUrl}>{link.label}</Link>
                             ) : (
-                              <a href={link.url} target="_blank" rel="noopener noreferrer">
+                              <a href={link.resolvedUrl} target="_blank" rel="noopener noreferrer">
                                 {link.label}
                               </a>
                             )}
@@ -205,10 +214,10 @@ export default function Footer({
                             loading="lazy"
                           />
                         );
-                        return cert.url ? (
+                        return cert.resolvedUrl ? (
                           <a
                             key={cert._key}
-                            href={cert.url}
+                            href={cert.resolvedUrl}
                             target="_blank"
                             rel="noopener noreferrer"
                             title={title}
