@@ -14,6 +14,7 @@ type NavItem = NonNullable<SiteSettings["mainNavigation"]>[number];
 
 type HeaderProps = {
   logo?: SiteSettings["logo"];
+  headerLogo?: SiteSettings["headerLogo"];
   siteName?: SiteSettings["siteName"];
   navigation?: SiteSettings["mainNavigation"];
 };
@@ -78,9 +79,15 @@ function NavItemLink({ item, pathname, onCollapseNav }: NavItemLinkProps) {
   );
 }
 
-export default function Header({ logo, siteName, navigation }: HeaderProps) {
+export default function Header({
+  logo,
+  headerLogo,
+  siteName,
+  navigation,
+}: HeaderProps) {
   const navCollapseRef = useRef<HTMLDivElement>(null);
   const pathname = usePathname();
+  const isHome = pathname === "/";
 
   const collapseNav = () => {
     const navElement = navCollapseRef.current;
@@ -89,24 +96,44 @@ export default function Header({ logo, siteName, navigation }: HeaderProps) {
     }
   };
 
-  const logoUrl = logo?.asset ? urlFor(logo).width(300).url() : null;
-  const logoAlt = logo?.alt || siteName || "";
+  const compactUrl = logo?.asset ? urlFor(logo).width(400).url() : null;
+  const fullUrl = headerLogo?.asset
+    ? urlFor(headerLogo).width(400).url()
+    : null;
+  const logoAlt = (fullUrl ? headerLogo?.alt : logo?.alt) || siteName || "";
 
   return (
     <>
-      <header className="sticky-header">
+      <header className={`sticky-header${isHome ? " is-home" : ""}`}>
         <nav
           className="navbar navbar-expand-lg navbar-dark"
           aria-label="Main navigation"
         >
           <div className="container">
-            <Link href="/" className="navbar-brand header-logo" aria-label={`${siteName || ""} - Home`}>
-              {logoUrl && (
+            <Link
+              href="/"
+              className={`navbar-brand header-logo${
+                fullUrl ? "" : " logo-compact-only"
+              }`}
+              aria-label={`${siteName || ""} - Home`}
+            >
+              {fullUrl && (
                 <Image
-                  src={logoUrl}
+                  src={fullUrl}
                   alt={logoAlt}
-                  width={150}
-                  height={60}
+                  width={190}
+                  height={82}
+                  className="logo-full"
+                />
+              )}
+              {compactUrl && (
+                <Image
+                  src={compactUrl}
+                  alt={fullUrl ? "" : logoAlt}
+                  aria-hidden={fullUrl ? true : undefined}
+                  width={258}
+                  height={82}
+                  className="logo-compact"
                 />
               )}
             </Link>

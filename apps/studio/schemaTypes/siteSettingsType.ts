@@ -39,6 +39,25 @@ export const siteSettingsType = defineType({
       ],
     }),
     defineField({
+      name: "headerLogo",
+      title: "Logo del header (completo)",
+      type: "image",
+      group: "branding",
+      description:
+        "Isologo alto con la bajada 'inmobiliaria', que se muestra arriba de todo antes de scrollear. " +
+        "Al hacer scroll, la barra se achica y este logo hace un crossfade hacia el 'Logo' (la versión compacta, " +
+        "sin bajada), que también se usa en el footer y el SEO. Si no se sube este logo, el header muestra " +
+        "directamente la versión compacta, sin animación.",
+      options: { hotspot: true },
+      fields: [
+        defineField({
+          name: "alt",
+          title: "Texto alternativo",
+          type: "string",
+        }),
+      ],
+    }),
+    defineField({
       name: "favicon",
       title: "Favicon",
       type: "image",

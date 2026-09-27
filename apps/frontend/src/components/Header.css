@@ -1,3 +1,16 @@
+/* ==========================================================================
+   Header — "Barra Alta"
+   Una sola fila. Lockup completo (con bajada "inmobiliaria") en reposo; al
+   hacer scroll la barra se comprime y el lockup hace crossfade al recorte
+   compacto (sin bajada), que a esa altura ya sería ilegible.
+
+   Altura de arte (recortada, sin padding transparente):
+     móvil    reposo 56px (lockup completo)  → scroll 52px (compacto)
+     desktop  reposo 82px (lockup completo)  → scroll 64px (compacto)
+   Altura de barra:
+     móvil    80px → ~68px      desktop 110px → ~84px
+   ========================================================================== */
+
 .sticky-header {
   position: sticky;
   top: 0;
@@ -5,34 +18,109 @@
 }
 
 .sticky-header .navbar {
-  padding-top: 0.75rem;
-  padding-bottom: 0.75rem;
   background-color: var(--header-nav-bg);
+  --art-rest: 56px;
+  --art-scrolled: 52px;
+  --pad-rest: 0.75rem;
+  --pad-scrolled: 0.5rem;
+  padding-top: var(--pad-rest);
+  padding-bottom: var(--pad-rest);
   animation: shrink-navbar linear both;
-  animation-timeline: scroll();
-  animation-range: 0 100px;
+  animation-timeline: scroll(root);
+  animation-range: 0 120px;
+}
+
+@media (min-width: 992px) {
+  .sticky-header .navbar {
+    --art-rest: 82px;
+    --art-scrolled: 64px;
+    --pad-rest: 0.875rem;
+    --pad-scrolled: 0.625rem;
+  }
 }
 
 @keyframes shrink-navbar {
   to {
-    padding-top: 0.25rem;
-    padding-bottom: 0.25rem;
+    padding-top: var(--pad-scrolled);
+    padding-bottom: var(--pad-scrolled);
+  }
+}
+
+/* La marca es una caja apilada: los dos recortes ocupan la misma celda. */
+.header-logo {
+  display: grid;
+  grid-template-rows: minmax(0, 1fr);
+  height: var(--art-rest);
+  margin-bottom: 0;
+  animation: shrink-logo linear both;
+  animation-timeline: scroll(root);
+  animation-range: 0 120px;
+}
+
+/* Al desaparecer la bajada sobra el 25.4% inferior de la caja: se recupera
+   con margen negativo para que la barra no quede desbalanceada. */
+@keyframes shrink-logo {
+  to {
+    height: var(--art-scrolled);
+    margin-bottom: calc(var(--art-scrolled) * -0.254);
   }
 }
 
 .header-logo img {
-  height: auto;
+  grid-area: 1 / 1;
   width: auto;
-  max-height: 60px;
-  animation: shrink-logo linear both;
-  animation-timeline: scroll();
-  animation-range: 0 100px;
+  justify-self: start;
+  align-self: start;
 }
 
-@keyframes shrink-logo {
-  to {
-    max-height: 40px;
+.logo-full {
+  height: 100%;
+  animation: mark-out linear both;
+  animation-timeline: scroll(root);
+  animation-range: 0 70px;
+}
+
+.logo-compact {
+  height: 74.6%;
+  opacity: 0;
+  animation: mark-in linear both;
+  animation-timeline: scroll(root);
+  animation-range: 0 70px;
+}
+
+@keyframes mark-out {
+  0%,
+  45% {
+    opacity: 1;
   }
+
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes mark-in {
+  0%,
+  45% {
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}
+
+/* Sin logo completo cargado en Sanity todavía: se muestra solo el
+   compacto, a un tamaño fijo legible y sin animación de crossfade. */
+.header-logo.logo-compact-only {
+  height: var(--art-rest);
+  animation: none;
+}
+
+.header-logo.logo-compact-only .logo-compact {
+  height: 100%;
+  opacity: 1;
+  animation: none;
 }
 
 .header-nav .nav-link {
@@ -44,4 +132,132 @@
 .header-nav .nav-link:hover,
 .header-nav .nav-link:focus {
   color: var(--bs-primary);
+}
+
+.navbar-brand:focus-visible,
+.nav-link:focus-visible,
+.navbar-toggler:focus-visible {
+  outline: 2px solid var(--bs-primary);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+/* Navegadores sin scroll-driven animations (Firefox <144, Safari <26):
+   la barra quedaría fija en el estado alto. Se fija en un tamaño intermedio. */
+@supports not (animation-timeline: scroll(root)) {
+  .sticky-header .navbar {
+    --art-rest: 48px;
+    padding-top: 0.625rem;
+    padding-bottom: 0.625rem;
+  }
+
+  @media (min-width: 992px) {
+    .sticky-header .navbar {
+      --art-rest: 66px;
+    }
+  }
+
+  .logo-full {
+    display: none;
+  }
+
+  .logo-compact {
+    opacity: 1;
+    height: 100%;
+  }
+}
+
+/* Reducción de movimiento: sin animación ligada al scroll; queda el estado
+   de reposo, pero acotado para no comer viewport de forma permanente. */
+@media (prefers-reduced-motion: reduce) {
+  .sticky-header .navbar,
+  .header-logo,
+  .logo-full,
+  .logo-compact {
+    animation: none;
+  }
+
+  .sticky-header .navbar {
+    --art-rest: 50px;
+    padding-top: 0.625rem;
+    padding-bottom: 0.625rem;
+  }
+
+  @media (min-width: 992px) {
+    .sticky-header .navbar {
+      --art-rest: 70px;
+    }
+  }
+
+  .logo-full {
+    display: none;
+  }
+
+  .logo-compact {
+    opacity: 1;
+    height: 100%;
+  }
+}
+
+/* ==========================================================================
+   HOME — la barra flota transparente sobre el hero y se solidifica al
+   scrollear. `is-home` sale de usePathname() === "/" en Header.tsx.
+   Así la cabecera y la marca del hero no leen como dos bloques apilados:
+   sin plancha de fondo, la cabecera forma parte del hero.
+   ========================================================================== */
+
+/* fixed sólo en / para que la barra transparente no ocupe alto de flujo */
+.sticky-header.is-home {
+  position: fixed;
+  inset: 0 0 auto 0;
+}
+
+.sticky-header.is-home .navbar {
+  background-color: transparent;
+  background-image: linear-gradient(
+    180deg,
+    rgba(0, 0, 0, 0.55),
+    rgba(0, 0, 0, 0)
+  );
+  animation: shrink-navbar linear both, solidify linear both;
+  animation-timeline: scroll(root), scroll(root);
+  animation-range: 0 120px, 0 140px;
+}
+
+@keyframes solidify {
+  to {
+    background-color: var(--header-nav-bg);
+    background-image: linear-gradient(180deg, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0));
+  }
+}
+
+/* El menú colapsable sólo existe debajo de `lg`. Si se abre en scroll 0, la
+   barra transparente dejaría los links flotando sobre la foto del hero con
+   sólo el degradé como fondo: se fuerza sólida y sin degradé mientras el
+   collapse está abierto o animándose, y se saca `solidify` de la animación
+   (las animaciones pisan las declaraciones normales, así que no alcanza con
+   declarar background-color/-image solos). */
+@media (max-width: 991.98px) {
+  .sticky-header.is-home
+    .navbar:has(.navbar-collapse.show, .navbar-collapse.collapsing) {
+    animation: shrink-navbar linear both;
+    animation-timeline: scroll(root);
+    animation-range: 0 120px;
+    background-color: var(--header-nav-bg);
+    background-image: none;
+  }
+}
+
+@supports not (animation-timeline: scroll(root)) {
+  .sticky-header.is-home .navbar {
+    background-color: var(--header-nav-bg);
+    background-image: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sticky-header.is-home .navbar {
+    background-color: var(--header-nav-bg);
+    background-image: none;
+  }
 }
