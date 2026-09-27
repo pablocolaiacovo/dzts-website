@@ -1,7 +1,7 @@
 # Footer Redesign (map above, fixed-height footer)
 
 - **Date**: 2026-09-27
-- **PR**: TBD
+- **PR**: [#178](https://github.com/pablocolaiacovo/dzts-website/pull/178)
 - **Status**: Implemented
 - **Owner**: main agent (architect tier) — schema via `implementer`, UI via `ui-developer`
 
