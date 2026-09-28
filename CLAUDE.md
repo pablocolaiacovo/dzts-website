@@ -65,7 +65,9 @@ The main Opus agent delegates coding tasks to lighter models via custom agents i
 | **DevOps** | `devops` | Sonnet | GitHub Actions workflows, CI failures, releases (dev → main), Dependabot PRs, deploy issues |
 | **Triage** | `triage` | Opus | PR/issue triage: merge-readiness assessment, priority ranking, recommended merge order, release backlog reports |
 | **UI Developer** | `ui-developer` | Opus | Visual design options, HTML prototypes, implementing the approved design as components + CSS within the brand style |
-| **Architect** | _(main agent)_ | Opus | Multi-system debugging, architecture decisions, planning, PR reviews, new patterns |
+| **Reviewer** | `reviewer` | Opus | PR code reviews: correctness bugs, static-export violations, Sanity data handling, conventions, missing tests/specs |
+| **SEO Auditor** | `seo-auditor` | Sonnet | Site audits: technical SEO, structured data, Lighthouse/Core Web Vitals, headers, progress vs. the previous audit |
+| **Architect** | _(main agent)_ | Opus | Multi-system debugging, architecture decisions, planning, new patterns |
 
 ### Delegate to `implementer` (Sonnet) when:
 
@@ -113,13 +115,32 @@ The triage agent **decides and recommends — it never merges, closes, or edits 
 
 The architect writes the brief (requirements, constraints, target page/component); the agent proposes options in phase 1 and implements only the chosen one in phase 2. It is **UI-only**: no Sanity queries/schema, caching, workflows, or e2e tests — it reports data or selector needs back for routing to `implementer`. Plain component/CSS changes with an already-decided look still go to `implementer`.
 
+### Delegate to `reviewer` (Opus) when:
+
+- Reviewing a PR's diff (or a local branch/diff) before merge
+- Auditing a change for correctness bugs, static-export violations (API routes, middleware, server actions, missing `generateStaticParams`), and Sanity `null` handling
+- Checking a schema change ships the regenerated `apps/frontend/src/sanity/types.ts`
+- Checking convention, SEO/a11y, and security regressions, plus missing e2e selector updates, unit tests, or `docs/specs/` entries
+- Posting inline review comments on a PR (only when explicitly asked)
+
+The reviewer **judges and explains — it never pushes, approves, or merges**. It returns a severity-ranked review (🔴 blocking / 🟡 should fix / ⚪ nit) with `path:line` findings and suggested fixes. Fixes route onward to `implementer`/`quick-fix` (app code), `devops` (workflows), or `ui-developer` (design); findings that hinge on an architecture decision come back to the main agent. It differs from `triage`: triage decides *which* PRs are ready and in what order, the reviewer decides *whether one PR's code is right*.
+
+### Delegate to `seo-auditor` (Sonnet) when:
+
+- Auditing the production site or a full local build for technical SEO, structured data, or performance
+- Re-checking pending items from a previous audit after a release
+- Verifying Cache-Control/security headers and sitemap/robots on production
+- Measuring Lighthouse/Core Web Vitals before/after a performance change
+
+The auditor **measures and reports — it never edits code, Sanity content, or GitHub**. Fixes route onward to `implementer`/`quick-fix`/`ui-developer`/`devops`; content fixes route to the user. Content strategy (new page types, competitor gaps) comes back to the main agent. It differs from `reviewer`: the reviewer judges a PR diff before merge, the auditor measures the deployed site.
+
 ### Keep on Opus (handle directly) when:
 
 - Task touches 3+ files with interdependencies
 - Architecture or design decisions are needed
 - Debugging complex issues that require reasoning across multiple systems
 - Planning mode
-- PR reviews or code audits
+- Reviews whose findings require an architecture decision (the reviewer escalates these back)
 - Tasks where the user is asking for opinions/recommendations
 - New patterns not yet established in the codebase
 
@@ -269,7 +290,7 @@ Two GitHub Actions workflows run on PRs to `dev` and `main`:
 - `/propiedades` - Properties listing page with filters, pagination, and active filter badges
 - `/propiedades/[slug]` - Property detail page with images, description, JSON-LD structured data, and location map
 - `/propiedades/[slug]/ficha` - Print-optimized property sheet (no header/footer, `(print)` route group)
-- Custom `not-found.tsx` (branded 404 page) and `error.tsx` (error boundary with retry) at app root and `(site)` route group
+- Custom `not-found.tsx` (branded 404 page) at the app root and in the `(site)` route group; `error.tsx` (error boundary with retry) in `(site)`; `global-error.tsx` at the app root
 
 ### Content Integration
 
@@ -293,7 +314,6 @@ Two GitHub Actions workflows run on PRs to `dev` and `main`:
 - Sitemap static entries omit `lastModified` to avoid `new Date()` on every build.
 - Disabled pagination controls render as `<span>` instead of `<a>`.
 - Footer certification images are set to `loading="lazy"`.
-- Inter font no longer sets an unused CSS variable.
 - Property detail pages export `generateStaticParams()` to pre-render available property slugs at build time.
 
 ## Components
@@ -338,7 +358,7 @@ The frontend is deployed as a static site to shared hosting:
 - Ensure only one `<h1>` per page. Section headings within page content should use `<h2>` or lower.
 - **robots.txt** (`src/app/robots.ts`): Environment-aware. Reads `SITE_ENV`, falling back to `VERCEL_ENV`. Only `"production"` allows indexing; everything else emits `Disallow: /`. `SITE_ENV=production` is set by `.github/workflows/deploy.yml` for FTP builds; `VERCEL_ENV` is auto-injected by Vercel, which keeps preview deploys blocked from search engines automatically.
 - **sitemap.xml** (`src/app/sitemap.ts`): Dynamically generated. Includes home, `/propiedades`, and all property detail pages fetched from Sanity.
-- **llms.txt** (`src/app/llms.txt/route.ts`): Markdown file for AI agents/LLMs ([spec](https://llmstxt.org/)). Lists main pages and all properties to help LLMs understand site content.
+- **llms.txt** (generated by `scripts/generate-llms-txt.mjs` in the frontend's `prebuild` step): Markdown file for AI agents/LLMs ([spec](https://llmstxt.org/)). Lists main pages and all properties to help LLMs understand site content.
 
 ## E2E Tests
 
