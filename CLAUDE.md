@@ -328,12 +328,13 @@ Two GitHub Actions workflows run on PRs to `dev` and `main`:
 - Components in `/app` are Server Components unless marked with `"use client"`
 - Use Next.js Metadata API for SEO (exported `metadata` object). The root layout uses a `title.template` (`"%s | DZTS Inmobiliaria"`), so child pages only set the page-specific part (e.g., `title: "Propiedades"`, not `"Propiedades | DZTS Inmobiliaria"`).
 - Use `next/image` for optimized images
-- Dark mode supported via `prefers-color-scheme` CSS media query.
+- No dark mode: there is no `prefers-color-scheme` color CSS anywhere in the frontend, and the brand palette is calibrated against a white background. Don't add a partial dark block — swapping text colors without darkening the background serves bright cyan on white at 2.2:1.
 - Don't add too many comments to the code.
 - Use double quotes for strings (Prettier is pre-configured for this).
 - Use mobile first for css.
 - Prefer bootstrap css classes and components over custom css.
 - Use CSS over JavaScript when possible for animations and dynamic behavior.
+- Brand palette is the manual's three colors only: `--brand-cyan` (`#01BCF3`) and `--brand-grey` (`#404041`) in `variables.css`, plus white. Cyan for prices, subtitles, links, bars and fills; grey for titles and for text on cyan. Don't add derived tones. See `docs/specs/2026-09-28-brand-palette-d-prime.md`.
 - Format prices with `toLocaleString("es-AR")` and display currency as `AR$`/`US$` (not `ARS`/`USD`).
 - Shared types go in `src/types/`, shared utilities in `src/lib/`. Do not duplicate type definitions or utility functions across components — import from the shared location.
 

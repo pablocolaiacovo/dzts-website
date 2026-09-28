@@ -95,7 +95,7 @@ function PropertyHeader({
       {property.reference && (
         <div className="text-muted small mb-1">Ref: {property.reference}</div>
       )}
-      <h1 className="text-secondary mb-2" style={{ fontSize: "2.5rem" }}>
+      <h1 className="text-dark mb-2" style={{ fontSize: "2.5rem" }}>
         {property.title}
       </h1>
       <div className="d-flex gap-2 mb-2">
@@ -107,7 +107,7 @@ function PropertyHeader({
           </span>
         )}
         {property.propertyType && (
-          <span className="badge rounded-pill bg-info text-white fs-6">
+          <span className="badge rounded-pill bg-primary fs-6">
             {property.propertyType}
           </span>
         )}

@@ -85,7 +85,7 @@ export default function PropertyCard({
               Ref: {reference}
             </div>
           )}
-          <h5 className="fw-bold text-primary mb-2 fs-5">{title}</h5>
+          <h5 className="fw-bold text-dark mb-2 fs-5">{title}</h5>
           {(city || rooms) && (
             <p className="mb-2 text-muted small">
               {city}
@@ -95,7 +95,7 @@ export default function PropertyCard({
           )}
           {subtitle && <p className="mb-3 text-body small">{subtitle}</p>}
           <div className="d-flex align-items-center justify-content-end border-top pt-3 mt-auto">
-            <span className="fw-bold text-primary fs-5">
+            <span className="fw-bold text-primary fs-4">
               {price != null
                 ? `${currencySymbol}${price.toLocaleString("es-AR")}`
                 : "Consultar precio"}

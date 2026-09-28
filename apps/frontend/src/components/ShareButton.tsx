@@ -37,7 +37,7 @@ export default function ShareButton({ propertySlug }: ShareButtonProps) {
     <div className="position-relative flex-fill">
       <button
         type="button"
-        className="btn btn-info text-white py-2 fw-bold w-100"
+        className="btn btn-outline-primary py-2 fw-bold w-100"
         onClick={handleShare}
       >
         <i className="bi bi-share me-2" aria-hidden="true" />
