@@ -23,7 +23,7 @@ import { ANALYTICS_EVENT } from "@/lib/analytics";
 import "./property-detail.css";
 
 type Property = NonNullable<Awaited<ReturnType<typeof getCachedProperty>>>;
-type PropertyFeature = { label: string; value: string | number };
+type PropertyFeature = { icon: string; value: string | number; label: string };
 
 const STATUS_LABELS: Record<string, string> = {
   reservado: "Reservado",
@@ -61,13 +61,7 @@ export async function generateStaticParams() {
   return slugs.map((entry) => ({ slug: entry.slug }));
 }
 
-function PropertyHeader({
-  property,
-  slug,
-}: {
-  property: Property;
-  slug: string;
-}) {
+function PropertyGallery({ property }: { property: Property }) {
   const statusLabel = property.status
     ? STATUS_LABELS[property.status]
     : undefined;
@@ -81,129 +75,100 @@ function PropertyHeader({
   });
 
   return (
-    <>
-      <Breadcrumb
-        items={[
-          { label: "Inicio", href: "/", isHome: true },
-          { label: "Propiedades", href: "/propiedades" },
-          {
-            label: property.title || "Propiedad",
-            href: `/propiedades/${slug}`,
-          },
-        ]}
-      />
-      {property.reference && (
-        <div className="text-muted small mb-1">Ref: {property.reference}</div>
+    <div className="position-relative">
+      {statusLabel && (
+        <div
+          className={`status-banner${isReservado ? " status-banner--reservado" : ""}`}
+          aria-label={`Propiedad ${statusLabel.toLowerCase()}`}
+        >
+          <span>{statusLabel}</span>
+        </div>
       )}
-      <h1 className="text-dark mb-2" style={{ fontSize: "2.5rem" }}>
-        {property.title}
-      </h1>
-      <div className="d-flex gap-2 mb-2">
+      <div className="rounded-2 overflow-hidden">
+        <ImageCarousel images={carouselImages} title={property.title ?? ""} />
+      </div>
+    </div>
+  );
+}
+
+function PropertySummary({ property }: { property: Property }) {
+  const location = [property.address, property.city].filter(Boolean).join(", ");
+
+  return (
+    <>
+      <div className="d-flex flex-wrap align-items-center gap-2 mb-2">
         {property.operationType && (
           <span
-            className={`badge rounded-pill fs-6 ${property.operationType === "venta" ? "bg-success" : "bg-warning text-dark"}`}
+            className={`badge rounded-pill ${property.operationType === "venta" ? "bg-success" : "bg-warning text-dark"}`}
           >
             {property.operationType === "venta" ? "Venta" : "Alquiler"}
           </span>
         )}
         {property.propertyType && (
-          <span className="badge rounded-pill bg-primary fs-6">
+          <span className="badge rounded-pill bg-primary">
             {property.propertyType}
           </span>
         )}
-      </div>
-
-      <div className="text-primary mb-3" style={{ fontSize: "1.1rem" }}>
-        {property.subtitle && <div>{property.subtitle}</div>}
-        <div>
-          {property.address}
-          {property.address && property.city && ", "}
-          {property.city && <span>{property.city}</span>}
-        </div>
-      </div>
-      <hr className="border-primary mb-4" />
-
-      <div className="position-relative">
-        {statusLabel && (
-          <div
-            className={`status-banner${isReservado ? " status-banner--reservado" : ""}`}
-            aria-label={`Propiedad ${statusLabel.toLowerCase()}`}
-          >
-            <span>{statusLabel}</span>
-          </div>
+        {property.reference && (
+          <span className="text-muted small ms-1">
+            Ref. {property.reference}
+          </span>
         )}
-        <ImageCarousel
-          images={carouselImages}
-          title={property.title ?? ""}
-        />
       </div>
+      <h1 className="fs-4 text-dark mb-1">{property.title}</h1>
+      {location && (
+        <p className="text-secondary mb-1">
+          <i className="bi bi-geo-alt-fill text-primary me-1" aria-hidden="true" />
+          {location}
+        </p>
+      )}
+      {property.subtitle && (
+        <p className="text-muted small mb-3">{property.subtitle}</p>
+      )}
     </>
   );
 }
 
-function PropertyFeaturesGrid({ features }: { features: PropertyFeature[] }) {
+function PropertyFeatureList({ features }: { features: PropertyFeature[] }) {
   if (features.length === 0) return null;
 
   return (
-    <div className="row g-3 my-4 text-center">
+    <ul className="property-features d-flex flex-wrap list-unstyled border-top border-bottom mb-3">
       {features.map((feature) => (
-        <div className="col-6 col-md-4" key={feature.label}>
-          <div className="bg-light rounded-3 p-3 h-100">
-            <div className="fw-bold fs-4 text-primary">{feature.value}</div>
-            <div className="text-muted small">{feature.label}</div>
-          </div>
-        </div>
+        <li key={feature.icon} className="d-flex align-items-center gap-2">
+          <i className={`bi bi-${feature.icon}`} aria-hidden="true" />
+          <span>
+            <b>{feature.value}</b> {feature.label}
+          </span>
+        </li>
       ))}
-    </div>
+    </ul>
   );
 }
 
-function PropertyActions({
+function PropertyPriceBox({
   slug,
   title,
+  price,
   whatsappShareUrl,
   whatsappConsultUrl,
 }: {
   slug: string;
   title: string | null;
+  price: string;
   whatsappShareUrl: string;
   whatsappConsultUrl: string | null;
 }) {
   return (
-    <>
-      <div className="d-flex gap-2 w-100">
-        <TrackedLink
-          href={`/propiedades/${slug}/ficha`}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="btn btn-outline-secondary text-dark py-2 fw-bold flex-fill text-center"
-          eventName={ANALYTICS_EVENT.fichaOpen}
-          eventParams={{ property_slug: slug }}
-        >
-          <i className="bi bi-file-earmark-text me-2" aria-hidden="true" />
-          Ficha
-        </TrackedLink>
-        <ShareButton propertySlug={slug} />
-        <TrackedLink
-          href={whatsappShareUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="btn btn-outline-success py-2 fw-bold flex-fill text-center"
-          aria-label="Compartir por WhatsApp"
-          eventName={ANALYTICS_EVENT.share}
-          eventParams={{ method: "whatsapp", location: "property_detail", property_slug: slug }}
-        >
-          <i className="bi bi-whatsapp me-2" aria-hidden="true" />
-          WhatsApp
-        </TrackedLink>
-      </div>
-      {whatsappConsultUrl && (
-        <div className="mt-4">
+    <div className="property-price-box bg-light border rounded">
+      <div className="d-flex flex-wrap justify-content-between align-items-center gap-2">
+        <p className="fs-3 fw-bold text-primary lh-1 mb-0">{price}</p>
+        {whatsappConsultUrl && (
           <TrackedLink
             href={whatsappConsultUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="btn btn-success text-white px-4 py-3 fw-bold fs-5 w-100"
+            className="btn btn-success text-white fw-bold px-3 flex-grow-1 flex-sm-grow-0"
             eventName={ANALYTICS_EVENT.whatsappContact}
             eventParams={{
               location: "property_detail",
@@ -212,11 +177,37 @@ function PropertyActions({
             }}
           >
             <i className="bi bi-whatsapp me-2" aria-hidden="true" />
-            Consultar por WhatsApp
+            Consultar
           </TrackedLink>
-        </div>
-      )}
-    </>
+        )}
+      </div>
+      <div className="property-price-box__actions d-flex flex-wrap align-items-center gap-3 border-top">
+        <TrackedLink
+          href={`/propiedades/${slug}/ficha`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="btn btn-link btn-sm d-inline-flex align-items-center"
+          eventName={ANALYTICS_EVENT.fichaOpen}
+          eventParams={{ property_slug: slug }}
+        >
+          <i className="bi bi-file-earmark-text me-1" aria-hidden="true" />
+          Ficha
+        </TrackedLink>
+        <ShareButton propertySlug={slug} />
+        <TrackedLink
+          href={whatsappShareUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="btn btn-link btn-sm d-inline-flex align-items-center"
+          aria-label="Compartir por WhatsApp"
+          eventName={ANALYTICS_EVENT.share}
+          eventParams={{ method: "whatsapp", location: "property_detail", property_slug: slug }}
+        >
+          <i className="bi bi-whatsapp me-1" aria-hidden="true" />
+          Enviar
+        </TrackedLink>
+      </div>
+    </div>
   );
 }
 
@@ -267,22 +258,42 @@ export default async function PropertyPage({
   };
 
   const features: PropertyFeature[] = [
-    property.rooms != null && { label: "Dormitorios", value: property.rooms },
-    property.bathrooms != null && { label: "Baños", value: property.bathrooms },
-    property.garages != null && { label: "Cocheras", value: property.garages },
-    property.sizeCovered != null && {
-      label: "Sup. cubierta",
-      value: `${property.sizeCovered} m²`,
+    property.rooms != null && {
+      icon: "door-open",
+      value: property.rooms,
+      label: "dorm.",
     },
-    property.sizeLand != null && {
-      label: "Sup. terreno",
-      value: `${property.sizeLand} m²`,
+    property.bathrooms != null && {
+      icon: "droplet",
+      value: property.bathrooms,
+      label: property.bathrooms === 1 ? "baño" : "baños",
+    },
+    property.garages != null && {
+      icon: "car-front",
+      value: property.garages,
+      label: property.garages === 1 ? "cochera" : "cocheras",
+    },
+    property.sizeCovered != null && {
+      icon: "house-door",
+      value: `${property.sizeCovered} m²`,
+      label: "cub.",
     },
     property.sizeTotal != null && {
-      label: "Sup. total",
+      icon: "rulers",
       value: `${property.sizeTotal} m²`,
+      label: "tot.",
+    },
+    property.sizeLand != null && {
+      icon: "bounding-box",
+      value: `${property.sizeLand} m²`,
+      label: "lote",
     },
   ].filter(Boolean) as PropertyFeature[];
+
+  const price =
+    property.price != null
+      ? `${property.currency === "ARS" ? "AR$" : "US$"}${property.price.toLocaleString("es-AR")}`
+      : "Consultar precio";
 
   const whatsappNumber = organization?.whatsappNumber;
   const whatsappConsultUrl = whatsappNumber
@@ -299,34 +310,41 @@ export default async function PropertyPage({
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <div className="container py-5">
-        <div className="row justify-content-center">
-          <div className="col-12 col-lg-10">
-            <PropertyHeader property={property} slug={slug} />
-            <PropertyFeaturesGrid features={features} />
-            {property.description ? (
-              <div className="mb-5">
-                <PortableText value={property.description} />
-              </div>
-            ) : null}
-
-            <hr className="border-secondary my-4" />
-            <p
-              className="text-primary fw-bold text-center mb-3"
-              style={{ fontSize: "clamp(1.5rem, 5vw, 2.5rem)" }}
-            >
-              {property.price != null
-                ? `${property.currency === "ARS" ? "AR$" : "US$"}${property.price.toLocaleString("es-AR")}`
-                : "Consultar precio"}
-            </p>
-            <PropertyActions
+      <div className="property-detail container pt-3 pb-5">
+        <Breadcrumb
+          items={[
+            { label: "Inicio", href: "/", isHome: true },
+            { label: "Propiedades", href: "/propiedades" },
+            {
+              label: property.title || "Propiedad",
+              href: `/propiedades/${slug}`,
+            },
+          ]}
+        />
+        <div className="row g-4 align-items-start">
+          <div className="col-12 col-lg-7">
+            <PropertyGallery property={property} />
+          </div>
+          <div className="col-12 col-lg-5">
+            <PropertySummary property={property} />
+            <PropertyFeatureList features={features} />
+            <PropertyPriceBox
               slug={slug}
               title={property.title}
+              price={price}
               whatsappShareUrl={whatsappShareUrl}
               whatsappConsultUrl={whatsappConsultUrl}
             />
           </div>
         </div>
+        {property.description ? (
+          <div className="row mt-4">
+            <div className="col-12 col-lg-8">
+              <h2 className="fs-5 fw-semibold mb-2">Descripción</h2>
+              <PortableText value={property.description} />
+            </div>
+          </div>
+        ) : null}
       </div>
       <MapSection
         address={[property.address, property.city, "Argentina"]
