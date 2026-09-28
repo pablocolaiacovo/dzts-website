@@ -125,8 +125,15 @@
 
 .header-nav .nav-link {
   color: #ffffff;
-  font-weight: 400;
+  font-size: var(--font-size-lg);
+  font-weight: 500;
   transition: color 0.2s ease;
+}
+
+@media (min-width: 992px) {
+  .header-nav .nav-link {
+    font-size: var(--font-size-xl);
+  }
 }
 
 .header-nav .nav-link:hover,
