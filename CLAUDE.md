@@ -334,6 +334,7 @@ Two GitHub Actions workflows run on PRs to `dev` and `main`:
 - Use mobile first for css.
 - Prefer bootstrap css classes and components over custom css.
 - Use CSS over JavaScript when possible for animations and dynamic behavior.
+- Brand palette is the manual's three colors only: `--brand-cyan` (`#01BCF3`) and `--brand-grey` (`#404041`) in `variables.css`, plus white. Cyan for prices, subtitles, links, bars and fills; grey for titles and for text on cyan. Don't add derived tones. See `docs/specs/2026-09-28-brand-palette-d-prime.md`.
 - Format prices with `toLocaleString("es-AR")` and display currency as `AR$`/`US$` (not `ARS`/`USD`).
 - Shared types go in `src/types/`, shared utilities in `src/lib/`. Do not duplicate type definitions or utility functions across components — import from the shared location.
 
