@@ -52,6 +52,7 @@
   grid-template-rows: minmax(0, 1fr);
   height: var(--art-rest);
   margin-bottom: 0;
+  padding-block: 0;
   animation: shrink-logo linear both;
   animation-timeline: scroll(root);
   animation-range: 0 120px;
