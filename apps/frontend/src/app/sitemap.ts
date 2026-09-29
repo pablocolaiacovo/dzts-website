@@ -9,11 +9,13 @@ interface PropertySlug {
 }
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL;
+  const rawBaseUrl = process.env.NEXT_PUBLIC_SITE_URL;
 
-  if (!baseUrl) {
+  if (!rawBaseUrl) {
     return [];
   }
+
+  const baseUrl = rawBaseUrl.replace(/\/+$/, "");
 
   const properties = await client.fetch<PropertySlug[]>(`
     *[_type == "property" && defined(slug.current) && published != false] {
@@ -23,7 +25,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   `);
 
   const propertyUrls: MetadataRoute.Sitemap = properties.map((property) => ({
-    url: `${baseUrl}/propiedades/${property.slug}`,
+    url: `${baseUrl}/propiedades/${property.slug}/`,
     lastModified: new Date(property._updatedAt),
     changeFrequency: "weekly",
     priority: 0.8,
@@ -31,12 +33,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   return [
     {
-      url: baseUrl,
+      url: `${baseUrl}/`,
       changeFrequency: "daily",
       priority: 1,
     },
     {
-      url: `${baseUrl}/propiedades`,
+      url: `${baseUrl}/propiedades/`,
       changeFrequency: "daily",
       priority: 0.9,
     },

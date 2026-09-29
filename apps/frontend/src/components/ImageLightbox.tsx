@@ -58,7 +58,7 @@ function LightboxImageBlock({
         doubleClick={{ mode: "toggle" }}
         panning={{ velocityDisabled: true }}
         smooth={!prefersReducedMotion}
-        onTransformed={(_ref, state) => onScaleChange(state.scale)}
+        onTransform={(_ref, state) => onScaleChange(state.scale)}
       >
         <TransformComponent
           wrapperStyle={{

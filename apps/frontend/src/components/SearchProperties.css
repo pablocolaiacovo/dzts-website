@@ -1,14 +1,15 @@
 .logo-container {
   position: relative;
-  width: 12.5rem;
-  height: 6.25rem;
+  width: 18.75rem;
+  height: 9.375rem;
   margin: 0 auto;
+  max-width: 100%;
 }
 
 @media (min-width: 768px) {
   .logo-container {
-    width: 25rem;
-    height: 12.5rem;
+    width: 37.5rem;
+    height: 18.75rem;
   }
 }
 
@@ -33,7 +34,7 @@
   padding: 0.75rem 1.25rem;
   font-size: 1rem;
   border-radius: var(--bs-border-radius);
-  color: var(--bs-primary);
+  color: var(--brand-grey);
   background-color: var(--bs-secondary);
   border: 1px solid var(--bs-primary);
   font-weight: 500;
@@ -42,7 +43,7 @@
 
 .btn-custom:hover {
   background-color: var(--bs-primary);
-  color: var(--bs-secondary);
+  color: var(--brand-grey);
 }
 
 @media (min-width: 768px) {

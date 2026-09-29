@@ -64,7 +64,7 @@ export default async function FichaPage({
   return (
     <>
       <div className="ficha-container">
-        <FichaActions />
+        <FichaActions propertySlug={slug} />
         <header className="ficha-header">
           {property.reference && (
             <div className="ficha-reference">Ref: {property.reference}</div>
@@ -77,7 +77,7 @@ export default async function FichaPage({
               </span>
             )}
             {property.propertyType && (
-              <span className="badge rounded-pill fs-6 bg-secondary text-dark">
+              <span className="badge rounded-pill fs-6 bg-secondary text-white">
                 {property.propertyType}
               </span>
             )}

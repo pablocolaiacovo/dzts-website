@@ -1,19 +1,39 @@
 "use client";
 
 import { useState } from "react";
+import { trackEvent, ANALYTICS_EVENT } from "@/lib/analytics";
 
-export default function FichaActions() {
+type FichaActionsProps = {
+  propertySlug?: string;
+};
+
+export default function FichaActions({ propertySlug }: FichaActionsProps) {
   const [copied, setCopied] = useState(false);
+
+  function handlePrint() {
+    trackEvent(ANALYTICS_EVENT.fichaPrint, { property_slug: propertySlug });
+    window.print();
+  }
 
   async function handleShare() {
     const url = window.location.href;
 
     if (navigator.share) {
       await navigator.share({ title: document.title, url });
+      trackEvent(ANALYTICS_EVENT.share, {
+        method: "native",
+        location: "ficha",
+        property_slug: propertySlug,
+      });
       return;
     }
 
     await navigator.clipboard.writeText(url);
+    trackEvent(ANALYTICS_EVENT.share, {
+      method: "clipboard",
+      location: "ficha",
+      property_slug: propertySlug,
+    });
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   }
@@ -23,7 +43,7 @@ export default function FichaActions() {
       <button
         type="button"
         className="btn btn-dark px-4 py-2 fw-bold"
-        onClick={() => window.print()}
+        onClick={handlePrint}
       >
         <i className="bi bi-printer me-2" aria-hidden="true" />
         Imprimir Ficha

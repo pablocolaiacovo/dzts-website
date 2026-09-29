@@ -64,7 +64,10 @@ The main Opus agent delegates coding tasks to lighter models via custom agents i
 | **Implement** | `implementer` | Sonnet | Components, bug fixes, schema changes, CSS, lint fixes, new routes, caching updates |
 | **DevOps** | `devops` | Sonnet | GitHub Actions workflows, CI failures, releases (dev → main), Dependabot PRs, deploy issues |
 | **Triage** | `triage` | Opus | PR/issue triage: merge-readiness assessment, priority ranking, recommended merge order, release backlog reports |
-| **Architect** | _(main agent)_ | Opus | Multi-system debugging, architecture decisions, planning, PR reviews, new patterns |
+| **UI Developer** | `ui-developer` | Opus | Visual design options, HTML prototypes, implementing the approved design as components + CSS within the brand style |
+| **Reviewer** | `reviewer` | Opus | PR code reviews: correctness bugs, static-export violations, Sanity data handling, conventions, missing tests/specs |
+| **SEO Auditor** | `seo-auditor` | Sonnet | Site audits: technical SEO, structured data, Lighthouse/Core Web Vitals, headers, progress vs. the previous audit |
+| **Architect** | _(main agent)_ | Opus | Multi-system debugging, architecture decisions, planning, new patterns |
 
 ### Delegate to `implementer` (Sonnet) when:
 
@@ -103,13 +106,41 @@ The devops agent does **not** change application source code — if a CI failure
 
 The triage agent **decides and recommends — it never merges, closes, or edits code**. It may apply labels/comments only when explicitly asked. Execution routes onward: merges/releases to `devops`, code fixes to `implementer`/`quick-fix`, business-priority calls to the user.
 
+### Delegate to `ui-developer` (Opus) when:
+
+- Designing a new page, section, or component where the look is not yet decided (needs 2–3 visual options and a recommendation)
+- Building clickable HTML prototypes for review before committing to an implementation
+- Restyling or redesigning existing UI to fit the brand (tokens in `variables.css`, Bootstrap 5, existing component patterns)
+- Implementing an approved design as React components + CSS
+
+The architect writes the brief (requirements, constraints, target page/component); the agent proposes options in phase 1 and implements only the chosen one in phase 2. It is **UI-only**: no Sanity queries/schema, caching, workflows, or e2e tests — it reports data or selector needs back for routing to `implementer`. Plain component/CSS changes with an already-decided look still go to `implementer`.
+
+### Delegate to `reviewer` (Opus) when:
+
+- Reviewing a PR's diff (or a local branch/diff) before merge
+- Auditing a change for correctness bugs, static-export violations (API routes, middleware, server actions, missing `generateStaticParams`), and Sanity `null` handling
+- Checking a schema change ships the regenerated `apps/frontend/src/sanity/types.ts`
+- Checking convention, SEO/a11y, and security regressions, plus missing e2e selector updates, unit tests, or `docs/specs/` entries
+- Posting inline review comments on a PR (only when explicitly asked)
+
+The reviewer **judges and explains — it never pushes, approves, or merges**. It returns a severity-ranked review (🔴 blocking / 🟡 should fix / ⚪ nit) with `path:line` findings and suggested fixes. Fixes route onward to `implementer`/`quick-fix` (app code), `devops` (workflows), or `ui-developer` (design); findings that hinge on an architecture decision come back to the main agent. It differs from `triage`: triage decides *which* PRs are ready and in what order, the reviewer decides *whether one PR's code is right*.
+
+### Delegate to `seo-auditor` (Sonnet) when:
+
+- Auditing the production site or a full local build for technical SEO, structured data, or performance
+- Re-checking pending items from a previous audit after a release
+- Verifying Cache-Control/security headers and sitemap/robots on production
+- Measuring Lighthouse/Core Web Vitals before/after a performance change
+
+The auditor **measures and reports — it never edits code, Sanity content, or GitHub**. Fixes route onward to `implementer`/`quick-fix`/`ui-developer`/`devops`; content fixes route to the user. Content strategy (new page types, competitor gaps) comes back to the main agent. It differs from `reviewer`: the reviewer judges a PR diff before merge, the auditor measures the deployed site.
+
 ### Keep on Opus (handle directly) when:
 
 - Task touches 3+ files with interdependencies
 - Architecture or design decisions are needed
 - Debugging complex issues that require reasoning across multiple systems
 - Planning mode
-- PR reviews or code audits
+- Reviews whose findings require an architecture decision (the reviewer escalates these back)
 - Tasks where the user is asking for opinions/recommendations
 - New patterns not yet established in the codebase
 
@@ -259,7 +290,7 @@ Two GitHub Actions workflows run on PRs to `dev` and `main`:
 - `/propiedades` - Properties listing page with filters, pagination, and active filter badges
 - `/propiedades/[slug]` - Property detail page with images, description, JSON-LD structured data, and location map
 - `/propiedades/[slug]/ficha` - Print-optimized property sheet (no header/footer, `(print)` route group)
-- Custom `not-found.tsx` (branded 404 page) and `error.tsx` (error boundary with retry) at app root and `(site)` route group
+- Custom `not-found.tsx` (branded 404 page) at the app root and in the `(site)` route group; `error.tsx` (error boundary with retry) in `(site)`; `global-error.tsx` at the app root
 
 ### Content Integration
 
@@ -277,13 +308,13 @@ Two GitHub Actions workflows run on PRs to `dev` and `main`:
 - LCP image priority is on the home hero background (`SearchProperties`), not on the header logo.
 - Reduced motion: smooth scroll falls back to `behavior: "auto"`, carousel auto-advance is disabled, and global CSS reduces animations when `prefers-reduced-motion` is set.
 - Header nav background uses `--header-nav-bg` from `apps/frontend/src/styles/variables.css` (no inline style).
+- Header ("Barra Alta"): shows only `siteSettings.headerLogo` (tall lockup, with "inmobiliaria" tagline), no navbar vertical padding (bar height = logo height); the logo shrinks 56→52px (mobile) / 82→64px (`lg`+) via scroll-driven animation. `siteSettings.logo` (compact) is used in the header only as a fallback (×0.746 scale) when `headerLogo` has no asset; it is otherwise for the Footer and JSON-LD. No animation without `animation-timeline` support or with reduced motion. The header is always `position: sticky` and a solid `--header-nav-bg` background on every page, including `/`. See `docs/specs/2026-09-27-header-barra-alta.md`.
 - Map iframe titles are passed via the `MapSection` `title` prop for contextual SEO.
 - Sanity CDN preconnect is included in `apps/frontend/src/app/layout.tsx`.
 - `global-error.tsx` exists as a root error boundary with its own `<html>` and `<body>`.
 - Sitemap static entries omit `lastModified` to avoid `new Date()` on every build.
 - Disabled pagination controls render as `<span>` instead of `<a>`.
 - Footer certification images are set to `loading="lazy"`.
-- Inter font no longer sets an unused CSS variable.
 - Property detail pages export `generateStaticParams()` to pre-render available property slugs at build time.
 
 ## Components
@@ -291,18 +322,20 @@ Two GitHub Actions workflows run on PRs to `dev` and `main`:
 - **MapSection** - Reusable component for displaying embedded Google Maps. Renders full-width iframe (450px height) when address is provided, returns null if no address exists.
 - **ShareButton** - Client component with Web Share API (mobile) / clipboard copy with "Link copiado" feedback (desktop). Used on the property detail page.
 - **FichaActions** - Client component with "Imprimir Ficha" (`window.print()`) and "Compartir" (same share logic as ShareButton) buttons. Used on the print-optimized ficha page.
+- **TrackedLink** - Client component wrapping a real `<a>` (all anchor props pass through) that fires `trackEvent()` on click without `preventDefault()`. Used for the WhatsApp float and the property detail page's Ficha/WhatsApp/consult links.
 
 ## Conventions
 
 - Components in `/app` are Server Components unless marked with `"use client"`
 - Use Next.js Metadata API for SEO (exported `metadata` object). The root layout uses a `title.template` (`"%s | DZTS Inmobiliaria"`), so child pages only set the page-specific part (e.g., `title: "Propiedades"`, not `"Propiedades | DZTS Inmobiliaria"`).
 - Use `next/image` for optimized images
-- Dark mode supported via `prefers-color-scheme` CSS media query.
+- No dark mode: there is no `prefers-color-scheme` color CSS anywhere in the frontend, and the brand palette is calibrated against a white background. Don't add a partial dark block — swapping text colors without darkening the background serves bright cyan on white at 2.2:1.
 - Don't add too many comments to the code.
 - Use double quotes for strings (Prettier is pre-configured for this).
 - Use mobile first for css.
 - Prefer bootstrap css classes and components over custom css.
 - Use CSS over JavaScript when possible for animations and dynamic behavior.
+- Brand palette is the manual's three colors only: `--brand-cyan` (`#01BCF3`) and `--brand-grey` (`#404041`) in `variables.css`, plus white. Cyan for prices, subtitles, links, bars and fills; grey for titles and for text on cyan. Don't add derived tones. See `docs/specs/2026-09-28-brand-palette-d-prime.md`.
 - Format prices with `toLocaleString("es-AR")` and display currency as `AR$`/`US$` (not `ARS`/`USD`).
 - Shared types go in `src/types/`, shared utilities in `src/lib/`. Do not duplicate type definitions or utility functions across components — import from the shared location.
 
@@ -313,8 +346,9 @@ The frontend is deployed as a static site to shared hosting:
 - `next.config.ts` sets `output: "export"` and `trailingSlash: true`.
 - `pnpm build` emits `apps/frontend/out/`; upload that directory to the host.
 - There is **no Node server** in production — no API routes, no middleware, no runtime caching, no server actions.
-- `images.unoptimized: true` disables the Next.js image optimizer (no server to run it). `next/image` still works and emits plain `<img>` tags.
-- Security headers (`X-Content-Type-Options`, `X-Frame-Options`, `Referrer-Policy`) and the trailing-slash redirect live in `apps/frontend/public/.htaccess`, which Next copies into `out/`. Replace with the equivalent nginx config if the host is nginx.
+- `images.loader: "custom"` with `images.loaderFile: "./src/lib/imageLoader.ts"` replaces the default Next.js Image Optimization API (which needs a server we don't have) with the Sanity CDN's own on-the-fly resizing. `next/image` still emits a static `<img>` (no optimizer route to call at request time), but now with a real `srcset`: the loader rewrites each requested width into a `cdn.sanity.io` URL's `w` (and proportionally scaled `h`) query param, so the browser picks the right size instead of always downloading the largest one. URLs that aren't on `cdn.sanity.io` (local `/Images/...` assets, `placehold.co` placeholders) pass through unchanged.
+- Security headers (`X-Content-Type-Options`, `X-Frame-Options`, `Referrer-Policy`), the Cache-Control policy, and the trailing-slash redirect live in `apps/frontend/public/.htaccess`, which Next copies into `out/`. Replace with the equivalent nginx config if the host is nginx.
+- Cache-Control policy (`.htaccess`): hashed assets under `/_next/static/` are `public, max-age=31536000, immutable` (filenames change on every deploy, so caching forever is safe); `/Images/` and `favicon.ico` are `public, max-age=604800` (7 days, not hashed); all `*.html` (including `index.html` served for directory requests like `/propiedades/`), `sitemap.xml`, `robots.txt`, and `llms.txt` are `no-cache` so deploys are visible immediately (ETag/Last-Modified make revalidation cheap).
 - `/propiedades` fetches **all** active properties at build time. Filtering and pagination happen client-side in `PropertiesListing.tsx` via `useSearchParams`.
 - Content updates require a **rebuild + redeploy**. This is automated via `.github/workflows/deploy.yml`: a Sanity webhook fires a `repository_dispatch: sanity-publish` event, the workflow runs `pnpm build`, and `apps/frontend/out/` is uploaded over FTP. See README "Automated Deploys" for the setup. There is no `/api/revalidate` route.
 
@@ -326,7 +360,7 @@ The frontend is deployed as a static site to shared hosting:
 - Ensure only one `<h1>` per page. Section headings within page content should use `<h2>` or lower.
 - **robots.txt** (`src/app/robots.ts`): Environment-aware. Reads `SITE_ENV`, falling back to `VERCEL_ENV`. Only `"production"` allows indexing; everything else emits `Disallow: /`. `SITE_ENV=production` is set by `.github/workflows/deploy.yml` for FTP builds; `VERCEL_ENV` is auto-injected by Vercel, which keeps preview deploys blocked from search engines automatically.
 - **sitemap.xml** (`src/app/sitemap.ts`): Dynamically generated. Includes home, `/propiedades`, and all property detail pages fetched from Sanity.
-- **llms.txt** (`src/app/llms.txt/route.ts`): Markdown file for AI agents/LLMs ([spec](https://llmstxt.org/)). Lists main pages and all properties to help LLMs understand site content.
+- **llms.txt** (generated by `scripts/generate-llms-txt.mjs` in the frontend's `prebuild` step): Markdown file for AI agents/LLMs ([spec](https://llmstxt.org/)). Lists main pages and all properties to help LLMs understand site content.
 - Property detail title/description are generated by `src/lib/propertySeo.ts` (`buildPropertyTitle`, `buildPropertyDescription`) from title, operation, city, neighborhood, subtitle, rooms and price, since raw Sanity content is often all-caps and too short for search snippets; Sanity's `seo.metaTitle`/`seo.metaDescription` on the property still override these via `resolveMetadata()`.
 - `SITE_NAME` (`src/lib/seo.ts`) is the single source of truth for the brand string, used by the root layout's `title.default`/`title.template`. The home `page.tsx` sits at the same level as the root layout, so `title.template` doesn't apply to it: when Sanity has a home `metaTitle`, it's passed through `withSiteName()` to append `SITE_NAME` (unless already present, case-insensitively) before being set as `title: { absolute: ... }`; with no `metaTitle`, `title` is deleted so the layout default applies.
 
@@ -391,7 +425,7 @@ When modifying components, be aware these selectors are used by e2e tests:
 - `homePage.sections[]` includes optional `anchorId` for header anchors (e.g., `/#servicios`, `/#nosotros`).
 - Header smooth-scrolls to anchors when already on `/` and updates the hash without full navigation.
 - `TextImageSection` supports a carousel (multiple images) via `SectionCarousel` component. Always uses `urlFor()` for images (requires `_id` in GROQ query).
-- Anchored sections use `scroll-margin-top: 60px` to offset the sticky header.
+- Anchored sections use `scroll-margin-top: 64px` (`80px` on `lg`+) to offset the header's scrolled height.
 - The `/propiedades` listing page fetches all active properties at build time and passes them to `PropertiesListing.tsx`, a client component that reads `useSearchParams` to handle filtering and pagination without navigation round-trips.
 - Route groups: `(site)` wraps pages with header/footer/WhatsApp button via its own layout; `(print)` provides a minimal layout for the ficha page. Root layout only has html/body/fonts/bootstrap.
 - The ficha page (`/propiedades/[slug]/ficha`) uses raw `<img>` tags (not `next/image`) for print reliability. It has `robots: { index: false, follow: false }`.
@@ -400,3 +434,4 @@ When modifying components, be aware these selectors are used by e2e tests:
 - WhatsApp consultation URL is built from `siteSettings.whatsappNumber` with a pre-filled message including the property name.
 - Sold/rented properties display a status banner ribbon (CSS-only, positioned absolute) overlaying the image carousel.
 - `TextImageSection` displays images in large circles (full column width, `border-radius: 50%`, `aspect-ratio: 1/1`).
+- `src/lib/analytics.ts` exports `trackEvent()` (wraps `sendGAEvent` from `@next/third-parties/google`) and the `ANALYTICS_EVENT` constants (`whatsappContact`, `share`, `fichaOpen`, `fichaPrint`) for GA4 conversion tracking. Safe no-op with no measurement id, on the server, or without `window.gtag`; never throws; strips `undefined` params.

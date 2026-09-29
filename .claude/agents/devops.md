@@ -32,7 +32,7 @@ apps/studio/     # Sanity Studio v5 → deployed to *.sanity.studio
 
 There is **no server in production** for the frontend — it is a static export on shared hosting. No API routes, no middleware, no runtime revalidation. Content updates require rebuild + redeploy (triggered by a Sanity webhook via `repository_dispatch: sanity-publish`).
 
-## Critical Gotchas (memorize these)
+## Gotchas
 
 1. **pnpm filter names**: the frontend's filter is `dzts-website` (its `package.json` `name`), NOT `frontend`. The studio is `dzts-studio`. A wrong filter **silently no-ops** the step — CI stays green while doing nothing.
 2. **ci.yml typechecks the frontend, it does not build it.** The static export fetches Sanity content at build time, which fails on the `ci-placeholder` creds (`Dataset not found`). The real `next build` is validated in `e2e.yml` against the `Preview` environment's non-prod creds. Do not "fix" ci.yml by adding a frontend build.

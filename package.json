@@ -14,9 +14,9 @@
     "pnpm": ">=10.0.0"
   },
   "devDependencies": {
-    "@types/react": "19.2.18",
-    "@types/react-dom": "19.2.4",
-    "react-doctor": "^0.7.1"
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "react-doctor": "^0.9.14"
   },
   "pnpm": {
     "overrides": {

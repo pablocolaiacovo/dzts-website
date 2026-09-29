@@ -79,13 +79,13 @@ export default function PropertyCard({
           )}
         </div>
         <div className="w-100 bg-primary" style={{ height: 4 }}></div>
-        <div className="card-body text-center pb-2 bg-light rounded-bottom-4">
+        <div className="card-body d-flex flex-column text-center pb-2 bg-light rounded-bottom-4">
           {reference && (
             <div className="text-muted small mb-1" style={{ fontSize: "0.75rem" }}>
               Ref: {reference}
             </div>
           )}
-          <h5 className="fw-bold text-primary mb-2 fs-5">{title}</h5>
+          <h5 className="fw-bold text-dark mb-2 fs-5">{title}</h5>
           {(city || rooms) && (
             <p className="mb-2 text-muted small">
               {city}
@@ -94,8 +94,8 @@ export default function PropertyCard({
             </p>
           )}
           {subtitle && <p className="mb-3 text-body small">{subtitle}</p>}
-          <div className="d-flex align-items-center justify-content-end border-top pt-3">
-            <span className="fw-bold text-primary fs-5">
+          <div className="d-flex align-items-center justify-content-end border-top pt-3 mt-auto">
+            <span className="fw-bold text-primary fs-4">
               {price != null
                 ? `${currencySymbol}${price.toLocaleString("es-AR")}`
                 : "Consultar precio"}

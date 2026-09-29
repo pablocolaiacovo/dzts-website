@@ -10,6 +10,35 @@ DirectoryIndex index.html
   Header set Referrer-Policy "strict-origin-when-cross-origin"
 </IfModule>
 
+<IfModule mod_headers.c>
+  # Cache-Control policy. Next.js content-hashes every /_next/static/ asset
+  # (filenames change on every deploy), so those can be cached forever as
+  # immutable. HTML, and the hand-authored crawler files, must revalidate on
+  # every request so deploys are visible immediately; the ETag/Last-Modified
+  # headers Apache already sends make that revalidation cheap (304s).
+  #
+  # <LocationMatch> is not permitted in per-directory context (.htaccess), so
+  # path-prefix rules use the core <If> directive (Apache 2.4 ap_expr) against
+  # REQUEST_URI instead. Filename-based rules use <FilesMatch>, which matches
+  # against the resolved filename -- including the index.html that
+  # DirectoryIndex serves for directory requests like /propiedades/.
+  <If "%{REQUEST_URI} =~ m#^/_next/static/#">
+    Header set Cache-Control "public, max-age=31536000, immutable"
+  </If>
+
+  <If "%{REQUEST_URI} =~ m#^/Images/# || %{REQUEST_URI} == '/favicon.ico'">
+    Header set Cache-Control "public, max-age=604800"
+  </If>
+
+  <FilesMatch "\.html$">
+    Header set Cache-Control "no-cache"
+  </FilesMatch>
+
+  <FilesMatch "^(sitemap\.xml|robots\.txt|llms\.txt)$">
+    Header set Cache-Control "no-cache"
+  </FilesMatch>
+</IfModule>
+
 <IfModule mod_rewrite.c>
   RewriteEngine On
 

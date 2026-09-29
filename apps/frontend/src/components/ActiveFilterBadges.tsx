@@ -145,7 +145,7 @@ export default function ActiveFilterBadges({
       {appliedFilters.map(({ key, value, label, icon }) => (
         <span
           key={`${key}-${value}`}
-          className="badge bg-primary bg-opacity-10 text-primary border border-primary rounded-pill d-inline-flex align-items-center gap-1 px-3 py-2"
+          className="badge bg-primary bg-opacity-10 text-dark border border-primary rounded-pill d-inline-flex align-items-center gap-1 px-3 py-2"
         >
           <i className={`bi ${icon}`}></i>
           {label}

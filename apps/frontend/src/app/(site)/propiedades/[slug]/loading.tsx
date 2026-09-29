@@ -1,47 +1,41 @@
 export default function PropertyLoading() {
   return (
     <>
-      <div className="container py-5">
-        <div className="row justify-content-center">
-          <div className="col-12 col-lg-10">
-            <nav aria-label="breadcrumb" className="mb-3">
-              <div className="placeholder-glow">
-                <span className="placeholder col-4"></span>
-              </div>
-            </nav>
+      <div className="container pt-3 pb-5">
+        <nav aria-label="breadcrumb" className="mb-2">
+          <div className="placeholder-glow">
+            <span className="placeholder col-4"></span>
+          </div>
+        </nav>
 
-            <div className="placeholder-glow mb-2">
-              <span className="placeholder col-7"></span>
-            </div>
-            <div className="d-flex gap-2 mb-2 placeholder-glow">
-              <span className="placeholder rounded-pill" style={{ width: 90, height: 28 }}></span>
-              <span className="placeholder rounded-pill" style={{ width: 120, height: 28 }}></span>
-            </div>
-
-            <div className="placeholder-glow mb-3">
-              <span className="placeholder col-8 d-block mb-2"></span>
-              <span className="placeholder col-6 d-block"></span>
-            </div>
-            <hr className="border-primary mb-4" />
-
-            <div className="carousel-image-container position-relative mb-4">
-              <div className="placeholder-glow bg-light rounded-3 w-100 h-100">
+        <div className="row g-4 align-items-start">
+          <div className="col-12 col-lg-7">
+            <div className="carousel-image-container position-relative rounded-2 overflow-hidden">
+              <div className="placeholder-glow bg-light w-100 h-100">
                 <span className="placeholder w-100 h-100 d-block"></span>
               </div>
             </div>
-
-            <div className="placeholder-glow mb-5">
-              <span className="placeholder col-12 d-block mb-2"></span>
-              <span className="placeholder col-11 d-block mb-2"></span>
-              <span className="placeholder col-10 d-block mb-2"></span>
-              <span className="placeholder col-9 d-block"></span>
+          </div>
+          <div className="col-12 col-lg-5 placeholder-glow">
+            <div className="d-flex gap-2 mb-2">
+              <span className="placeholder rounded-pill" style={{ width: 60, height: 22 }}></span>
+              <span className="placeholder rounded-pill" style={{ width: 80, height: 22 }}></span>
             </div>
+            <span className="placeholder col-10 d-block mb-2" style={{ height: 28 }}></span>
+            <span className="placeholder col-7 d-block mb-2"></span>
+            <span className="placeholder col-5 d-block mb-3"></span>
+            <span className="placeholder col-12 d-block mb-3" style={{ height: 56 }}></span>
+            <span className="placeholder col-12 d-block rounded" style={{ height: 96 }}></span>
+          </div>
+        </div>
 
-            <hr className="border-secondary my-4" />
-            <div className="d-flex flex-column flex-md-row align-items-center justify-content-between gap-3 placeholder-glow">
-              <span className="placeholder col-5" style={{ height: 34 }}></span>
-              <span className="placeholder col-4" style={{ height: 46 }}></span>
-            </div>
+        <div className="row mt-4">
+          <div className="col-12 col-lg-8 placeholder-glow">
+            <span className="placeholder col-3 d-block mb-3" style={{ height: 24 }}></span>
+            <span className="placeholder col-12 d-block mb-2"></span>
+            <span className="placeholder col-11 d-block mb-2"></span>
+            <span className="placeholder col-10 d-block mb-2"></span>
+            <span className="placeholder col-9 d-block"></span>
           </div>
         </div>
       </div>
