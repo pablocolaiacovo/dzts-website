@@ -1,14 +1,11 @@
 /* ==========================================================================
    Header — "Barra Alta"
-   Una sola fila. Lockup completo (con bajada "inmobiliaria") en reposo; al
-   hacer scroll la barra se comprime y el lockup hace crossfade al recorte
-   compacto (sin bajada), que a esa altura ya sería ilegible.
+   Una sola fila, sin padding vertical: la barra mide lo que el logo. Solo el
+   lockup alto (headerLogo) y se achica al scrollear. Si falta headerLogo se
+   usa el logo compacto (escala 0.746, su proporción respecto del lockup).
 
-   Altura de arte (recortada, sin padding transparente):
-     móvil    reposo 56px (lockup completo)  → scroll 52px (compacto)
-     desktop  reposo 82px (lockup completo)  → scroll 64px (compacto)
-   Altura de barra:
-     móvil    80px → ~68px      desktop 110px → ~84px
+   Altura del logo (= altura de la barra):
+     móvil    56px → 52px      desktop  82px → 64px
    ========================================================================== */
 
 .sticky-header {
@@ -18,129 +15,42 @@
 }
 
 .sticky-header .navbar {
-  background-color: var(--header-nav-bg);
+  --bs-navbar-padding-y: 0;
   --art-rest: 56px;
   --art-scrolled: 52px;
-  --pad-rest: 0.75rem;
-  --pad-scrolled: 0.5rem;
-  padding-top: var(--pad-rest);
-  padding-bottom: var(--pad-rest);
-  animation: shrink-navbar linear both;
-  animation-timeline: scroll(root);
-  animation-range: 0 120px;
+  background-color: var(--header-nav-bg);
 }
 
 @media (min-width: 992px) {
   .sticky-header .navbar {
     --art-rest: 82px;
     --art-scrolled: 64px;
-    --pad-rest: 0.875rem;
-    --pad-scrolled: 0.625rem;
   }
 }
 
-@keyframes shrink-navbar {
-  to {
-    padding-top: var(--pad-scrolled);
-    padding-bottom: var(--pad-scrolled);
-  }
-}
-
-/* La marca es una caja apilada: los dos recortes ocupan la misma celda. */
 .header-logo {
-  display: grid;
-  grid-template-rows: minmax(0, 1fr);
-  height: var(--art-rest);
-  margin-bottom: 0;
+  --logo-scale: 1;
+  height: calc(var(--art-rest) * var(--logo-scale));
   padding-block: 0;
   animation: shrink-logo linear both;
   animation-timeline: scroll(root);
   animation-range: 0 120px;
 }
 
-/* Al desaparecer la bajada sobra el 25.4% inferior de la caja: se recupera
-   con margen negativo para que la barra no quede desbalanceada. */
+.header-logo-compact {
+  --logo-scale: 0.746;
+}
+
 @keyframes shrink-logo {
   to {
-    height: var(--art-scrolled);
-    margin-bottom: calc(var(--art-scrolled) * -0.254);
+    height: calc(var(--art-scrolled) * var(--logo-scale));
   }
 }
 
 .header-logo img {
-  grid-area: 1 / 1;
-  width: auto;
-  justify-self: start;
-  align-self: start;
-}
-
-.logo-full {
-  height: 100%;
-  animation: mark-out linear both;
-  animation-timeline: scroll(root);
-  animation-range: 0 70px;
-}
-
-.logo-compact {
-  height: 74.6%;
-  opacity: 0;
-  animation: mark-in linear both;
-  animation-timeline: scroll(root);
-  animation-range: 0 70px;
-}
-
-@keyframes mark-out {
-  0%,
-  25% {
-    opacity: 1;
-  }
-
-  55%,
-  100% {
-    opacity: 0;
-  }
-}
-
-@keyframes mark-in {
-  0%,
-  55% {
-    opacity: 0;
-  }
-
-  85%,
-  100% {
-    opacity: 1;
-  }
-}
-
-/* Un solo logo cargado en Sanity: sin crossfade, siempre visible. Con solo
-   el completo la caja va de --art-rest a --art-scrolled; con solo el compacto
-   mantiene su proporción (74.6%) y también se achica al scrollear. */
-.header-logo.logo-single {
-  animation-name: shrink-logo-single;
-}
-
-.header-logo.logo-single-compact {
-  height: calc(var(--art-rest) * 0.746);
-  animation-name: shrink-logo-single-compact;
-}
-
-.header-logo.logo-single .logo-solo {
   display: block;
   height: 100%;
-  opacity: 1;
-}
-
-@keyframes shrink-logo-single {
-  to {
-    height: var(--art-scrolled);
-  }
-}
-
-@keyframes shrink-logo-single-compact {
-  to {
-    height: calc(var(--art-scrolled) * 0.746);
-  }
+  width: auto;
 }
 
 .header-nav .nav-link {
@@ -169,71 +79,16 @@
   border-radius: 2px;
 }
 
-/* Navegadores sin scroll-driven animations (Firefox <144, Safari <26) y
-   reducción de movimiento: sin animaciones; queda un estado estático
-   intermedio con solo el logo compacto, sin margen negativo. */
+/* Sin scroll-driven animations (Firefox <144, Safari <26) o con reducción de
+   movimiento: sin animación; el logo queda estático en su tamaño de reposo. */
 @supports not (animation-timeline: scroll(root)) {
-  .sticky-header .navbar,
-  .sticky-header .header-logo,
-  .sticky-header .header-logo img {
+  .header-logo {
     animation: none;
-  }
-
-  .sticky-header .navbar {
-    --art-rest: 48px;
-    padding-top: 0.625rem;
-    padding-bottom: 0.625rem;
-  }
-
-  @media (min-width: 992px) {
-    .sticky-header .navbar {
-      --art-rest: 66px;
-    }
-  }
-
-  .header-logo.logo-single-compact {
-    height: var(--art-rest);
-  }
-
-  .logo-full {
-    display: none;
-  }
-
-  .logo-compact {
-    opacity: 1;
-    height: 100%;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .sticky-header .navbar,
-  .sticky-header .header-logo,
-  .sticky-header .header-logo img {
+  .header-logo {
     animation: none;
-  }
-
-  .sticky-header .navbar {
-    --art-rest: 50px;
-    padding-top: 0.625rem;
-    padding-bottom: 0.625rem;
-  }
-
-  @media (min-width: 992px) {
-    .sticky-header .navbar {
-      --art-rest: 70px;
-    }
-  }
-
-  .header-logo.logo-single-compact {
-    height: var(--art-rest);
-  }
-
-  .logo-full {
-    display: none;
-  }
-
-  .logo-compact {
-    opacity: 1;
-    height: 100%;
   }
 }

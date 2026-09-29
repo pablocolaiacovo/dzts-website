@@ -7,90 +7,61 @@
 
 ## Goal
 
-Replace the header's fixed-size single logo with a two-state lockup: a tall
-lockup (with the "inmobiliaria" tagline) shown at rest, that shrinks and
-crossfades into the current compact logo as the visitor scrolls. Approved
-from a set of HTML prototypes; this spec ports the chosen "Opción 1 — Barra
-Alta" prototype into the codebase. The header keeps a solid background and
-`position: sticky` on every page, including `/`.
+Replace the header's fixed-size single logo with a taller lockup (with the
+"inmobiliaria" tagline) that shrinks slightly as the visitor scrolls.
+Approved from a set of HTML prototypes ("Opción 1 — Barra Alta"), then
+simplified by a later client decision (see Decisions). The header keeps a
+solid background and `position: sticky` on every page, including `/`.
 
 ## Decisions
 
-### Two logos, one grid cell, CSS-only crossfade
+### Final behavior: only the tall lockup, no navbar padding
 
-`.header-logo` is a CSS grid with a single row; `.logo-full` and
-`.logo-compact` both occupy `grid-area: 1 / 1` so they stack instead of
-flowing side by side. Scroll-driven animations (`animation-timeline:
-scroll(root)`) crossfade opacity between the two images and shrink the
-navbar's padding and the logo box's height as the page scrolls the first
-~120px. No JavaScript scroll listener is needed — this is the same technique
-the existing `shrink-navbar`/`shrink-logo` animations already used, extended
-to two images instead of one.
+A later client decision (approved on a live mock) removed the two-logo
+crossfade and the navbar's vertical padding. The header renders only
+`headerLogo`; the navbar has `--bs-navbar-padding-y: 0`, so the bar height is
+the logo box height (the 40px toggler fits inside). `.header-logo` height is
+animated with `animation-timeline: scroll(root)` over the first 120px from
+`--art-rest` to `--art-scrolled`: 56px → 52px on mobile, 82px → 64px on `lg`+.
+The image is `height: 100%; width: auto`. `.header-logo` keeps
+`padding-block: 0` (cancels Bootstrap's `.navbar-brand` padding); the logo sits
+flush, which the client approved.
 
-Art height: mobile 56px (full) → 52px (compact) at rest/scrolled; `lg`+ 82px →
-64px. When the tall lockup's tagline area disappears, the box's height drops
-by more than the compact image needs, so a negative `margin-bottom` (`-25.4%`
-of the scrolled height) recovers the freed space and keeps the bar visually
-balanced — ported as-is from the prototype's measurements.
+### Fallback: compact logo
 
-### Sequential fade
+When `headerLogo` has no asset, `Header.tsx` renders `siteSettings.logo`
+instead and adds `header-logo-compact` (`--logo-scale: 0.746`), so the box
+goes from `--art-rest * 0.746` to `--art-scrolled * 0.746`. If neither exists
+the link is empty. The link keeps `.navbar-brand` (e2e selector) and its
+`aria-label`; the image uses `alt=""`.
 
-Over the first 70px of scroll, `.logo-full` fades out between 25% and 55% of
-the range and `.logo-compact` fades in between 55% and 85%. There is a brief
-moment where neither is visible; the client approved this.
-
-### Fallback for browsers without scroll-driven animations, and reduced motion
+### No scroll-driven animations, and reduced motion
 
 `@supports not (animation-timeline: scroll(root))` (Safari < 26, Firefox <
-144) and `prefers-reduced-motion: reduce` set `animation: none` on the navbar,
-the logo box and its images. Without this, browsers that drop
-`animation-timeline` would run the keyframes as 0s time-based animations with
-`fill: both`, freezing at the end keyframe (negative margin, logo overflowing
-the bar). The static state is: `.logo-full` hidden, `.logo-compact` at 100% of
-a fixed box (48/66px in `@supports not`, 50/70px in reduced motion, mobile /
-`lg`+), no negative margin, navbar padding 0.625rem.
+144) and `prefers-reduced-motion: reduce` set `animation: none` on
+`.header-logo`. Without it, browsers that drop `animation-timeline` would run
+the keyframes as 0s time-based animations with `fill: both` and freeze at the
+end keyframe. The logo stays static at `--art-rest` (or its ×0.746).
 
-### Single-logo modes
+### Rejected along the way
 
-When only one of `logo` / `headerLogo` has an asset, `Header.tsx` renders that
-single image (`alt=""`, `.logo-solo`) and adds `logo-single` to `.header-logo`,
-so the brand never disappears and there is no crossfade:
+- A transparent, `position: fixed` home header that solidified on scroll:
+  the client wanted the bar consistent across pages.
+- A two-logo crossfade (tall lockup into the compact logo, with a negative
+  margin trick and animated navbar padding): dropped in favor of the simpler
+  behavior above.
 
-- Only `headerLogo`: box shrinks from `--art-rest` to `--art-scrolled`, no
-  negative margin.
-- Only `logo` (`logo-single-compact`): box height goes from
-  `--art-rest * 0.746` to `--art-scrolled * 0.746` (the compact's proportional
-  size), so the bar keeps shrinking on scroll as it did before this redesign.
-- In `@supports not` / reduced motion both are static; `logo-single-compact`
-  uses the fixed box height with the image at 100%.
-
-The link's accessible name comes from its `aria-label`
-(`"<siteName> - Home"`), not from image alt text; all header images use
-`alt=""`.
-
-### Always-solid, sticky header on every page (including home)
-
-A transparent, `position: fixed` header that floated over the home hero and
-solidified on scroll was tried and rejected by the client — they wanted the
-bar visually consistent across all pages, not different on `/`. The header
-is `position: sticky` and a solid `var(--header-nav-bg)` background
-everywhere, including `/`; the only change on any page is the taller art
-size and the two-logo crossfade.
-
-`TextImageSection`'s anchored sections (`/#servicios`, `/#nosotros`) keep
-their `scroll-margin-top` at 80px/100px (mobile/`lg`+) to clear the taller
-*scrolled* bar height (~68px/~84px) now that the art is bigger.
+`TextImageSection`'s anchored sections (`/#servicios`, `/#nosotros`) use
+`scroll-margin-top` 64px / 80px (mobile / `lg`+), i.e. the scrolled bar height
+(52 / 64px) plus a small gap.
 
 ### New `headerLogo` field instead of reusing `logo`
 
-`logo` (the existing field) keeps being the compact mark used in the footer,
-`RealEstateAgent` JSON-LD, and now the header's scrolled/compact state.
-`headerLogo` is a new, separate Sanity image field for the tall lockup —
-adding it as its own field (rather than deriving a "tall" crop from `logo`)
-means the editor can upload a differently-cropped asset with the tagline
-without touching the mark that's shared with the footer/SEO, and lets
-production keep working with a single logo until someone uploads the new
-one.
+`logo` keeps being the compact mark used in the footer and `RealEstateAgent`
+JSON-LD (and as the header fallback). `headerLogo` is a separate Sanity image
+field for the tall lockup, so the editor can upload a differently-cropped
+asset without touching the mark shared with the footer/SEO, and production
+keeps working with a single logo until the new one is uploaded.
 
 ### Hero logo and nav links
 
@@ -114,21 +85,16 @@ would otherwise inflate the bar.
   edits needed).
 - `apps/frontend/src/app/(site)/layout.tsx` — passes `headerLogo` through to
   `Header`.
-- `apps/frontend/src/components/Header.tsx` — renders `.logo-full` and
-  `.logo-compact` when both logos exist, or a single `.logo-solo` image with
-  a `logo-single` modifier otherwise (all with `alt=""`; the link's
-  `aria-label` names the brand); each sized via `urlFor(...).width(400)` (~2x the largest
-  rendered width, the `lg`+ full lockup at ~190px). Neither image gets
-  `priority` — the LCP candidate is the hero background image, not the
-  header.
-- `apps/frontend/src/components/Header.css` — full rewrite: `--art-rest` /
-  `--art-scrolled` / `--pad-rest` / `--pad-scrolled` custom properties on
-  `.sticky-header .navbar`, the `.header-logo` grid + `shrink-logo`/`mark-
-  in`/`mark-out` keyframes, `logo-single` modifiers, and
-  `@supports not` / `prefers-reduced-motion` fallbacks. The header stays
-  `position: sticky` with a solid background on every page.
+- `apps/frontend/src/components/Header.tsx` — renders a single image:
+  `headerLogo`, or `logo` (with `header-logo-compact`) as fallback (`alt=""`;
+  the link's `aria-label` names the brand), via `urlFor(...).width(400)`.
+  No `priority` — the LCP candidate is the hero background image.
+- `apps/frontend/src/components/Header.css` — `--art-rest` / `--art-scrolled`
+  on `.sticky-header .navbar`, zero navbar padding, the `.header-logo` box +
+  `shrink-logo` keyframes, `--logo-scale` for the compact fallback, and the
+  `@supports not` / reduced-motion `animation: none`.
 - `apps/frontend/src/components/TextImageSection.css` — `.section-block`
-  `scroll-margin-top` raised from `60px` to `80px`/`100px` (mobile/`lg`+).
+  `scroll-margin-top` set to `64px`/`80px` (mobile/`lg`+).
 - `docs/specs/2026-09-27-header-barra-alta.md` — this file.
 
 ## Operational notes
@@ -140,7 +106,7 @@ would otherwise inflate the bar.
   in Sanity Studio, upload the cropped tall lockup (with the "inmobiliaria"
   tagline, ~2.3:1 aspect ratio) to **Configuración del Sitio → Logo y Marca →
   "Logo del header (completo)"**. Until that upload happens, the header shows
-  the compact logo only at its proportional size, still shrinking on scroll.
+  the compact logo at its proportional size, still shrinking on scroll.
 - `pnpm build` was attempted against the `development` Sanity dataset and
   failed at `generateStaticParams()` for `/propiedades/[slug]` and
   `/propiedades/[slug]/ficha` ("returned an empty array") — that dataset has

@@ -95,14 +95,11 @@ export default function Header({
     }
   };
 
-  const compactUrl = logo?.asset ? urlFor(logo).width(400).url() : null;
-  const fullUrl = headerLogo?.asset
+  const headerLogoUrl = headerLogo?.asset
     ? urlFor(headerLogo).width(400).url()
     : null;
-  const soloUrl = fullUrl && compactUrl ? null : (fullUrl ?? compactUrl);
-  const logoClass = soloUrl
-    ? `logo-single${fullUrl ? "" : " logo-single-compact"}`
-    : "";
+  const compactLogoUrl = logo?.asset ? urlFor(logo).width(400).url() : null;
+  const logoUrl = headerLogoUrl ?? compactLogoUrl;
 
   return (
     <>
@@ -114,36 +111,16 @@ export default function Header({
           <div className="container">
             <Link
               href="/"
-              className={`navbar-brand header-logo ${logoClass}`.trim()}
+              className={`navbar-brand header-logo${headerLogoUrl ? "" : " header-logo-compact"}`}
               aria-label={`${siteName || ""} - Home`}
             >
-              {fullUrl && compactUrl ? (
-                <>
-                  <Image
-                    src={fullUrl}
-                    alt=""
-                    width={190}
-                    height={82}
-                    className="logo-full"
-                  />
-                  <Image
-                    src={compactUrl}
-                    alt=""
-                    width={258}
-                    height={82}
-                    className="logo-compact"
-                  />
-                </>
-              ) : (
-                soloUrl && (
-                  <Image
-                    src={soloUrl}
-                    alt=""
-                    width={fullUrl ? 190 : 258}
-                    height={82}
-                    className="logo-solo"
-                  />
-                )
+              {logoUrl && (
+                <Image
+                  src={logoUrl}
+                  alt=""
+                  width={headerLogoUrl ? 190 : 258}
+                  height={82}
+                />
               )}
             </Link>
 
