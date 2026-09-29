@@ -1,7 +1,9 @@
+import "./property-detail.css";
+
 export default function PropertyLoading() {
   return (
     <>
-      <div className="container pt-3 pb-5">
+      <div className="property-detail container pt-3 pb-5">
         <nav aria-label="breadcrumb" className="mb-2">
           <div className="placeholder-glow">
             <span className="placeholder col-4"></span>
