@@ -78,17 +78,24 @@
   color: #0684ac;
 }
 
+.property-detail .carousel-image-container {
+  aspect-ratio: 4 / 3;
+}
+
 @media (min-width: 992px) {
   .property-detail .carousel-image-container {
     aspect-ratio: 3 / 2;
   }
 }
 
-.property-description p {
+.property-description :is(p, li) {
   line-height: var(--line-height-normal);
+}
+
+.property-description :is(p, ul, ol) {
   margin-bottom: 0.625rem;
 }
 
-.property-description p:last-child {
+.property-description > :last-child {
   margin-bottom: 0;
 }
