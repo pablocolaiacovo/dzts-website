@@ -40,23 +40,20 @@ Path alias: `@/*` maps to `./src/*` within the frontend app.
 
 ## Sanity Integration
 
-- Fetch data server-side via `sanityFetch`
-- Caching: `"use cache"` directive + `cacheLife("hours"|"minutes")` + `cacheTag()`
-- Every cached function must include a `cacheTag()` matching the Sanity `_type`
-- `revalidateTag(tag, "max")` requires two args in Next.js 16
+- Fetch data server-side via `sanityFetch`; it runs at build time, because the frontend is a static export (`output: "export"`). There is no runtime caching, revalidation, API route, middleware, or server action — content changes ship by rebuilding and redeploying.
 - Property images can have `null` url/metadata - normalize before use
 
 ## Commands
 
-- Frontend lint: `pnpm --filter frontend lint`
-- Frontend build: `pnpm --filter frontend build`
+- Frontend lint: `pnpm --filter dzts-website lint`
+- Frontend typecheck: `pnpm --filter dzts-website exec tsc --noEmit`
+- Frontend unit tests: `pnpm --filter dzts-website test`
 - Frontend e2e tests: `pnpm build && pnpm test:e2e` (from `apps/frontend/`)
 - Studio typegen: `pnpm --filter dzts-studio typegen`
-- pnpm filter name for frontend is `dzts-website` (from `package.json` `name`), not `frontend`
+- The frontend's pnpm filter is `dzts-website` (its `package.json` `name`); `--filter frontend` matches nothing and silently no-ops
 
 ## Key Patterns
 
-- `ContactButton` pattern: thin client component wrapping a dynamically imported modal, used from server components
 - `TextImageSection`: renders Portable Text + images, supports carousel and anchor IDs
 - Filter types in `src/types/filters.ts`, helpers in `src/lib/filters.ts`
 

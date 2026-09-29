@@ -14,6 +14,7 @@ type NavItem = NonNullable<SiteSettings["mainNavigation"]>[number];
 
 type HeaderProps = {
   logo?: SiteSettings["logo"];
+  headerLogo?: SiteSettings["headerLogo"];
   siteName?: SiteSettings["siteName"];
   navigation?: SiteSettings["mainNavigation"];
 };
@@ -78,7 +79,12 @@ function NavItemLink({ item, pathname, onCollapseNav }: NavItemLinkProps) {
   );
 }
 
-export default function Header({ logo, siteName, navigation }: HeaderProps) {
+export default function Header({
+  logo,
+  headerLogo,
+  siteName,
+  navigation,
+}: HeaderProps) {
   const navCollapseRef = useRef<HTMLDivElement>(null);
   const pathname = usePathname();
 
@@ -89,8 +95,11 @@ export default function Header({ logo, siteName, navigation }: HeaderProps) {
     }
   };
 
-  const logoUrl = logo?.asset ? urlFor(logo).width(300).url() : null;
-  const logoAlt = logo?.alt || siteName || "";
+  const headerLogoUrl = headerLogo?.asset
+    ? urlFor(headerLogo).width(400).url()
+    : null;
+  const compactLogoUrl = logo?.asset ? urlFor(logo).width(400).url() : null;
+  const logoUrl = headerLogoUrl ?? compactLogoUrl;
 
   return (
     <>
@@ -100,13 +109,17 @@ export default function Header({ logo, siteName, navigation }: HeaderProps) {
           aria-label="Main navigation"
         >
           <div className="container">
-            <Link href="/" className="navbar-brand header-logo" aria-label={`${siteName || ""} - Home`}>
+            <Link
+              href="/"
+              className={`navbar-brand header-logo${headerLogoUrl ? "" : " header-logo-compact"}`}
+              aria-label={`${siteName || ""} - Home`}
+            >
               {logoUrl && (
                 <Image
                   src={logoUrl}
-                  alt={logoAlt}
-                  width={150}
-                  height={60}
+                  alt=""
+                  width={headerLogoUrl ? 190 : 258}
+                  height={82}
                 />
               )}
             </Link>

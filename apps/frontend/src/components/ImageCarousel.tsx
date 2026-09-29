@@ -28,7 +28,7 @@ export default function ImageCarousel({ images, title }: ImageCarouselProps) {
 
   if (images.length === 0) {
     return (
-      <div className="mb-4">
+      <div>
         <div className="carousel-image-container position-relative">
           <Image
             src="https://placehold.co/1200x900/png"
@@ -45,7 +45,7 @@ export default function ImageCarousel({ images, title }: ImageCarouselProps) {
   return (
     <div
       id="propertyCarousel"
-      className="carousel slide mb-4"
+      className="carousel slide"
       {...(!prefersReducedMotion ? { 'data-bs-ride': 'carousel' } : {})}
     >
       <div className="carousel-indicators">

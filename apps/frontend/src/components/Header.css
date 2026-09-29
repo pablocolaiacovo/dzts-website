@@ -1,3 +1,13 @@
+/* ==========================================================================
+   Header — "Barra Alta"
+   Una sola fila, sin padding vertical: la barra mide lo que el logo. Solo el
+   lockup alto (headerLogo) y se achica al scrollear. Si falta headerLogo se
+   usa el logo compacto (escala 0.746, su proporción respecto del lockup).
+
+   Altura del logo (= altura de la barra):
+     móvil    56px → 52px      desktop  82px → 64px
+   ========================================================================== */
+
 .sticky-header {
   position: sticky;
   top: 0;
@@ -5,43 +15,80 @@
 }
 
 .sticky-header .navbar {
-  padding-top: 0.75rem;
-  padding-bottom: 0.75rem;
+  --bs-navbar-padding-y: 0;
+  --art-rest: 56px;
+  --art-scrolled: 52px;
   background-color: var(--header-nav-bg);
-  animation: shrink-navbar linear both;
-  animation-timeline: scroll();
-  animation-range: 0 100px;
 }
 
-@keyframes shrink-navbar {
-  to {
-    padding-top: 0.25rem;
-    padding-bottom: 0.25rem;
+@media (min-width: 992px) {
+  .sticky-header .navbar {
+    --art-rest: 82px;
+    --art-scrolled: 64px;
   }
 }
 
-.header-logo img {
-  height: auto;
-  width: auto;
-  max-height: 60px;
+.header-logo {
+  --logo-scale: 1;
+  height: calc(var(--art-rest) * var(--logo-scale));
+  padding-block: 0;
   animation: shrink-logo linear both;
-  animation-timeline: scroll();
-  animation-range: 0 100px;
+  animation-timeline: scroll(root);
+  animation-range: 0 120px;
+}
+
+.header-logo-compact {
+  --logo-scale: 0.746;
 }
 
 @keyframes shrink-logo {
   to {
-    max-height: 40px;
+    height: calc(var(--art-scrolled) * var(--logo-scale));
   }
+}
+
+.header-logo img {
+  display: block;
+  height: 100%;
+  width: auto;
 }
 
 .header-nav .nav-link {
   color: #ffffff;
-  font-weight: 400;
+  font-size: var(--font-size-lg);
+  font-weight: 500;
   transition: color 0.2s ease;
+}
+
+@media (min-width: 992px) {
+  .header-nav .nav-link {
+    font-size: var(--font-size-xl);
+  }
 }
 
 .header-nav .nav-link:hover,
 .header-nav .nav-link:focus {
   color: var(--bs-primary);
+}
+
+.navbar-brand:focus-visible,
+.nav-link:focus-visible,
+.navbar-toggler:focus-visible {
+  outline: 2px solid var(--bs-primary);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+/* Sin scroll-driven animations (Firefox <144, Safari <26) o con reducción de
+   movimiento: sin animación; el logo queda estático en su tamaño de reposo. */
+@supports not (animation-timeline: scroll(root)) {
+  .header-logo {
+    animation: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .header-logo {
+    animation: none;
+  }
 }
