@@ -83,3 +83,12 @@
     aspect-ratio: 3 / 2;
   }
 }
+
+.property-description p {
+  line-height: var(--line-height-normal);
+  margin-bottom: 0.625rem;
+}
+
+.property-description p:last-child {
+  margin-bottom: 0;
+}

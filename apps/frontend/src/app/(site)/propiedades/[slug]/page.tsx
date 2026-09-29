@@ -340,7 +340,7 @@ export default async function PropertyPage({
         </div>
         {property.description ? (
           <div className="row mt-4">
-            <div className="col-12 col-lg-8">
+            <div className="property-description col-12 col-lg-8">
               <h2 className="fs-5 fw-semibold mb-2">Descripción</h2>
               <PortableText value={property.description} />
             </div>
