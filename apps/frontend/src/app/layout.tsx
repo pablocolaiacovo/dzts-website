@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { GoogleAnalytics } from "@next/third-parties/google";
 import BootstrapClient from "@/components/BootstrapClient";
+import { SITE_NAME } from "@/lib/seo";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "@/styles/variables.css";
@@ -17,8 +18,8 @@ const gaId = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID;
 export const metadata: Metadata = {
   ...(siteUrl ? { metadataBase: new URL(siteUrl) } : {}),
   title: {
-    default: "DZTS Inmobiliaria",
-    template: "%s | DZTS Inmobiliaria",
+    default: SITE_NAME,
+    template: `%s | ${SITE_NAME}`,
   },
   description:
     "Encontrá propiedades en venta y alquiler con DZTS Inmobiliaria. Casas, departamentos, terrenos y más.",
