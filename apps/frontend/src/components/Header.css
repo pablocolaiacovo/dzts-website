@@ -91,10 +91,11 @@
 
 @keyframes mark-out {
   0%,
-  45% {
+  25% {
     opacity: 1;
   }
 
+  55%,
   100% {
     opacity: 0;
   }
@@ -102,10 +103,11 @@
 
 @keyframes mark-in {
   0%,
-  45% {
+  55% {
     opacity: 0;
   }
 
+  85%,
   100% {
     opacity: 1;
   }
