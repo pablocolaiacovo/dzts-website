@@ -52,7 +52,7 @@ export async function generateMetadata({
     title: property.title,
     description: property.subtitle,
     ogImageUrl,
-    canonicalUrl: `/propiedades/${slug}`,
+    canonicalUrl: `/propiedades/${slug}/`,
   });
 }
 
@@ -183,7 +183,7 @@ function PropertyPriceBox({
       </div>
       <div className="property-price-box__actions d-flex flex-wrap align-items-center gap-3 border-top">
         <TrackedLink
-          href={`/propiedades/${slug}/ficha`}
+          href={`/propiedades/${slug}/ficha/`}
           target="_blank"
           rel="noopener noreferrer"
           className="btn btn-link btn-sm d-inline-flex align-items-center"
@@ -235,7 +235,7 @@ export default async function PropertyPage({
     "@type": "RealEstateListing",
     name: property.title,
     description: property.subtitle,
-    url: `${process.env.NEXT_PUBLIC_SITE_URL || ""}/propiedades/${slug}`,
+    url: `${process.env.NEXT_PUBLIC_SITE_URL || ""}/propiedades/${slug}/`,
     ...(property.price != null && {
       offers: {
         "@type": "Offer",
@@ -301,7 +301,7 @@ export default async function PropertyPage({
     : null;
 
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "";
-  const propertyUrl = `${siteUrl}/propiedades/${slug}`;
+  const propertyUrl = `${siteUrl}/propiedades/${slug}/`;
   const whatsappShareUrl = `https://wa.me/?text=${encodeURIComponent(`${property.title} - ${propertyUrl}`)}`;
 
   return (
@@ -314,10 +314,10 @@ export default async function PropertyPage({
         <Breadcrumb
           items={[
             { label: "Inicio", href: "/", isHome: true },
-            { label: "Propiedades", href: "/propiedades" },
+            { label: "Propiedades", href: "/propiedades/" },
             {
               label: property.title || "Propiedad",
-              href: `/propiedades/${slug}`,
+              href: `/propiedades/${slug}/`,
             },
           ]}
         />
