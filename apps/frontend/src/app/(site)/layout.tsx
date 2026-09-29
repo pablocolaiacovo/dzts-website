@@ -17,6 +17,7 @@ async function SiteShell({ children }: { children: React.ReactNode }) {
     <>
       <Header
         logo={siteSettings?.logo}
+        headerLogo={siteSettings?.headerLogo}
         siteName={siteSettings?.siteName}
         navigation={siteSettings?.mainNavigation}
       />

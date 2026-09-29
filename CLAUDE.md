@@ -308,6 +308,7 @@ Two GitHub Actions workflows run on PRs to `dev` and `main`:
 - LCP image priority is on the home hero background (`SearchProperties`), not on the header logo.
 - Reduced motion: smooth scroll falls back to `behavior: "auto"`, carousel auto-advance is disabled, and global CSS reduces animations when `prefers-reduced-motion` is set.
 - Header nav background uses `--header-nav-bg` from `apps/frontend/src/styles/variables.css` (no inline style).
+- Header ("Barra Alta"): shows only `siteSettings.headerLogo` (tall lockup, with "inmobiliaria" tagline), no navbar vertical padding (bar height = logo height); the logo shrinks 56→52px (mobile) / 82→64px (`lg`+) via scroll-driven animation. `siteSettings.logo` (compact) is used in the header only as a fallback (×0.746 scale) when `headerLogo` has no asset; it is otherwise for the Footer and JSON-LD. No animation without `animation-timeline` support or with reduced motion. The header is always `position: sticky` and a solid `--header-nav-bg` background on every page, including `/`. See `docs/specs/2026-09-27-header-barra-alta.md`.
 - Map iframe titles are passed via the `MapSection` `title` prop for contextual SEO.
 - Sanity CDN preconnect is included in `apps/frontend/src/app/layout.tsx`.
 - `global-error.tsx` exists as a root error boundary with its own `<html>` and `<body>`.
@@ -422,7 +423,7 @@ When modifying components, be aware these selectors are used by e2e tests:
 - `homePage.sections[]` includes optional `anchorId` for header anchors (e.g., `/#servicios`, `/#nosotros`).
 - Header smooth-scrolls to anchors when already on `/` and updates the hash without full navigation.
 - `TextImageSection` supports a carousel (multiple images) via `SectionCarousel` component. Always uses `urlFor()` for images (requires `_id` in GROQ query).
-- Anchored sections use `scroll-margin-top: 60px` to offset the sticky header.
+- Anchored sections use `scroll-margin-top: 64px` (`80px` on `lg`+) to offset the header's scrolled height.
 - The `/propiedades` listing page fetches all active properties at build time and passes them to `PropertiesListing.tsx`, a client component that reads `useSearchParams` to handle filtering and pagination without navigation round-trips.
 - Route groups: `(site)` wraps pages with header/footer/WhatsApp button via its own layout; `(print)` provides a minimal layout for the ficha page. Root layout only has html/body/fonts/bootstrap.
 - The ficha page (`/propiedades/[slug]/ficha`) uses raw `<img>` tags (not `next/image`) for print reliability. It has `robots: { index: false, follow: false }`.

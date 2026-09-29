@@ -66,7 +66,7 @@ export default function SearchProperties({
               alt={heroLogoAlt ?? ""}
               fill
               className="logo-image"
-              sizes="(max-width: 767.98px) 200px, 400px"
+              sizes="(max-width: 767.98px) 300px, 600px"
             />
           </div>
           <h1 className="text-center">{heroHeading}</h1>

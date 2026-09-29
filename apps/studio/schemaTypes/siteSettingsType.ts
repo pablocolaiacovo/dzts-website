@@ -29,6 +29,26 @@ export const siteSettingsType = defineType({
       title: "Logo",
       type: "image",
       group: "branding",
+      description:
+        "Versión compacta, sin bajada. Se usa en el footer y el SEO, y en el header solo si falta el 'Logo del header (completo)'.",
+      options: { hotspot: true },
+      fields: [
+        defineField({
+          name: "alt",
+          title: "Texto alternativo",
+          type: "string",
+        }),
+      ],
+    }),
+    defineField({
+      name: "headerLogo",
+      title: "Logo del header (completo)",
+      type: "image",
+      group: "branding",
+      description:
+        "Isologo alto con la bajada 'inmobiliaria'. Es el único logo del header: se muestra grande arriba de todo " +
+        "y se achica un poco al hacer scroll. Si no se sube, el header usa el 'Logo' (versión compacta, sin bajada). " +
+        "Recortá la imagen ajustada al dibujo, sin márgenes transparentes, con proporción aproximada de 2,3:1.",
       options: { hotspot: true },
       fields: [
         defineField({
