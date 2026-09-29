@@ -77,3 +77,9 @@
 .property-price-box__actions .btn-link:focus-visible {
   color: #0684ac;
 }
+
+@media (min-width: 992px) {
+  .property-detail .carousel-image-container {
+    aspect-ratio: 3 / 2;
+  }
+}
