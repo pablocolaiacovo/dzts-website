@@ -113,17 +113,34 @@
   }
 }
 
-/* Sin logo completo cargado en Sanity todavía: se muestra solo el
-   compacto, a un tamaño fijo legible y sin animación de crossfade. */
-.header-logo.logo-compact-only {
-  height: var(--art-rest);
-  animation: none;
+/* Un solo logo cargado en Sanity: sin crossfade, siempre visible. Con solo
+   el completo la caja va de --art-rest a --art-scrolled; con solo el compacto
+   mantiene su proporción (74.6%) y también se achica al scrollear. */
+.header-logo.logo-single {
+  animation-name: shrink-logo-single;
 }
 
-.header-logo.logo-compact-only .logo-compact {
+.header-logo.logo-single-compact {
+  height: calc(var(--art-rest) * 0.746);
+  animation-name: shrink-logo-single-compact;
+}
+
+.header-logo.logo-single .logo-solo {
+  display: block;
   height: 100%;
   opacity: 1;
-  animation: none;
+}
+
+@keyframes shrink-logo-single {
+  to {
+    height: var(--art-scrolled);
+  }
+}
+
+@keyframes shrink-logo-single-compact {
+  to {
+    height: calc(var(--art-scrolled) * 0.746);
+  }
 }
 
 .header-nav .nav-link {
@@ -152,9 +169,16 @@
   border-radius: 2px;
 }
 
-/* Navegadores sin scroll-driven animations (Firefox <144, Safari <26):
-   la barra quedaría fija en el estado alto. Se fija en un tamaño intermedio. */
+/* Navegadores sin scroll-driven animations (Firefox <144, Safari <26) y
+   reducción de movimiento: sin animaciones; queda un estado estático
+   intermedio con solo el logo compacto, sin margen negativo. */
 @supports not (animation-timeline: scroll(root)) {
+  .sticky-header .navbar,
+  .sticky-header .header-logo,
+  .sticky-header .header-logo img {
+    animation: none;
+  }
+
   .sticky-header .navbar {
     --art-rest: 48px;
     padding-top: 0.625rem;
@@ -167,6 +191,10 @@
     }
   }
 
+  .header-logo.logo-single-compact {
+    height: var(--art-rest);
+  }
+
   .logo-full {
     display: none;
   }
@@ -177,13 +205,10 @@
   }
 }
 
-/* Reducción de movimiento: sin animación ligada al scroll; queda el estado
-   de reposo, pero acotado para no comer viewport de forma permanente. */
 @media (prefers-reduced-motion: reduce) {
   .sticky-header .navbar,
-  .header-logo,
-  .logo-full,
-  .logo-compact {
+  .sticky-header .header-logo,
+  .sticky-header .header-logo img {
     animation: none;
   }
 
@@ -197,6 +222,10 @@
     .sticky-header .navbar {
       --art-rest: 70px;
     }
+  }
+
+  .header-logo.logo-single-compact {
+    height: var(--art-rest);
   }
 
   .logo-full {

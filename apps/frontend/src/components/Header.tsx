@@ -99,7 +99,10 @@ export default function Header({
   const fullUrl = headerLogo?.asset
     ? urlFor(headerLogo).width(400).url()
     : null;
-  const logoAlt = (fullUrl ? headerLogo?.alt : logo?.alt) || siteName || "";
+  const soloUrl = fullUrl && compactUrl ? null : (fullUrl ?? compactUrl);
+  const logoClass = soloUrl
+    ? `logo-single${fullUrl ? "" : " logo-single-compact"}`
+    : "";
 
   return (
     <>
@@ -111,29 +114,36 @@ export default function Header({
           <div className="container">
             <Link
               href="/"
-              className={`navbar-brand header-logo${
-                fullUrl ? "" : " logo-compact-only"
-              }`}
+              className={`navbar-brand header-logo ${logoClass}`.trim()}
               aria-label={`${siteName || ""} - Home`}
             >
-              {fullUrl && (
-                <Image
-                  src={fullUrl}
-                  alt={logoAlt}
-                  width={190}
-                  height={82}
-                  className="logo-full"
-                />
-              )}
-              {compactUrl && (
-                <Image
-                  src={compactUrl}
-                  alt={fullUrl ? "" : logoAlt}
-                  aria-hidden={fullUrl ? true : undefined}
-                  width={258}
-                  height={82}
-                  className="logo-compact"
-                />
+              {fullUrl && compactUrl ? (
+                <>
+                  <Image
+                    src={fullUrl}
+                    alt=""
+                    width={190}
+                    height={82}
+                    className="logo-full"
+                  />
+                  <Image
+                    src={compactUrl}
+                    alt=""
+                    width={258}
+                    height={82}
+                    className="logo-compact"
+                  />
+                </>
+              ) : (
+                soloUrl && (
+                  <Image
+                    src={soloUrl}
+                    alt=""
+                    width={fullUrl ? 190 : 258}
+                    height={82}
+                    className="logo-solo"
+                  />
+                )
               )}
             </Link>
 

@@ -47,7 +47,8 @@ export const siteSettingsType = defineType({
         "Isologo alto con la bajada 'inmobiliaria', que se muestra arriba de todo antes de scrollear. " +
         "Al hacer scroll, la barra se achica y este logo hace un crossfade hacia el 'Logo' (la versión compacta, " +
         "sin bajada), que también se usa en el footer y el SEO. Si no se sube este logo, el header muestra " +
-        "directamente la versión compacta, sin animación.",
+        "directamente la versión compacta, sin animación. " +
+        "Recortá la imagen ajustada al dibujo, sin márgenes transparentes, con proporción aproximada de 2,3:1.",
       options: { hotspot: true },
       fields: [
         defineField({
