@@ -76,9 +76,9 @@ export default function PropiedadesLoading() {
                   />
                   <div className="w-100 bg-primary" style={{ height: 4 }} />
                   <div className="card-body text-center pb-2 placeholder-glow">
-                    <h5 className="fw-bold mb-2">
+                    <div className="h5 fw-bold mb-2">
                       <span className="placeholder col-8"></span>
-                    </h5>
+                    </div>
                     <p className="mb-2">
                       <span className="placeholder col-5"></span>
                     </p>
