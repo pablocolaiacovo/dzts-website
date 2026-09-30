@@ -43,9 +43,9 @@ The prototype had one in the bottom bar; it was dropped by request. `ScrollToTop
 
 On desktop the footer uses `min-height: var(--footer-height)` so long content grows instead of clipping. The trade-off: if the footer content exceeds the token, the home page scrolls slightly past one viewport.
 
-### `--header-height: 58px`
+### `--header-height` follows the scrolled header
 
-The scrolled (shrunk) header measures 58px, not 60px. Using 60px left a 2px strip of the previous section visible between the header and the map.
+The map height subtracts the header's scrolled height, so any mismatch shows a strip of the previous section between the header and the map. After the "Barra Alta" header (see `2026-09-27-header-barra-alta.md`) the bar is as tall as its logo, so `--header-height` is defined in `Header.css` from the same `--art-scrolled` value the logo animation uses: 52px / 64px (mobile / ≥992px) with `headerLogo`, and `--art-scrolled × --logo-compact-scale` (min 40px, the toggler) when only the compact logo exists (`:root:has(.header-logo-compact)`).
 
 ## Implementation
 

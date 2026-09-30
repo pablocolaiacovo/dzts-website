@@ -31,3 +31,71 @@
 .status-banner--reservado::after {
   border-color: #b8860b transparent transparent transparent;
 }
+
+.property-detail .breadcrumb {
+  margin-bottom: 0.5rem;
+}
+
+.property-features {
+  gap: 0.4rem 1.25rem;
+  padding: 0.85rem 0;
+}
+
+.property-features li {
+  font-size: 0.9375rem;
+  white-space: nowrap;
+}
+
+.property-features .bi {
+  color: #0684ac;
+  font-size: 1.1rem;
+  line-height: 1;
+}
+
+.property-features b {
+  font-weight: 600;
+}
+
+.property-price-box {
+  padding: 0.75rem 0.875rem;
+}
+
+.property-price-box__actions {
+  margin-top: 0.625rem;
+  padding-top: 0.5rem;
+}
+
+.property-price-box__actions .btn-link {
+  color: #495057;
+  text-decoration: none;
+  padding: 0;
+  font-size: 0.8125rem;
+  font-weight: 500;
+}
+
+.property-price-box__actions .btn-link:hover,
+.property-price-box__actions .btn-link:focus-visible {
+  color: #0684ac;
+}
+
+.property-detail .carousel-image-container {
+  aspect-ratio: 4 / 3;
+}
+
+@media (min-width: 992px) {
+  .property-detail .carousel-image-container {
+    aspect-ratio: 3 / 2;
+  }
+}
+
+.property-description :is(p, li) {
+  line-height: var(--line-height-normal);
+}
+
+.property-description :is(p, ul, ol) {
+  margin-bottom: 0.625rem;
+}
+
+.property-description > :last-child {
+  margin-bottom: 0;
+}

@@ -163,6 +163,14 @@ export type SiteSettings = {
     alt?: string;
     _type: "image";
   };
+  headerLogo?: {
+    asset?: SanityImageAssetReference;
+    media?: unknown;
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    alt?: string;
+    _type: "image";
+  };
   favicon?: {
     asset?: SanityImageAssetReference;
     media?: unknown;
@@ -588,12 +596,13 @@ export type ROOM_COUNTS_QUERY_RESULT = Array<number | null>;
 
 // Source: ../frontend/src/sanity/queries/propertyDetail.ts
 // Variable: PROPERTY_QUERY
-// Query: *[_type == "property" && slug.current == $slug][0]  {    title,    subtitle,    reference,    address,    description,    price,    "propertyType": propertyType->name,    operationType,    status,    currency,    "city": city->name,    rooms,    bathrooms,    garages,    sizeLand,    sizeCovered,    sizeTotal,    "images": images[] { asset->{ _id, url, metadata { lqip } } },    "ogImage": images[0],    seo {      metaTitle,      metaDescription,      ogImage { asset->{ url } },      noIndex    }  }
+// Query: *[_type == "property" && slug.current == $slug][0]  {    title,    subtitle,    reference,    address,    neighborhood,    description,    price,    "propertyType": propertyType->name,    operationType,    status,    currency,    "city": city->name,    rooms,    bathrooms,    garages,    sizeLand,    sizeCovered,    sizeTotal,    "images": images[] { asset->{ _id, url, metadata { lqip } } },    "ogImage": images[0],    seo {      metaTitle,      metaDescription,      ogImage { asset->{ url } },      noIndex    }  }
 export type PROPERTY_QUERY_RESULT = {
   title: string | null;
   subtitle: string | null;
   reference: string | null;
   address: string | null;
+  neighborhood: string | null;
   description: Array<{
     children?: Array<{
       marks?: Array<string>;
@@ -727,7 +736,7 @@ export type ORGANIZATION_QUERY_RESULT = {
 
 // Source: ../frontend/src/sanity/queries/siteSettings.ts
 // Variable: SITE_SETTINGS_QUERY
-// Query: *[_type == "siteSettings"][0] {    siteName,    logo {      asset->{        _id,        url,        metadata { lqip, dimensions }      },      alt    },    favicon {      asset->{        _id,        url      }    },    mainNavigation[] {      _key,      label,      linkType,      internalPath,      externalUrl,      actionId    },    phone,    email,    address,    officeHours,    whatsappNumber,    whatsappMessage,    socialLinks[] {      _key,      platform,      url    },    footerLinks[] {      _key,      label,      url    },    certificationLogos[] {      _key,      image {        asset->{          _id,          url,          metadata { lqip, dimensions }        }      },      alt,      title,      url    },    creditLine {      text,      url    },    footerTagline,    licenseNumber  }
+// Query: *[_type == "siteSettings"][0] {    siteName,    logo {      asset->{        _id,        url,        metadata { lqip, dimensions }      },      crop,      hotspot,      alt    },    headerLogo {      asset->{        _id,        url,        metadata { lqip, dimensions }      },      crop,      hotspot,      alt    },    favicon {      asset->{        _id,        url      }    },    mainNavigation[] {      _key,      label,      linkType,      internalPath,      externalUrl,      actionId    },    phone,    email,    address,    officeHours,    whatsappNumber,    whatsappMessage,    socialLinks[] {      _key,      platform,      url    },    footerLinks[] {      _key,      label,      url    },    certificationLogos[] {      _key,      image {        asset->{          _id,          url,          metadata { lqip, dimensions }        }      },      alt,      title,      url    },    creditLine {      text,      url    },    footerTagline,    licenseNumber  }
 export type SITE_SETTINGS_QUERY_RESULT = {
   siteName: string | null;
   logo: {
@@ -739,6 +748,21 @@ export type SITE_SETTINGS_QUERY_RESULT = {
         dimensions: SanityImageDimensions | null;
       } | null;
     } | null;
+    crop: SanityImageCrop | null;
+    hotspot: SanityImageHotspot | null;
+    alt: string | null;
+  } | null;
+  headerLogo: {
+    asset: {
+      _id: string;
+      url: string | null;
+      metadata: {
+        lqip: string | null;
+        dimensions: SanityImageDimensions | null;
+      } | null;
+    } | null;
+    crop: SanityImageCrop | null;
+    hotspot: SanityImageHotspot | null;
     alt: string | null;
   } | null;
   favicon: {
@@ -808,14 +832,14 @@ declare global {
     '\n  *[_type == "city"] | order(name asc) { name, "slug": slug.current }\n': CITIES_QUERY_RESULT;
     '\n  *[_type == "propertyTypeCategory"] | order(name asc) { name, "slug": slug.current }\n': PROPERTY_TYPES_QUERY_RESULT;
     '\n  array::unique(*[_type == "property" && defined(rooms) && published != false].rooms) | order(@ asc)\n': ROOM_COUNTS_QUERY_RESULT;
-    '\n  *[_type == "property" && slug.current == $slug][0]\n  {\n    title,\n    subtitle,\n    reference,\n    address,\n    description,\n    price,\n    "propertyType": propertyType->name,\n    operationType,\n    status,\n    currency,\n    "city": city->name,\n    rooms,\n    bathrooms,\n    garages,\n    sizeLand,\n    sizeCovered,\n    sizeTotal,\n    "images": images[] { asset->{ _id, url, metadata { lqip } } },\n    "ogImage": images[0],\n    seo {\n      metaTitle,\n      metaDescription,\n      ogImage { asset->{ url } },\n      noIndex\n    }\n  }\n': PROPERTY_QUERY_RESULT;
+    '\n  *[_type == "property" && slug.current == $slug][0]\n  {\n    title,\n    subtitle,\n    reference,\n    address,\n    neighborhood,\n    description,\n    price,\n    "propertyType": propertyType->name,\n    operationType,\n    status,\n    currency,\n    "city": city->name,\n    rooms,\n    bathrooms,\n    garages,\n    sizeLand,\n    sizeCovered,\n    sizeTotal,\n    "images": images[] { asset->{ _id, url, metadata { lqip } } },\n    "ogImage": images[0],\n    seo {\n      metaTitle,\n      metaDescription,\n      ogImage { asset->{ url } },\n      noIndex\n    }\n  }\n': PROPERTY_QUERY_RESULT;
     '\n  *[_type == "property" && defined(slug.current) && published != false]{\n    "slug": slug.current\n  }\n': PROPERTY_SLUGS_QUERY_RESULT;
     '\n  *[_type == "propiedadesPage"][0].heading\n': PROPIEDADES_HEADING_QUERY_RESULT;
     '\n  *[_type == "siteSettings"][0].seo {\n    metaTitle,\n    metaDescription,\n    ogImage { asset->{ url } }\n  }\n': SITE_SEO_QUERY_RESULT;
     '\n  *[_type == "homePage"][0].seo {\n  metaTitle,\n  metaDescription,\n  ogImage { asset->{ url } },\n  noIndex\n}\n': HOME_SEO_QUERY_RESULT;
     '\n  *[_type == "propiedadesPage"][0].seo {\n  metaTitle,\n  metaDescription,\n  ogImage { asset->{ url } },\n  noIndex\n}\n': PROPIEDADES_SEO_QUERY_RESULT;
     '\n  *[_type == "siteSettings"][0] {\n    siteName,\n    logo { asset->{ url } },\n    phone,\n    email,\n    address,\n    whatsappNumber,\n    socialLinks[] { url }\n  }\n': ORGANIZATION_QUERY_RESULT;
-    '\n  *[_type == "siteSettings"][0] {\n    siteName,\n    logo {\n      asset->{\n        _id,\n        url,\n        metadata { lqip, dimensions }\n      },\n      alt\n    },\n    favicon {\n      asset->{\n        _id,\n        url\n      }\n    },\n    mainNavigation[] {\n      _key,\n      label,\n      linkType,\n      internalPath,\n      externalUrl,\n      actionId\n    },\n    phone,\n    email,\n    address,\n    officeHours,\n    whatsappNumber,\n    whatsappMessage,\n    socialLinks[] {\n      _key,\n      platform,\n      url\n    },\n    footerLinks[] {\n      _key,\n      label,\n      url\n    },\n    certificationLogos[] {\n      _key,\n      image {\n        asset->{\n          _id,\n          url,\n          metadata { lqip, dimensions }\n        }\n      },\n      alt,\n      title,\n      url\n    },\n    creditLine {\n      text,\n      url\n    },\n    footerTagline,\n    licenseNumber\n  }\n': SITE_SETTINGS_QUERY_RESULT;
+    '\n  *[_type == "siteSettings"][0] {\n    siteName,\n    logo {\n      asset->{\n        _id,\n        url,\n        metadata { lqip, dimensions }\n      },\n      crop,\n      hotspot,\n      alt\n    },\n    headerLogo {\n      asset->{\n        _id,\n        url,\n        metadata { lqip, dimensions }\n      },\n      crop,\n      hotspot,\n      alt\n    },\n    favicon {\n      asset->{\n        _id,\n        url\n      }\n    },\n    mainNavigation[] {\n      _key,\n      label,\n      linkType,\n      internalPath,\n      externalUrl,\n      actionId\n    },\n    phone,\n    email,\n    address,\n    officeHours,\n    whatsappNumber,\n    whatsappMessage,\n    socialLinks[] {\n      _key,\n      platform,\n      url\n    },\n    footerLinks[] {\n      _key,\n      label,\n      url\n    },\n    certificationLogos[] {\n      _key,\n      image {\n        asset->{\n          _id,\n          url,\n          metadata { lqip, dimensions }\n        }\n      },\n      alt,\n      title,\n      url\n    },\n    creditLine {\n      text,\n      url\n    },\n    footerTagline,\n    licenseNumber\n  }\n': SITE_SETTINGS_QUERY_RESULT;
   }
 }
 // Lets @sanity/client releases that predate the global registry read it too

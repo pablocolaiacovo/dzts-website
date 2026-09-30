@@ -3,8 +3,14 @@
    ========================================================================= */
 
 .section-block {
-  scroll-margin-top: 60px;
+  scroll-margin-top: 64px;
   overflow: hidden;
+}
+
+@media (min-width: 992px) {
+  .section-block {
+    scroll-margin-top: 80px;
+  }
 }
 
 /* --- Background variants --- */

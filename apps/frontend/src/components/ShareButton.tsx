@@ -34,13 +34,13 @@ export default function ShareButton({ propertySlug }: ShareButtonProps) {
   }
 
   return (
-    <div className="position-relative flex-fill">
+    <div className="position-relative d-flex">
       <button
         type="button"
-        className="btn btn-info text-white py-2 fw-bold w-100"
+        className="btn btn-link btn-sm d-inline-flex align-items-center"
         onClick={handleShare}
       >
-        <i className="bi bi-share me-2" aria-hidden="true" />
+        <i className="bi bi-share me-1" aria-hidden="true" />
         Compartir
       </button>
       {copied && (

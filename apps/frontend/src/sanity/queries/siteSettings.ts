@@ -55,6 +55,18 @@ export const SITE_SETTINGS_QUERY = defineQuery(/* groq */ `
         url,
         metadata { lqip, dimensions }
       },
+      crop,
+      hotspot,
+      alt
+    },
+    headerLogo {
+      asset->{
+        _id,
+        url,
+        metadata { lqip, dimensions }
+      },
+      crop,
+      hotspot,
       alt
     },
     favicon {
