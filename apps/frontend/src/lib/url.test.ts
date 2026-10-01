@@ -28,8 +28,12 @@ describe("extractUrl", () => {
     expect(extractUrl("/propiedades/?operacion=venta")).toBe("/propiedades/?operacion=venta");
   });
 
-  it("returns an internal anchor starting with # as-is", () => {
+  it("returns a home anchor starting with /# as-is", () => {
     expect(extractUrl("/#servicios")).toBe("/#servicios");
+  });
+
+  it("returns an in-page anchor starting with # as-is", () => {
+    expect(extractUrl("#servicios")).toBe("#servicios");
   });
 
   it("returns null for an empty string", () => {

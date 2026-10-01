@@ -3,6 +3,15 @@ import { CogIcon } from "@sanity/icons/Cog";
 import { LinkIcon } from "@sanity/icons/Link";
 import { MenuIcon } from "@sanity/icons/Menu";
 
+const URL_ERROR = "Usá una ruta interna (/…), una URL http(s) o el código HTML de AFIP.";
+
+const validateLinkTarget = (value: string | undefined) => {
+  const trimmed = value?.trim();
+  if (!trimmed) return true;
+  if (trimmed.startsWith("/") || trimmed.startsWith("#")) return true;
+  return /https?:\/\//i.test(trimmed) ? true : URL_ERROR;
+};
+
 export const siteSettingsType = defineType({
   name: "siteSettings",
   title: "Configuración del Sitio",

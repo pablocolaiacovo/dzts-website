@@ -164,7 +164,11 @@
 
 .footer-bar {
   border-top: 1px solid var(--footer-rule);
-  padding: 0.75rem 0 calc(56px + 1.5rem + 0.75rem);
+  padding: 0.75rem 0;
+}
+
+:root:has(.whatsapp-float) .footer-bar {
+  padding-bottom: calc(56px + 1.5rem + 0.75rem);
 }
 
 .footer-bar .container {
@@ -181,7 +185,8 @@
 }
 
 @media (min-width: 768px) {
-  .footer-bar {
+  .footer-bar,
+  :root:has(.whatsapp-float) .footer-bar {
     padding-bottom: 0.75rem;
   }
 

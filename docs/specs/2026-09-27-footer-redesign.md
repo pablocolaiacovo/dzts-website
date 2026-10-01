@@ -56,7 +56,8 @@ The map height subtracts the header's scrolled height, so any mismatch shows a s
 - `apps/frontend/src/lib/url.ts` (+ test) — `extractUrl()` for footer and certification links.
 - `apps/frontend/src/lib/whatsapp.ts` (+ test) — `buildWhatsAppUrl()` shared by the footer and `WhatsAppButton`.
 - `apps/frontend/src/components/MapSection.tsx` / `MapSection.css` — inline styles moved to CSS; new `variant` prop. The home skeleton (`MapSectionFallback`) uses the same classes.
-- `apps/frontend/src/styles/variables.css` — `--header-height`, `--footer-fg-muted`, `--footer-rule`, `--footer-height`.
+- `apps/frontend/src/styles/variables.css` — `--footer-fg-muted`, `--footer-rule`, `--footer-height`.
+- `apps/frontend/src/components/Header.css` — `--header-height` (`:root`).
 
 ## Operational notes
 

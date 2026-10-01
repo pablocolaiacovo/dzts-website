@@ -188,7 +188,7 @@ export default function Footer({
                       <ul className="footer-list footer-links mb-4">
                         {links.map((link) => (
                           <li key={link._key}>
-                            {link.resolvedUrl.startsWith("/") ? (
+                            {/^[/#]/.test(link.resolvedUrl) ? (
                               <Link href={link.resolvedUrl}>{link.label}</Link>
                             ) : (
                               <a href={link.resolvedUrl} target="_blank" rel="noopener noreferrer">
