@@ -271,7 +271,7 @@ export const siteSettingsType = defineType({
               type: "string",
               description:
                 "Link o ruta interna (ej: /propiedades). También podés pegar el código HTML que da AFIP para Data Fiscal: se usa el link automáticamente.",
-              validation: (rule) => rule.required(),
+              validation: (rule) => rule.required().custom(validateLinkTarget),
             }),
           ],
           preview: {
@@ -314,13 +314,7 @@ export const siteSettingsType = defineType({
               type: "string",
               description:
                 "Link o ruta interna (ej: /propiedades). También podés pegar el código HTML que da AFIP para Data Fiscal: se usa el link automáticamente.",
-              validation: (rule) =>
-                rule.custom((value) => {
-                  if (!value) return true;
-                  return /https?:\/\//i.test(value)
-                    ? true
-                    : "Debe contener una URL http(s) válida, o el código HTML que provee AFIP para Data Fiscal.";
-                }),
+              validation: (rule) => rule.custom(validateLinkTarget),
             }),
           ],
           preview: {
