@@ -8,7 +8,8 @@ import Image from "next/image";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
 import "./ImageCarousel.css";
 
-const CAROUSEL_SIZES = "(min-width: 1400px) 760px, (min-width: 992px) 58vw, 100vw";
+const CAROUSEL_SIZES =
+  "(min-width: 1400px) 746px, (min-width: 1200px) 641px, (min-width: 992px) 536px, (min-width: 768px) 696px, (min-width: 576px) 516px, 100vw";
 
 const ImageLightbox = dynamic(() => import("./ImageLightbox"), { ssr: false });
 

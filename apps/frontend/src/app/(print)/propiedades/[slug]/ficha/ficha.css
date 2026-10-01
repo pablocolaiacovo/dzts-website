@@ -97,7 +97,8 @@
   margin-bottom: 1.5rem;
 }
 
-.ficha-description h2 {
+.ficha-description > h2,
+.ficha-description h3.h2 {
   font-size: 1.25rem;
   font-weight: 600;
   margin-bottom: 0.75rem;
