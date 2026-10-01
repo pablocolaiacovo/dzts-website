@@ -538,7 +538,7 @@ function PropertiesFiltersInner({
           `}
         >
           <div className="d-none d-lg-flex align-items-center justify-content-between mb-3">
-            <h5 className="mb-0 fw-bold">Filtros</h5>
+            <h2 className="h5 mb-0 fw-bold">Filtros</h2>
             <button
               type="button"
               className="btn btn-sm btn-outline-secondary"
