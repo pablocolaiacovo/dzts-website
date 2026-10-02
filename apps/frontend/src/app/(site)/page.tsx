@@ -84,6 +84,7 @@ async function MapSectionWrapper() {
   return (
     <MapSection
       id="contacto"
+      variant="footer"
       address={data?.address}
       embedUrl={data?.mapEmbedUrl}
       title="Ubicación de la oficina"
@@ -141,14 +142,7 @@ function TextSectionsFallback() {
 }
 
 function MapSectionFallback() {
-  return (
-    <div className="w-100">
-      <div
-        className="bg-light"
-        style={{ width: "100%", height: "450px" }}
-      ></div>
-    </div>
-  );
+  return <div className="map-section map-section-footer w-100 bg-light"></div>;
 }
 
 export default async function Home() {
