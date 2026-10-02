@@ -42,6 +42,9 @@
   --bs-dark-rgb: 64, 64, 65;
   --bs-light: #f8f9fa;
   --header-nav-bg: var(--brand-grey);
+  --footer-fg-muted: rgba(255, 255, 255, 0.78);
+  --footer-rule: rgba(255, 255, 255, 0.15);
+  --footer-height: clamp(340px, 44dvh, 400px);
 
   --font-size-xs: 0.75rem;
   --font-size-sm: 0.875rem;

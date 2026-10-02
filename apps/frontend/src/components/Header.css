@@ -8,6 +8,23 @@
      móvil    56px → 52px      desktop  82px → 64px
    ========================================================================== */
 
+:root {
+  --logo-compact-scale: 0.746;
+  --art-scrolled: 52px;
+  --header-height: var(--art-scrolled);
+}
+
+@media (min-width: 992px) {
+  :root {
+    --art-scrolled: 64px;
+  }
+}
+
+/* Con logo compacto la barra es más baja; en móvil la dominan los 40px del toggler */
+:root:has(.header-logo-compact) {
+  --header-height: max(40px, calc(var(--art-scrolled) * var(--logo-compact-scale)));
+}
+
 .sticky-header {
   position: sticky;
   top: 0;
@@ -17,14 +34,12 @@
 .sticky-header .navbar {
   --bs-navbar-padding-y: 0;
   --art-rest: 56px;
-  --art-scrolled: 52px;
   background-color: var(--header-nav-bg);
 }
 
 @media (min-width: 992px) {
   .sticky-header .navbar {
     --art-rest: 82px;
-    --art-scrolled: 64px;
   }
 }
 
@@ -38,7 +53,7 @@
 }
 
 .header-logo-compact {
-  --logo-scale: 0.746;
+  --logo-scale: var(--logo-compact-scale);
 }
 
 @keyframes shrink-logo {
