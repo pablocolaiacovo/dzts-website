@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { PortableText } from "@portabletext/react";
+import { portableTextHeadingsAs } from "@/lib/portableText";
 import { urlFor } from "@/sanity/lib/image";
 import type { SanityImageSource } from "@sanity/image-url";
 import type { HOME_SECTIONS_QUERY_RESULT } from "@/sanity/types";
@@ -75,7 +76,10 @@ export default function TextImageSection({
             className={`col-12 ${hasImages ? "col-lg-6" : "col-lg-8 mx-auto"}`}
           >
             <div className="section-content">
-              <PortableText value={content} />
+              <PortableText
+                value={content}
+                components={portableTextHeadingsAs("h2")}
+              />
             </div>
           </div>
         </div>

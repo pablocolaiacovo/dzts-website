@@ -20,8 +20,8 @@
   color: var(--bs-dark);
 }
 
-.section-bg-primary h2,
-.section-bg-primary h3 {
+.section-bg-primary .h2,
+.section-bg-primary .h3 {
   color: var(--bs-dark);
 }
 
@@ -30,8 +30,8 @@
   color: var(--bs-secondary);
 }
 
-.section-bg-dark h2,
-.section-bg-dark h3 {
+.section-bg-dark .h2,
+.section-bg-dark .h3 {
   color: var(--bs-primary);
 }
 
@@ -40,8 +40,8 @@
   color: var(--bs-dark);
 }
 
-.section-bg-light h2,
-.section-bg-light h3 {
+.section-bg-light .h2,
+.section-bg-light .h3 {
   color: var(--bs-primary);
 }
 
@@ -50,8 +50,8 @@
   color: var(--bs-dark);
 }
 
-.section-bg-white h2,
-.section-bg-white h3 {
+.section-bg-white .h2,
+.section-bg-white .h3 {
   color: var(--bs-primary);
 }
 

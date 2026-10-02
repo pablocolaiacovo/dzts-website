@@ -17,6 +17,7 @@ interface PropertyCardProps {
   city?: string | null;
   reference?: string | null;
   priority?: boolean;
+  headingLevel?: "h2" | "h3";
 }
 
 const STATUS_LABELS: Record<string, { label: string; badgeClass: string }> = {
@@ -39,6 +40,7 @@ export default function PropertyCard({
   city,
   reference,
   priority,
+  headingLevel: Heading = "h3",
 }: PropertyCardProps) {
   const statusInfo = status ? STATUS_LABELS[status] : undefined;
   const imageUrl = image
@@ -85,7 +87,7 @@ export default function PropertyCard({
               Ref: {reference}
             </div>
           )}
-          <h5 className="fw-bold text-dark mb-2 fs-5">{title}</h5>
+          <Heading className="h5 fw-bold text-dark mb-2 fs-5">{title}</Heading>
           {(city || rooms) && (
             <p className="mb-2 text-muted small">
               {city}

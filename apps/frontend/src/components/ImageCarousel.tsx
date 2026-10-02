@@ -8,6 +8,9 @@ import Image from "next/image";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
 import "./ImageCarousel.css";
 
+const CAROUSEL_SIZES =
+  "(min-width: 1400px) 746px, (min-width: 1200px) 641px, (min-width: 992px) 536px, (min-width: 768px) 696px, (min-width: 576px) 516px, 100vw";
+
 const ImageLightbox = dynamic(() => import("./ImageLightbox"), { ssr: false });
 
 interface CarouselImage {
@@ -34,7 +37,7 @@ export default function ImageCarousel({ images, title }: ImageCarouselProps) {
             src="https://placehold.co/1200x900/png"
             alt={`${title} - Sin imagen`}
             fill
-            sizes="100vw"
+            sizes={CAROUSEL_SIZES}
             className="object-fit-cover"
           />
         </div>
@@ -89,7 +92,7 @@ export default function ImageCarousel({ images, title }: ImageCarouselProps) {
                   src={url}
                   alt={`${title} - Imagen ${index + 1}`}
                   fill
-                  sizes="100vw"
+                  sizes={CAROUSEL_SIZES}
                   className="object-fit-cover"
                   priority={index === 0}
                   {...(image.lqip ? { placeholder: "blur" as const, blurDataURL: image.lqip } : {})}

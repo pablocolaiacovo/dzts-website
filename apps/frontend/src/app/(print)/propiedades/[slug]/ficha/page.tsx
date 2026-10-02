@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { PortableText } from "@portabletext/react";
+import { portableTextHeadingsAs } from "@/lib/portableText";
 import type { SanityImageSource } from "@sanity/image-url";
 import { urlFor } from "@/sanity/lib/image";
 import {
@@ -144,7 +145,10 @@ export default async function FichaPage({
         {property.description && (
           <div className="ficha-description">
             <h2>Descripción</h2>
-            <PortableText value={property.description} />
+            <PortableText
+              value={property.description}
+              components={portableTextHeadingsAs("h3")}
+            />
           </div>
         )}
       </div>

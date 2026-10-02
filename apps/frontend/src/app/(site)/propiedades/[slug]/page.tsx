@@ -13,6 +13,7 @@ import {
   getAllPropertySlugs,
 } from "@/sanity/queries/propertyDetail";
 import { resolveMetadata } from "@/lib/seo";
+import { portableTextHeadingsAs } from "@/lib/portableText";
 import { buildPropertyTitle, buildPropertyDescription } from "@/lib/propertySeo";
 
 import Breadcrumb from "@/components/Breadcrumb";
@@ -342,7 +343,10 @@ export default async function PropertyPage({
           <div className="row mt-4">
             <div className="property-description col-12 col-lg-8">
               <h2 className="fs-5 fw-semibold mb-2">Descripción</h2>
-              <PortableText value={property.description} />
+              <PortableText
+                value={property.description}
+                components={portableTextHeadingsAs("h3")}
+              />
             </div>
           </div>
         ) : null}
