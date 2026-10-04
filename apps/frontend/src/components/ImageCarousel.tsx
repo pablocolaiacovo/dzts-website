@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import dynamic from "next/dynamic";
 import { urlFor } from "@/sanity/lib/image";
 import type { SanityImageSource } from "@sanity/image-url";
@@ -27,7 +27,20 @@ export default function ImageCarousel({ images, title }: ImageCarouselProps) {
   const prefersReducedMotion = useReducedMotion();
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState(0);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const carouselRef = useRef<HTMLDivElement>(null);
   const hideLightbox = useCallback(() => setLightboxOpen(false), []);
+
+  useEffect(() => {
+    const element = carouselRef.current;
+    if (!element) return;
+    const onSlide = (event: Event) => {
+      const { to } = event as Event & { to: number };
+      setCurrentIndex(to);
+    };
+    element.addEventListener("slide.bs.carousel", onSlide);
+    return () => element.removeEventListener("slide.bs.carousel", onSlide);
+  }, [images.length]);
 
   if (images.length === 0) {
     return (
@@ -48,22 +61,10 @@ export default function ImageCarousel({ images, title }: ImageCarouselProps) {
   return (
     <div
       id="propertyCarousel"
+      ref={carouselRef}
       className="carousel slide"
       {...(!prefersReducedMotion ? { 'data-bs-ride': 'carousel' } : {})}
     >
-      <div className="carousel-indicators">
-        {images.map((_, index) => (
-          <button
-            key={index}
-            type="button"
-            data-bs-target="#propertyCarousel"
-            data-bs-slide-to={index}
-            className={index === 0 ? 'active' : ''}
-            aria-current={index === 0 ? 'true' : undefined}
-            aria-label={`Slide ${index + 1}`}
-          />
-        ))}
-      </div>
       <div className="carousel-inner">
         {images.map((image, index) => {
           const url = image.asset ? urlFor(image.asset).width(1200).height(900).quality(80).auto('format').url()
@@ -104,6 +105,10 @@ export default function ImageCarousel({ images, title }: ImageCarouselProps) {
       </div>
       {images.length > 1 && (
         <>
+          <div className="carousel-counter badge rounded-pill position-absolute bottom-0 end-0 m-2">
+            <i className="bi bi-camera-fill me-1" aria-hidden="true" />
+            {currentIndex + 1} / {images.length}
+          </div>
           <button
             className="carousel-control-prev"
             type="button"
