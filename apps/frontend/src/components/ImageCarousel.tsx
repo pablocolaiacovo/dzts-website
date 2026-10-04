@@ -36,7 +36,7 @@ export default function ImageCarousel({ images, title }: ImageCarouselProps) {
     if (!element) return;
     const onSlide = (event: Event) => {
       const { to } = event as Event & { to: number };
-      setCurrentIndex(to);
+      if (typeof to === "number") setCurrentIndex(to);
     };
     element.addEventListener("slide.bs.carousel", onSlide);
     return () => element.removeEventListener("slide.bs.carousel", onSlide);
@@ -107,6 +107,7 @@ export default function ImageCarousel({ images, title }: ImageCarouselProps) {
         <>
           <div className="carousel-counter badge rounded-pill position-absolute bottom-0 end-0 m-2">
             <i className="bi bi-camera-fill me-1" aria-hidden="true" />
+            <span className="visually-hidden">Foto </span>
             {currentIndex + 1} / {images.length}
           </div>
           <button
