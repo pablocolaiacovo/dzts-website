@@ -2,6 +2,11 @@ import Link from "next/link";
 import Image from "next/image";
 import { urlFor } from "@/sanity/lib/image";
 import type { SanityImageSource } from "@sanity/image-url";
+import {
+  OPERATION_BADGE_CLASS,
+  PROPERTY_STATUS,
+  getOperationLabel,
+} from "@/lib/propertyStatus";
 
 interface PropertyCardProps {
   title: string | null;
@@ -20,12 +25,6 @@ interface PropertyCardProps {
   headingLevel?: "h2" | "h3";
 }
 
-const STATUS_LABELS: Record<string, { label: string; badgeClass: string }> = {
-  reservado: { label: "Reservado", badgeClass: "bg-warning text-dark" },
-  vendido: { label: "Vendido", badgeClass: "bg-danger text-white" },
-  alquilado: { label: "Alquilado", badgeClass: "bg-danger text-white" },
-};
-
 export default function PropertyCard({
   title,
   slug,
@@ -42,7 +41,7 @@ export default function PropertyCard({
   priority,
   headingLevel: Heading = "h3",
 }: PropertyCardProps) {
-  const statusInfo = status ? STATUS_LABELS[status] : undefined;
+  const statusInfo = status ? PROPERTY_STATUS[status] : undefined;
   const imageUrl = image
     ? urlFor(image).width(800).height(600).quality(80).auto("format").url()
     : "https://placehold.co/400x300/png";
@@ -67,9 +66,9 @@ export default function PropertyCard({
           />
           {operationType && (
             <span
-              className={`position-absolute top-0 end-0 m-2 badge rounded-pill ${operationType === "venta" ? "bg-success" : "bg-warning text-dark"}`}
+              className={`position-absolute top-0 end-0 m-2 badge rounded-pill ${OPERATION_BADGE_CLASS}`}
             >
-              {operationType === "venta" ? "Venta" : "Alquiler"}
+              {getOperationLabel(operationType)}
             </span>
           )}
           {statusInfo && (

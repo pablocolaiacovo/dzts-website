@@ -25,11 +25,20 @@
 
 .status-banner--reservado {
   background-color: var(--bs-warning, #ffc107);
-  color: #212529;
+  color: #fff;
 }
 
 .status-banner--reservado::after {
   border-color: #b8860b transparent transparent transparent;
+}
+
+.status-banner--alquilado {
+  background-color: var(--bs-success, #198754);
+  color: #fff;
+}
+
+.status-banner--alquilado::after {
+  border-color: #0f5132 transparent transparent transparent;
 }
 
 .property-detail .breadcrumb {

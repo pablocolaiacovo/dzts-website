@@ -22,16 +22,15 @@ import TrackedLink from "@/components/TrackedLink";
 import ImageCarousel from "@/components/ImageCarousel";
 import MapSection from "@/components/MapSection";
 import { ANALYTICS_EVENT } from "@/lib/analytics";
+import {
+  OPERATION_BADGE_CLASS,
+  PROPERTY_STATUS,
+  getOperationLabel,
+} from "@/lib/propertyStatus";
 import "./property-detail.css";
 
 type Property = NonNullable<Awaited<ReturnType<typeof getCachedProperty>>>;
 type PropertyFeature = { icon: string; value: string | number; label: string };
-
-const STATUS_LABELS: Record<string, string> = {
-  reservado: "Reservado",
-  vendido: "Vendido",
-  alquilado: "Alquilado",
-};
 
 export async function generateMetadata({
   params,
@@ -65,9 +64,8 @@ export async function generateStaticParams() {
 
 function PropertyGallery({ property }: { property: Property }) {
   const statusLabel = property.status
-    ? STATUS_LABELS[property.status]
+    ? PROPERTY_STATUS[property.status]?.label
     : undefined;
-  const isReservado = property.status === "reservado";
 
   const carouselImages = (property.images ?? []).map((img) => {
     const asset = img?.asset?.url
@@ -80,7 +78,7 @@ function PropertyGallery({ property }: { property: Property }) {
     <div className="position-relative">
       {statusLabel && (
         <div
-          className={`status-banner${isReservado ? " status-banner--reservado" : ""}`}
+          className={`status-banner status-banner--${property.status}`}
           aria-label={`Propiedad ${statusLabel.toLowerCase()}`}
         >
           <span>{statusLabel}</span>
@@ -101,9 +99,9 @@ function PropertySummary({ property }: { property: Property }) {
       <div className="d-flex flex-wrap align-items-center gap-2 mb-2">
         {property.operationType && (
           <span
-            className={`badge rounded-pill ${property.operationType === "venta" ? "bg-success" : "bg-warning text-dark"}`}
+            className={`badge rounded-pill ${OPERATION_BADGE_CLASS}`}
           >
-            {property.operationType === "venta" ? "Venta" : "Alquiler"}
+            {getOperationLabel(property.operationType)}
           </span>
         )}
         {property.propertyType && (
