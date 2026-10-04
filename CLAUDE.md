@@ -255,7 +255,7 @@ Two GitHub Actions workflows run on PRs to `dev` and `main`:
 
 - Runs Playwright e2e tests against a production build of the frontend.
 - Runs inside the official Playwright container (`mcr.microsoft.com/playwright:<version>-noble`) so browsers + OS deps are preinstalled — there is no `playwright install` step (it used to hang and burn the 15-min job timeout). A small `resolve-playwright` job reads the `@playwright/test` version from `pnpm-lock.yaml` and feeds it as the image tag, keeping the container in sync with the package automatically (Dependabot can't update `container:` image refs — dependabot-core#5819).
-- Only triggers when `apps/frontend/` or the workflow file changes (path filter).
+- Only triggers when `apps/frontend/`, the root `pnpm-lock.yaml` / `pnpm-workspace.yaml`, or the workflow file changes (path filter), or manually via `workflow_dispatch`.
 - Binds to the GitHub `Preview` environment; reads `NEXT_PUBLIC_SANITY_PROJECT_ID` / `NEXT_PUBLIC_SANITY_DATASET` from that environment's Secrets (non-prod Sanity project). `deploy.yml` binds to `Production` for the real Sanity project + FTP credentials. `ci.yml` is unscoped and uses placeholder values.
 - Uploads `playwright-report/` and `test-results/` as artifacts on failure.
 - The pnpm filter name for the frontend is `dzts-website` (the `name` field in `package.json`), not `frontend`.
@@ -273,6 +273,7 @@ Two GitHub Actions workflows run on PRs to `dev` and `main`:
 - npm updates are grouped by ecosystem (`next-ecosystem`, `react`, `sanity`, `eslint`, `bootstrap`) to reduce PR noise. Ungrouped packages get individual PRs.
 - `target-branch: "dev"` is set on both ecosystems so PRs open against `dev` (the `deps → dev → release` flow), not `main`. Dependabot reads this file from the **default branch (`main`)**, so the `target-branch` change only takes effect once it lands on `main` — keep `dev` mirrored so a release merge doesn't revert it.
 - Dependabot is disabled by default on forks; it was enabled manually (Settings → Code security) for this repo. The `dependabot.yml` is inert until that toggle is on.
+- Transitive-dependency overrides (security patches) live in `pnpm-workspace.yaml` → `overrides:`, bounded to the vulnerable major (`pkg@>=X.0.0 <X.Y.Z`). The `pnpm` field in `package.json` is no longer read by pnpm 10.33+ (it only emits a WARN).
 - Dependabot PRs trigger the CI + e2e workflows, so lint + build + e2e are validated before merge.
 
 ### Code Scanning (CodeQL)

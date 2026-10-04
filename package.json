@@ -17,11 +17,5 @@
     "@types/react": "19.3.0",
     "@types/react-dom": "19.3.0",
     "react-doctor": "^0.9.14"
-  },
-  "pnpm": {
-    "overrides": {
-      "@types/react": "$@types/react",
-      "@types/react-dom": "$@types/react-dom"
-    }
   }
 }
