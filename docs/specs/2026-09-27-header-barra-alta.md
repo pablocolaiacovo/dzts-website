@@ -15,15 +15,16 @@ solid background and `position: sticky` on every page, including `/`.
 
 ## Decisions
 
-### Final behavior: only the tall lockup, no navbar padding
+### Final behavior: only the tall lockup
 
 A later client decision (approved on a live mock) removed the two-logo
-crossfade and the navbar's vertical padding. The header renders only
-`headerLogo`; the navbar has `--bs-navbar-padding-y: 0`, so the bar height is
-the logo box height (the 40px toggler fits inside). `.header-logo` height is
+crossfade and the navbar's animated vertical padding. The header renders only
+`headerLogo`; the bar height is the logo box height (the 40px toggler fits
+inside) plus a static navbar padding added later (see the 2026-10-07 update). `.header-logo` height is
 animated with `animation-timeline: scroll(root)` over the first 120px from
-`--art-rest` to `--art-scrolled`: 56px → 52px on mobile, 82px → 64px on `lg`+.
-The image is `height: 100%; width: auto`. `.header-logo` keeps
+`--art-rest` to `--art-scrolled`: the image goes 56px → 52px on mobile, 82px →
+64px on `lg`+ (the bar shrinks further and clips the tagline, see the update
+below). The image is `width: auto` with its own animated height. `.header-logo` keeps
 `padding-block: 0` (cancels Bootstrap's `.navbar-brand` padding); the logo sits
 flush, which the client approved.
 
@@ -53,7 +54,36 @@ end keyframe. The logo stays static at `--art-rest` (or its ×0.746).
 
 `TextImageSection`'s anchored sections (`/#servicios`, `/#nosotros`) use
 `scroll-margin-top` 64px / 80px (mobile / `lg`+), i.e. the scrolled bar height
-(52 / 64px) plus a small gap.
+(56 / ~68px) plus a small gap.
+
+### Update 2026-10-07: tagline clipped on scroll
+
+The client asked for the bottom line of the lockup ("by César Torres") to hide on scroll after all, leaving "dzts / inmobiliaria".
+Implemented with a single image: `.header-logo` has `overflow: hidden` and its
+height animates to `--art-scrolled * 0.746` (the mark's share of the lockup
+height), while the `img` height animates separately (`shrink-logo-art`) to
+`--art-scrolled`. The box shrinks faster than the image, so the tagline is
+progressively clipped from the bottom and only "dzts / inmobiliaria" remains.
+
+Scrolled logo/toggler heights: 40px on mobile (the toggler dominates) and 47.7px on
+`lg`+ (bar heights including padding: see the next update). With
+the compact fallback box and image are equal throughout, so nothing is clipped.
+`@supports not` and reduced motion set `animation: none` on both the box and
+the image (static full lockup).
+
+### Update 2026-10-07: vertical breathing room
+
+The client asked for a bit more breathing room, so the navbar now has a static
+vertical padding `--header-pad-y`: 0.5rem on mobile, 0.625rem on `lg`+ (not
+animated). The scrolled bar is 56px (mobile) / ~68px (`lg`+), and
+`--header-height` includes the padding:
+`max(40px, --art-scrolled * 0.746) + 2 * --header-pad-y`.
+
+Rejected: the two-logo crossfade, which needed a second asset, a negative-margin
+trick and broke when Sanity crops changed the aspect ratio.
+
+Caveat: the 0.746 ratio assumes the `headerLogo` crop keeps the tagline as the
+bottom 25.4% of the image (2.343:1 lockup).
 
 ### New `headerLogo` field instead of reusing `logo`
 
@@ -90,7 +120,7 @@ would otherwise inflate the bar.
   the link's `aria-label` names the brand), via `urlFor(...).width(400)`.
   No `priority` — the LCP candidate is the hero background image.
 - `apps/frontend/src/components/Header.css` — `--art-rest` / `--art-scrolled`
-  on `.sticky-header .navbar`, zero navbar padding, the `.header-logo` box +
+  on `.sticky-header .navbar`, navbar padding via `--header-pad-y`, the `.header-logo` box +
   `shrink-logo` keyframes, `--logo-scale` for the compact fallback, and the
   `@supports not` / reduced-motion `animation: none`.
 - `apps/frontend/src/components/TextImageSection.css` — `.section-block`
