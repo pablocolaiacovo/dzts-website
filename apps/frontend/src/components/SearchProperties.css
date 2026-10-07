@@ -1,7 +1,7 @@
 .logo-container {
   position: relative;
   width: 23.4375rem;
-  height: 11.71875rem;
+  aspect-ratio: 2 / 1;
   margin: 0 auto;
   max-width: 100%;
 }
@@ -9,7 +9,6 @@
 @media (min-width: 768px) {
   .logo-container {
     width: 46.875rem;
-    height: 23.4375rem;
   }
 }
 
