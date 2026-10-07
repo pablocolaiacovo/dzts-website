@@ -55,24 +55,30 @@
   color: var(--bs-primary);
 }
 
-/* --- Circular image container --- */
+/* --- Circular image (single or carousel) --- */
 
-.section-image-wrap {
+.section-image-wrap,
+.section-carousel-wrap {
   position: relative;
-  width: 100%;
+  width: min(100%, 240px);
   aspect-ratio: 1/1;
+  margin-inline: auto;
   border-radius: 50%;
   overflow: hidden;
 }
 
-/* --- Carousel wrapper (circular, same as single image) --- */
+@media (min-width: 768px) {
+  .section-image-wrap,
+  .section-carousel-wrap {
+    width: 300px;
+  }
+}
 
-.section-carousel-wrap {
-  position: relative;
-  width: 100%;
-  aspect-ratio: 1/1;
-  border-radius: 50%;
-  overflow: hidden;
+@media (min-width: 992px) {
+  .section-image-wrap,
+  .section-carousel-wrap {
+    width: min(100%, 380px);
+  }
 }
 
 .section-carousel-wrap > .carousel {
@@ -83,19 +89,21 @@
 /* --- Content --- */
 
 .section-content {
-  padding: 1.5rem 0;
+  max-width: 40rem;
 }
 
-@media (min-width: 992px) {
-  .section-content {
-    padding: 0;
-  }
+.col-lg-8.mx-auto > .section-content {
+  margin-inline: auto;
+}
+
+.section-content > :last-child {
+  margin-bottom: 0;
 }
 
 /* --- Carousel controls --- */
 
 .section-carousel-control {
-  width: 40px;
+  width: 32px;
   opacity: 0.85;
 }
 
