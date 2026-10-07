@@ -19,3 +19,19 @@ export function portableTextHeadingsAs(
   }
   return { block };
 }
+
+type PortableTextItem = {
+  _type: string;
+  children?: Array<{ text?: string }>;
+};
+
+// Editors leave empty paragraphs as spacers; they render as blank <p> tags.
+export function withoutEmptyBlocks<T extends PortableTextItem>(
+  value: T[],
+): T[] {
+  return value.filter(
+    (item) =>
+      item._type !== "block" ||
+      (item.children ?? []).some((child) => child.text?.trim()),
+  );
+}

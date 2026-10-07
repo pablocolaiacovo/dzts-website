@@ -4,6 +4,7 @@ import Image from "next/image";
 import { urlFor } from "@/sanity/lib/image";
 import type { SanityImageSource } from "@sanity/image-url";
 import type { HOME_SECTIONS_QUERY_RESULT } from "@/sanity/types";
+import { SECTION_IMAGE_SIZES } from "./sectionImage";
 
 type SectionImage = NonNullable<
   NonNullable<HOME_SECTIONS_QUERY_RESULT>[number]["images"]
@@ -43,7 +44,7 @@ export default function SectionCarousel({ images, id }: SectionCarouselProps) {
                   src={url}
                   alt={image.alt || `Imagen ${index + 1}`}
                   fill
-                  sizes="(max-width: 991px) 100vw, 50vw"
+                  sizes={SECTION_IMAGE_SIZES}
                   className="object-fit-cover"
                   loading="lazy"
                   {...(image.asset?.metadata?.lqip

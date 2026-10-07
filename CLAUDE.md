@@ -435,5 +435,5 @@ When modifying components, be aware these selectors are used by e2e tests:
 - Property detail page includes: "Ficha" button (opens ficha in new tab), "Compartir" (ShareButton), WhatsApp share icon, and "Consultar por WhatsApp" full-width button.
 - WhatsApp consultation URL is built from `siteSettings.whatsappNumber` with a pre-filled message including the property name.
 - Sold/rented properties display a status banner ribbon (CSS-only, positioned absolute) overlaying the image carousel.
-- `TextImageSection` displays images in large circles (full column width, `border-radius: 50%`, `aspect-ratio: 1/1`).
+- `TextImageSection` displays images (single or `SectionCarousel`) in centered circles capped at 240px (mobile) / 300px (`md`) / 380px (`lg`+, `col-lg-5` with text in `col-lg-7`, max-width 40rem); `sizes` comes from `SECTION_IMAGE_SIZES` in `components/sectionImage.ts`. Empty Portable Text blocks are dropped via `withoutEmptyBlocks()` (`src/lib/portableText.tsx`); a section with no remaining content renders nothing.
 - `src/lib/analytics.ts` exports `trackEvent()` (wraps `sendGAEvent` from `@next/third-parties/google`) and the `ANALYTICS_EVENT` constants (`whatsappContact`, `share`, `fichaOpen`, `fichaPrint`) for GA4 conversion tracking. Safe no-op with no measurement id, on the server, or without `window.gtag`; never throws; strips `undefined` params.
