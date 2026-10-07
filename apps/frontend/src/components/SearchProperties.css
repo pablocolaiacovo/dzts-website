@@ -1,15 +1,14 @@
 .logo-container {
   position: relative;
-  width: 18.75rem;
-  height: 9.375rem;
+  width: 23.4375rem;
+  aspect-ratio: 2 / 1;
   margin: 0 auto;
   max-width: 100%;
 }
 
 @media (min-width: 768px) {
   .logo-container {
-    width: 37.5rem;
-    height: 18.75rem;
+    width: 46.875rem;
   }
 }
 
@@ -51,4 +50,8 @@
     padding: 1rem 2rem;
     font-size: 1rem;
   }
+}
+
+.hero > .container {
+  margin-bottom: 10vh;
 }
