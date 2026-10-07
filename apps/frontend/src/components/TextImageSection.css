@@ -92,6 +92,10 @@
   max-width: 40rem;
 }
 
+.col-lg-8.mx-auto > .section-content {
+  margin-inline: auto;
+}
+
 .section-content > :last-child {
   margin-bottom: 0;
 }
