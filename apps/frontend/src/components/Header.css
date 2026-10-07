@@ -3,7 +3,7 @@
    Una sola fila con un poco de padding vertical (--header-pad-y). Solo el
    lockup alto (headerLogo). Al scrollear la caja del logo (overflow: hidden)
    se achica más rápido que la imagen y recorta el "by César Torres" de abajo:
-   queda "dzts / inmobiliaria" (0.746 de la altura del lockup). Si falta
+   queda "dzts / inmobiliaria" (--logo-mark-ratio, 0.746 de la altura del lockup). Si falta
    headerLogo se usa el logo compacto (escala 0.746) y no hay recorte.
 
    Altura de la imagen:  móvil 56px → 52px      desktop 82px → 64px
@@ -14,16 +14,19 @@
 
 :root {
   --logo-compact-scale: 0.746;
+  --logo-mark-ratio: 0.746;
+  --art-rest: 56px;
   --art-scrolled: 52px;
   --header-pad-y: 0.5rem;
   --header-height: calc(
-    max(40px, calc(var(--art-scrolled) * var(--logo-compact-scale))) + 2 *
+    max(40px, calc(var(--art-scrolled) * var(--logo-mark-ratio))) + 2 *
       var(--header-pad-y)
   );
 }
 
 @media (min-width: 992px) {
   :root {
+    --art-rest: 82px;
     --art-scrolled: 64px;
     --header-pad-y: 0.625rem;
   }
@@ -37,14 +40,7 @@
 
 .sticky-header .navbar {
   --bs-navbar-padding-y: var(--header-pad-y);
-  --art-rest: 56px;
   background-color: var(--header-nav-bg);
-}
-
-@media (min-width: 992px) {
-  .sticky-header .navbar {
-    --art-rest: 82px;
-  }
 }
 
 .header-logo {
@@ -59,11 +55,12 @@
 
 .header-logo-compact {
   --logo-scale: var(--logo-compact-scale);
+  --logo-mark-ratio: var(--logo-compact-scale);
 }
 
 @keyframes shrink-logo {
   to {
-    height: calc(var(--art-scrolled) * var(--logo-compact-scale));
+    height: calc(var(--art-scrolled) * var(--logo-mark-ratio));
   }
 }
 
@@ -109,8 +106,20 @@
 }
 
 /* Sin scroll-driven animations (Firefox <144, Safari <26) o con reducción de
-   movimiento: sin animación; el logo queda estático en su tamaño de reposo. */
+   movimiento: sin animación; el logo queda estático en su tamaño de reposo y
+   --header-height usa la altura de reposo. */
 @supports not (animation-timeline: scroll(root)) {
+  :root {
+    --header-height: calc(var(--art-rest) + 2 * var(--header-pad-y));
+  }
+
+  :root:has(.header-logo-compact) {
+    --header-height: calc(
+      max(40px, calc(var(--art-rest) * var(--logo-compact-scale))) + 2 *
+        var(--header-pad-y)
+    );
+  }
+
   .header-logo,
   .header-logo img {
     animation: none;
@@ -118,6 +127,17 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  :root {
+    --header-height: calc(var(--art-rest) + 2 * var(--header-pad-y));
+  }
+
+  :root:has(.header-logo-compact) {
+    --header-height: calc(
+      max(40px, calc(var(--art-rest) * var(--logo-compact-scale))) + 2 *
+        var(--header-pad-y)
+    );
+  }
+
   .header-logo,
   .header-logo img {
     animation: none;
