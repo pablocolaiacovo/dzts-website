@@ -21,7 +21,10 @@
 }
 
 .section-bg-primary .h2,
-.section-bg-primary .h3 {
+.section-bg-primary .h3,
+.section-bg-primary .h4,
+.section-bg-primary .h5,
+.section-bg-primary .h6 {
   color: var(--bs-dark);
 }
 
@@ -31,7 +34,10 @@
 }
 
 .section-bg-dark .h2,
-.section-bg-dark .h3 {
+.section-bg-dark .h3,
+.section-bg-dark .h4,
+.section-bg-dark .h5,
+.section-bg-dark .h6 {
   color: var(--bs-primary);
 }
 
@@ -41,7 +47,10 @@
 }
 
 .section-bg-light .h2,
-.section-bg-light .h3 {
+.section-bg-light .h3,
+.section-bg-light .h4,
+.section-bg-light .h5,
+.section-bg-light .h6 {
   color: var(--bs-primary);
 }
 
@@ -51,7 +60,10 @@
 }
 
 .section-bg-white .h2,
-.section-bg-white .h3 {
+.section-bg-white .h3,
+.section-bg-white .h4,
+.section-bg-white .h5,
+.section-bg-white .h6 {
   color: var(--bs-primary);
 }
 
