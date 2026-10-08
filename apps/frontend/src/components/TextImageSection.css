@@ -20,8 +20,7 @@
   color: var(--bs-dark);
 }
 
-.section-bg-primary .h2,
-.section-bg-primary .h3 {
+.section-bg-primary :is(.h1, .h2, .h3, .h4, .h5, .h6) {
   color: var(--bs-dark);
 }
 
@@ -30,8 +29,7 @@
   color: var(--bs-secondary);
 }
 
-.section-bg-dark .h2,
-.section-bg-dark .h3 {
+.section-bg-dark :is(.h1, .h2, .h3, .h4, .h5, .h6) {
   color: var(--bs-primary);
 }
 
