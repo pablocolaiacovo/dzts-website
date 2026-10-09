@@ -162,6 +162,13 @@
   border-radius: 4px;
 }
 
+.cert-embed img {
+  display: block;
+  width: auto;
+  height: 50px;
+  border-radius: 4px;
+}
+
 .footer-bar {
   border-top: 1px solid var(--footer-rule);
   padding: 0.75rem 0;

@@ -1401,6 +1401,13 @@
         },
         "optional": true
       },
+      "dataFiscalHtml": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "string"
+        },
+        "optional": true
+      },
       "creditLine": {
         "type": "objectAttribute",
         "value": {

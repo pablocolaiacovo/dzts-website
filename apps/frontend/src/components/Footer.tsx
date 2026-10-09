@@ -4,6 +4,7 @@ import TrackedLink from "@/components/TrackedLink";
 import { ANALYTICS_EVENT } from "@/lib/analytics";
 import { buildWhatsAppUrl } from "@/lib/whatsapp";
 import { extractUrl } from "@/lib/url";
+import { safeEmbedHtml } from "@/lib/embedHtml";
 import { urlFor } from "@/sanity/lib/image";
 import type { SITE_SETTINGS_QUERY_RESULT } from "@/sanity/types";
 import "./Footer.css";
@@ -15,6 +16,7 @@ type FooterProps = {
   siteName?: SiteSettings["siteName"];
   footerLinks?: SiteSettings["footerLinks"];
   certificationLogos?: SiteSettings["certificationLogos"];
+  dataFiscalHtml?: SiteSettings["dataFiscalHtml"];
   socialLinks?: SiteSettings["socialLinks"];
   phone?: SiteSettings["phone"];
   email?: SiteSettings["email"];
@@ -48,6 +50,7 @@ export default function Footer({
   siteName,
   footerLinks,
   certificationLogos,
+  dataFiscalHtml,
   socialLinks,
   phone,
   email,
@@ -81,9 +84,12 @@ export default function Footer({
       : [],
   );
 
+  const dataFiscal = safeEmbedHtml(dataFiscalHtml);
+
   const hasBrand = Boolean(logoUrl || footerTagline || socials.length > 0);
   const hasContact = Boolean(address || phone || email || officeHours || whatsappNumber);
-  const hasExplore = links.length > 0 || certs.length > 0;
+  const hasCerts = certs.length > 0 || Boolean(dataFiscal);
+  const hasExplore = links.length > 0 || hasCerts;
   const year = new Date().getFullYear();
   const legal = [`© ${year}${siteName ? ` ${siteName}` : ""}`, licenseNumber]
     .filter(Boolean)
@@ -200,7 +206,7 @@ export default function Footer({
                       </ul>
                     </>
                   )}
-                  {certs.length > 0 && (
+                  {hasCerts && (
                     <div className="cert-row">
                       {certs.map((cert) => {
                         const title = cert.title || cert.alt || undefined;
@@ -230,6 +236,12 @@ export default function Footer({
                           </span>
                         );
                       })}
+                      {dataFiscal && (
+                        <span
+                          className="cert-embed"
+                          dangerouslySetInnerHTML={{ __html: dataFiscal }}
+                        />
+                      )}
                     </div>
                   )}
                 </div>
