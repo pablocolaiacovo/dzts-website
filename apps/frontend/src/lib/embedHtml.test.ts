@@ -20,9 +20,29 @@ describe("safeEmbedHtml", () => {
   });
 
   it("rejects scripts, iframes, event handlers and javascript: URLs", () => {
-    expect(safeEmbedHtml('<script>alert(1)</script>')).toBeNull();
-    expect(safeEmbedHtml('<iframe src="https://example.com"></iframe>')).toBeNull();
+    expect(safeEmbedHtml("<script>alert(1)</script>")).toBeNull();
+    expect(
+      safeEmbedHtml('<iframe src="https://example.com"></iframe>'),
+    ).toBeNull();
     expect(safeEmbedHtml('<img src="x" onerror="alert(1)">')).toBeNull();
     expect(safeEmbedHtml('<a href="javascript:alert(1)">x</a>')).toBeNull();
+  });
+
+  it("rejects slash-separated handlers, encoded schemes and page-altering tags", () => {
+    expect(safeEmbedHtml("<img src=x/onerror=alert(1)>")).toBeNull();
+    expect(safeEmbedHtml("<svg/onload=alert(1)>")).toBeNull();
+    expect(
+      safeEmbedHtml('<a href="&#106;avascript:alert(1)">x</a>'),
+    ).toBeNull();
+    expect(safeEmbedHtml('<base href="https://evil.example/">')).toBeNull();
+    expect(
+      safeEmbedHtml(
+        '<meta http-equiv="refresh" content="0;url=https://evil.example">',
+      ),
+    ).toBeNull();
+    expect(safeEmbedHtml("<style>body{display:none}</style>")).toBeNull();
+    expect(
+      safeEmbedHtml('<form action="https://evil.example"></form>'),
+    ).toBeNull();
   });
 });

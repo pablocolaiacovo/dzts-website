@@ -1,4 +1,5 @@
-const UNSAFE_EMBED = /<script|<iframe|<object|<embed|\son\w+\s*=|javascript:/i;
+const UNSAFE_EMBED =
+  /<(script|iframe|object|embed|base|meta|form|style|svg)\b|[\s/]on\w+\s*=|javascript:|&#/i;
 
 export function safeEmbedHtml(raw: string | null | undefined): string | null {
   const trimmed = raw?.trim();
