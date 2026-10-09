@@ -12,6 +12,25 @@ const validateLinkTarget = (value: string | undefined) => {
   return /https?:\/\//i.test(trimmed) ? true : URL_ERROR;
 };
 
+const UNSAFE_EMBED =
+  /<(script|iframe|object|embed|base|meta|form|style|svg)\b|[\s/]on\w+\s*=|javascript:|&#/i;
+
+const validateEmbedHtml = (value: string | undefined) => {
+  const trimmed = value?.trim();
+  if (!trimmed) return true;
+  if (UNSAFE_EMBED.test(trimmed)) {
+    return "El código no puede incluir scripts, iframes, svg, estilos, formularios ni atributos de eventos (onclick, etc.).";
+  }
+  return /<a\s[^>]*href=/i.test(trimmed)
+    ? true
+    : "Pegá el código completo, empezando por <a href=...";
+};
+
+const warnEmbedImgWithoutAlt = (value: string | undefined) =>
+  value && /<img(?![^>]*\salt=)/i.test(value)
+    ? 'La imagen no tiene texto alternativo: agregá alt="Data Fiscal AFIP" dentro de <img ...> para lectores de pantalla.'
+    : true;
+
 export const siteSettingsType = defineType({
   name: "siteSettings",
   title: "Configuración del Sitio",
@@ -313,7 +332,7 @@ export const siteSettingsType = defineType({
               title: "URL (opcional)",
               type: "string",
               description:
-                "Link o ruta interna (ej: /propiedades). También podés pegar el código HTML que da AFIP para Data Fiscal: se usa el link automáticamente.",
+                "Link o ruta interna (ej: /propiedades). Para Data Fiscal de AFIP usá el campo \"Data Fiscal (código HTML de AFIP)\".",
               validation: (rule) => rule.custom(validateLinkTarget),
             }),
           ],
@@ -321,6 +340,19 @@ export const siteSettingsType = defineType({
             select: { title: "title", media: "image" },
           },
         }),
+      ],
+    }),
+    defineField({
+      name: "dataFiscalHtml",
+      title: "Data Fiscal (código HTML de AFIP)",
+      type: "text",
+      rows: 4,
+      group: "footer",
+      description:
+        "Pegá tal cual el código HTML que da AFIP/ARCA para el formulario 960 (Data Fiscal). Se muestra exactamente así, primero en la fila de logos del pie de página.",
+      validation: (rule) => [
+        rule.custom(validateEmbedHtml),
+        rule.custom(warnEmbedImgWithoutAlt).warning(),
       ],
     }),
 
