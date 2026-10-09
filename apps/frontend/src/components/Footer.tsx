@@ -208,6 +208,12 @@ export default function Footer({
                   )}
                   {hasCerts && (
                     <div className="cert-row">
+                      {dataFiscal && (
+                        <span
+                          className="cert-embed"
+                          dangerouslySetInnerHTML={{ __html: dataFiscal }}
+                        />
+                      )}
                       {certs.map((cert) => {
                         const title = cert.title || cert.alt || undefined;
                         const image = (
@@ -236,12 +242,6 @@ export default function Footer({
                           </span>
                         );
                       })}
-                      {dataFiscal && (
-                        <span
-                          className="cert-embed"
-                          dangerouslySetInnerHTML={{ __html: dataFiscal }}
-                        />
-                      )}
                     </div>
                   )}
                 </div>

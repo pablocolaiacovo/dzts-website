@@ -341,7 +341,7 @@ export const siteSettingsType = defineType({
       rows: 4,
       group: "footer",
       description:
-        "Pegá tal cual el código HTML que da AFIP/ARCA para el formulario 960 (Data Fiscal). Se muestra exactamente así junto a los logos del pie de página.",
+        "Pegá tal cual el código HTML que da AFIP/ARCA para el formulario 960 (Data Fiscal). Se muestra exactamente así, primero en la fila de logos del pie de página.",
       validation: (rule) => rule.custom(validateEmbedHtml),
     }),
 
