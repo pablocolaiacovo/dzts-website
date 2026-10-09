@@ -1,9 +1,14 @@
 import Image from "next/image";
 import { PortableText } from "@portabletext/react";
+import {
+  portableTextHeadingsAs,
+  withoutEmptyBlocks,
+} from "@/lib/portableText";
 import { urlFor } from "@/sanity/lib/image";
 import type { SanityImageSource } from "@sanity/image-url";
 import type { HOME_SECTIONS_QUERY_RESULT } from "@/sanity/types";
 import SectionCarousel from "./SectionCarousel";
+import { SECTION_IMAGE_SIZES } from "./sectionImage";
 import "./TextImageSection.css";
 
 type Section = NonNullable<HOME_SECTIONS_QUERY_RESULT>[number];
@@ -21,7 +26,8 @@ export default function TextImageSection({
   backgroundColor,
   index,
 }: TextImageSectionProps) {
-  if (!content) return null;
+  const blocks = content ? withoutEmptyBlocks(content) : [];
+  if (blocks.length === 0) return null;
   const validImages = images?.filter((img) => img.asset?.url) ?? [];
   const primaryImage = validImages[0];
   const primaryAsset = primaryImage?.asset ?? null;
@@ -43,12 +49,12 @@ export default function TextImageSection({
 
   return (
     <section className={`section-block section-bg-${bg}`} id={sectionId}>
-      <div className="container py-5">
+      <div className="container py-4 py-lg-5">
         <div
-          className={`row g-4 align-items-center${reverseRow ? " flex-row-reverse" : ""}`}
+          className={`row g-4 g-lg-5 align-items-center justify-content-center${reverseRow ? " flex-row-reverse" : ""}`}
         >
           {hasImages && (
-            <div className="col-12 col-lg-6">
+            <div className="col-12 col-lg-5">
               {hasCarousel ? (
                 <SectionCarousel images={validImages} id={carouselId} />
               ) : imageUrl ? (
@@ -57,7 +63,7 @@ export default function TextImageSection({
                     src={imageUrl}
                     alt={primaryImage?.alt || "Imagen de sección"}
                     fill
-                    sizes="(max-width: 991px) 100vw, 50vw"
+                    sizes={SECTION_IMAGE_SIZES}
                     className="object-fit-cover"
                     loading="lazy"
                     {...(primaryImage?.asset?.metadata?.lqip
@@ -72,10 +78,13 @@ export default function TextImageSection({
             </div>
           )}
           <div
-            className={`col-12 ${hasImages ? "col-lg-6" : "col-lg-8 mx-auto"}`}
+            className={`col-12 ${hasImages ? "col-lg-7" : "col-lg-8 mx-auto"}`}
           >
             <div className="section-content">
-              <PortableText value={content} />
+              <PortableText
+                value={blocks}
+                components={portableTextHeadingsAs("h2")}
+              />
             </div>
           </div>
         </div>

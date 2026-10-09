@@ -2,6 +2,11 @@ import Link from "next/link";
 import Image from "next/image";
 import { urlFor } from "@/sanity/lib/image";
 import type { SanityImageSource } from "@sanity/image-url";
+import {
+  OPERATION_BADGE_CLASS,
+  PROPERTY_STATUS,
+  getOperationLabel,
+} from "@/lib/propertyStatus";
 
 interface PropertyCardProps {
   title: string | null;
@@ -17,13 +22,8 @@ interface PropertyCardProps {
   city?: string | null;
   reference?: string | null;
   priority?: boolean;
+  headingLevel?: "h2" | "h3";
 }
-
-const STATUS_LABELS: Record<string, { label: string; badgeClass: string }> = {
-  reservado: { label: "Reservado", badgeClass: "bg-warning text-dark" },
-  vendido: { label: "Vendido", badgeClass: "bg-danger text-white" },
-  alquilado: { label: "Alquilado", badgeClass: "bg-danger text-white" },
-};
 
 export default function PropertyCard({
   title,
@@ -39,8 +39,9 @@ export default function PropertyCard({
   city,
   reference,
   priority,
+  headingLevel: Heading = "h3",
 }: PropertyCardProps) {
-  const statusInfo = status ? STATUS_LABELS[status] : undefined;
+  const statusInfo = status ? PROPERTY_STATUS[status] : undefined;
   const imageUrl = image
     ? urlFor(image).width(800).height(600).quality(80).auto("format").url()
     : "https://placehold.co/400x300/png";
@@ -65,9 +66,9 @@ export default function PropertyCard({
           />
           {operationType && (
             <span
-              className={`position-absolute top-0 end-0 m-2 badge rounded-pill ${operationType === "venta" ? "bg-success" : "bg-warning text-dark"}`}
+              className={`position-absolute top-0 end-0 m-2 badge rounded-pill ${OPERATION_BADGE_CLASS}`}
             >
-              {operationType === "venta" ? "Venta" : "Alquiler"}
+              {getOperationLabel(operationType)}
             </span>
           )}
           {statusInfo && (
@@ -85,7 +86,7 @@ export default function PropertyCard({
               Ref: {reference}
             </div>
           )}
-          <h5 className="fw-bold text-dark mb-2 fs-5">{title}</h5>
+          <Heading className="h5 fw-bold text-dark mb-2 fs-5">{title}</Heading>
           {(city || rooms) && (
             <p className="mb-2 text-muted small">
               {city}

@@ -1,0 +1,15 @@
+.map-section {
+  height: 450px;
+  scroll-margin-top: var(--header-height);
+}
+
+.map-section-footer {
+  height: 320px;
+}
+
+@media (min-width: 992px) {
+  .map-section-footer {
+    height: calc(100dvh - var(--header-height) - var(--footer-height));
+    min-height: 300px;
+  }
+}

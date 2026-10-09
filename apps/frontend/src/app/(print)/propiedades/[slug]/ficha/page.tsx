@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { PortableText } from "@portabletext/react";
+import { portableTextHeadingsAs } from "@/lib/portableText";
 import type { SanityImageSource } from "@sanity/image-url";
 import { urlFor } from "@/sanity/lib/image";
 import {
@@ -7,6 +8,11 @@ import {
   getAllPropertySlugs,
 } from "@/sanity/queries/propertyDetail";
 import FichaActions from "@/components/FichaActions";
+import {
+  OPERATION_BADGE_CLASS,
+  PROPERTY_STATUS,
+  getOperationLabel,
+} from "@/lib/propertyStatus";
 import "./ficha.css";
 
 export async function generateStaticParams() {
@@ -38,6 +44,10 @@ export default async function FichaPage({
   if (!property) {
     notFound();
   }
+
+  const statusInfo = property.status
+    ? PROPERTY_STATUS[property.status]
+    : undefined;
 
   const validImages = (property.images ?? []).filter(
     (img) => img?.asset?.url
@@ -72,8 +82,8 @@ export default async function FichaPage({
           <h1>{property.title}</h1>
           <div className="ficha-meta">
             {property.operationType && (
-              <span className="badge rounded-pill fs-6 bg-dark">
-                {property.operationType === "venta" ? "Venta" : "Alquiler"}
+              <span className={`badge rounded-pill fs-6 ${OPERATION_BADGE_CLASS}`}>
+                {getOperationLabel(property.operationType)}
               </span>
             )}
             {property.propertyType && (
@@ -81,15 +91,11 @@ export default async function FichaPage({
                 {property.propertyType}
               </span>
             )}
-            {property.status && property.status !== "disponible" && (
+            {statusInfo && (
               <span
-                className={`badge rounded-pill fs-6 ${property.status === "reservado" ? "bg-warning text-dark" : "bg-danger text-white"}`}
+                className={`badge rounded-pill fs-6 ${statusInfo.badgeClass}`}
               >
-                {property.status === "vendido"
-                  ? "Vendido"
-                  : property.status === "alquilado"
-                    ? "Alquilado"
-                    : "Reservado"}
+                {statusInfo.label}
               </span>
             )}
           </div>
@@ -144,7 +150,10 @@ export default async function FichaPage({
         {property.description && (
           <div className="ficha-description">
             <h2>Descripción</h2>
-            <PortableText value={property.description} />
+            <PortableText
+              value={property.description}
+              components={portableTextHeadingsAs("h3")}
+            />
           </div>
         )}
       </div>

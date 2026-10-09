@@ -255,7 +255,7 @@ Two GitHub Actions workflows run on PRs to `dev` and `main`:
 
 - Runs Playwright e2e tests against a production build of the frontend.
 - Runs inside the official Playwright container (`mcr.microsoft.com/playwright:<version>-noble`) so browsers + OS deps are preinstalled — there is no `playwright install` step (it used to hang and burn the 15-min job timeout). A small `resolve-playwright` job reads the `@playwright/test` version from `pnpm-lock.yaml` and feeds it as the image tag, keeping the container in sync with the package automatically (Dependabot can't update `container:` image refs — dependabot-core#5819).
-- Only triggers when `apps/frontend/` or the workflow file changes (path filter).
+- Only triggers when `apps/frontend/`, the root `pnpm-lock.yaml` / `pnpm-workspace.yaml`, or the workflow file changes (path filter), or manually via `workflow_dispatch`.
 - Binds to the GitHub `Preview` environment; reads `NEXT_PUBLIC_SANITY_PROJECT_ID` / `NEXT_PUBLIC_SANITY_DATASET` from that environment's Secrets (non-prod Sanity project). `deploy.yml` binds to `Production` for the real Sanity project + FTP credentials. `ci.yml` is unscoped and uses placeholder values.
 - Uploads `playwright-report/` and `test-results/` as artifacts on failure.
 - The pnpm filter name for the frontend is `dzts-website` (the `name` field in `package.json`), not `frontend`.
@@ -273,6 +273,7 @@ Two GitHub Actions workflows run on PRs to `dev` and `main`:
 - npm updates are grouped by ecosystem (`next-ecosystem`, `react`, `sanity`, `eslint`, `bootstrap`) to reduce PR noise. Ungrouped packages get individual PRs.
 - `target-branch: "dev"` is set on both ecosystems so PRs open against `dev` (the `deps → dev → release` flow), not `main`. Dependabot reads this file from the **default branch (`main`)**, so the `target-branch` change only takes effect once it lands on `main` — keep `dev` mirrored so a release merge doesn't revert it.
 - Dependabot is disabled by default on forks; it was enabled manually (Settings → Code security) for this repo. The `dependabot.yml` is inert until that toggle is on.
+- Transitive-dependency overrides (security patches) live in `pnpm-workspace.yaml` → `overrides:`, bounded to the vulnerable major (`pkg@>=X.0.0 <X.Y.Z`). The `pnpm` field in `package.json` is no longer read by pnpm 10.33+ (it only emits a WARN).
 - Dependabot PRs trigger the CI + e2e workflows, so lint + build + e2e are validated before merge.
 
 ### Code Scanning (CodeQL)
@@ -308,7 +309,7 @@ Two GitHub Actions workflows run on PRs to `dev` and `main`:
 - LCP image priority is on the home hero background (`SearchProperties`), not on the header logo.
 - Reduced motion: smooth scroll falls back to `behavior: "auto"`, carousel auto-advance is disabled, and global CSS reduces animations when `prefers-reduced-motion` is set.
 - Header nav background uses `--header-nav-bg` from `apps/frontend/src/styles/variables.css` (no inline style).
-- Header ("Barra Alta"): shows only `siteSettings.headerLogo` (tall lockup, with "inmobiliaria" tagline), no navbar vertical padding (bar height = logo height); the logo shrinks 56→52px (mobile) / 82→64px (`lg`+) via scroll-driven animation. `siteSettings.logo` (compact) is used in the header only as a fallback (×0.746 scale) when `headerLogo` has no asset; it is otherwise for the Footer and JSON-LD. No animation without `animation-timeline` support or with reduced motion. The header is always `position: sticky` and a solid `--header-nav-bg` background on every page, including `/`. See `docs/specs/2026-09-27-header-barra-alta.md`.
+- Header ("Barra Alta"): shows only `siteSettings.headerLogo` (tall lockup: "dzts / inmobiliaria / by César Torres"), static navbar vertical padding `--header-pad-y` (0.5rem / 0.625rem on `lg`+) around the logo; the logo image shrinks 56→52px (mobile) / 82→64px (`lg`+) via scroll-driven animation while its `overflow: hidden` box shrinks to the mark height (`--logo-mark-ratio`, 0.746 of the lockup; separate from `--logo-compact-scale`), clipping the bottom "by César Torres" line on scroll; the scrolled bar is 56px (mobile) / ~68px (`lg`+), padding included (`--header-height` uses the rest height when there is no animation). `siteSettings.logo` (compact) is used in the header only as a fallback (×0.746 scale) when `headerLogo` has no asset; it is otherwise for the Footer and JSON-LD. No animation without `animation-timeline` support or with reduced motion. The header is always `position: sticky` and a solid `--header-nav-bg` background on every page, including `/`. See `docs/specs/2026-09-27-header-barra-alta.md`.
 - Map iframe titles are passed via the `MapSection` `title` prop for contextual SEO.
 - Sanity CDN preconnect is included in `apps/frontend/src/app/layout.tsx`.
 - `global-error.tsx` exists as a root error boundary with its own `<html>` and `<body>`.
@@ -319,7 +320,8 @@ Two GitHub Actions workflows run on PRs to `dev` and `main`:
 
 ## Components
 
-- **MapSection** - Reusable component for displaying embedded Google Maps. Renders full-width iframe (450px height) when address is provided, returns null if no address exists.
+- **MapSection** - Reusable component for displaying embedded Google Maps. Renders a full-width iframe when address is provided, returns null if no address exists. `variant` prop: `"default"` is 450px tall (property detail); `"footer"` (home `#contacto`) is 320px on mobile and, on `lg`+, fills the viewport between the header and footer (`100dvh - var(--header-height) - var(--footer-height)`, min 300px). `--header-height` is defined in `Header.css`, `--footer-height` in `variables.css`.
+- **Footer** - Three columns (brand: logo, `footerTagline`, social links; contact: address, `officeHours`, WhatsApp CTA via `TrackedLink`; explore: `footerLinks` + `certificationLogos`) plus a bottom bar with `licenseNumber` and the credit line. Link/logo URLs go through `extractUrl()`; `/` and `#` prefixes render as internal links. The old `ScrollToTopButton` was removed.
 - **ShareButton** - Client component with Web Share API (mobile) / clipboard copy with "Link copiado" feedback (desktop). Used on the property detail page.
 - **FichaActions** - Client component with "Imprimir Ficha" (`window.print()`) and "Compartir" (same share logic as ShareButton) buttons. Used on the print-optimized ficha page.
 - **TrackedLink** - Client component wrapping a real `<a>` (all anchor props pass through) that fires `trackEvent()` on click without `preventDefault()`. Used for the WhatsApp float and the property detail page's Ficha/WhatsApp/consult links.
@@ -433,5 +435,5 @@ When modifying components, be aware these selectors are used by e2e tests:
 - Property detail page includes: "Ficha" button (opens ficha in new tab), "Compartir" (ShareButton), WhatsApp share icon, and "Consultar por WhatsApp" full-width button.
 - WhatsApp consultation URL is built from `siteSettings.whatsappNumber` with a pre-filled message including the property name.
 - Sold/rented properties display a status banner ribbon (CSS-only, positioned absolute) overlaying the image carousel.
-- `TextImageSection` displays images in large circles (full column width, `border-radius: 50%`, `aspect-ratio: 1/1`).
+- `TextImageSection` displays images (single or `SectionCarousel`) in centered circles capped at 240px (mobile) / 300px (`md`) / 380px (`lg`+, `col-lg-5` with text in `col-lg-7`, max-width 40rem); `sizes` comes from `SECTION_IMAGE_SIZES` in `components/sectionImage.ts`. Empty Portable Text blocks are dropped via `withoutEmptyBlocks()` (`src/lib/portableText.tsx`); a section with no remaining content renders nothing.
 - `src/lib/analytics.ts` exports `trackEvent()` (wraps `sendGAEvent` from `@next/third-parties/google`) and the `ANALYTICS_EVENT` constants (`whatsappContact`, `share`, `fichaOpen`, `fichaPrint`) for GA4 conversion tracking. Safe no-op with no measurement id, on the server, or without `window.gtag`; never throws; strips `undefined` params.

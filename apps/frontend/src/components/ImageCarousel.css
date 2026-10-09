@@ -3,3 +3,11 @@
   width: 100%;
   cursor: pointer;
 }
+
+.carousel-counter {
+  z-index: 2;
+  pointer-events: none;
+  background: rgba(0, 0, 0, 0.55);
+  color: #fff;
+  padding: 0.25rem 0.6rem;
+}

@@ -86,6 +86,7 @@ export const SITE_SETTINGS_QUERY = defineQuery(/* groq */ `
     phone,
     email,
     address,
+    officeHours,
     whatsappNumber,
     whatsappMessage,
     socialLinks[] {
@@ -114,6 +115,8 @@ export const SITE_SETTINGS_QUERY = defineQuery(/* groq */ `
     creditLine {
       text,
       url
-    }
+    },
+    footerTagline,
+    licenseNumber
   }
 `);

@@ -20,8 +20,7 @@
   color: var(--bs-dark);
 }
 
-.section-bg-primary h2,
-.section-bg-primary h3 {
+.section-bg-primary :is(.h1, .h2, .h3, .h4, .h5, .h6) {
   color: var(--bs-dark);
 }
 
@@ -30,8 +29,7 @@
   color: var(--bs-secondary);
 }
 
-.section-bg-dark h2,
-.section-bg-dark h3 {
+.section-bg-dark :is(.h1, .h2, .h3, .h4, .h5, .h6) {
   color: var(--bs-primary);
 }
 
@@ -40,8 +38,8 @@
   color: var(--bs-dark);
 }
 
-.section-bg-light h2,
-.section-bg-light h3 {
+.section-bg-light .h2,
+.section-bg-light .h3 {
   color: var(--bs-primary);
 }
 
@@ -50,29 +48,35 @@
   color: var(--bs-dark);
 }
 
-.section-bg-white h2,
-.section-bg-white h3 {
+.section-bg-white .h2,
+.section-bg-white .h3 {
   color: var(--bs-primary);
 }
 
-/* --- Circular image container --- */
+/* --- Circular image (single or carousel) --- */
 
-.section-image-wrap {
+.section-image-wrap,
+.section-carousel-wrap {
   position: relative;
-  width: 100%;
+  width: min(100%, 240px);
   aspect-ratio: 1/1;
+  margin-inline: auto;
   border-radius: 50%;
   overflow: hidden;
 }
 
-/* --- Carousel wrapper (circular, same as single image) --- */
+@media (min-width: 768px) {
+  .section-image-wrap,
+  .section-carousel-wrap {
+    width: 300px;
+  }
+}
 
-.section-carousel-wrap {
-  position: relative;
-  width: 100%;
-  aspect-ratio: 1/1;
-  border-radius: 50%;
-  overflow: hidden;
+@media (min-width: 992px) {
+  .section-image-wrap,
+  .section-carousel-wrap {
+    width: min(100%, 380px);
+  }
 }
 
 .section-carousel-wrap > .carousel {
@@ -83,19 +87,21 @@
 /* --- Content --- */
 
 .section-content {
-  padding: 1.5rem 0;
+  max-width: 40rem;
 }
 
-@media (min-width: 992px) {
-  .section-content {
-    padding: 0;
-  }
+.col-lg-8.mx-auto > .section-content {
+  margin-inline: auto;
+}
+
+.section-content > :last-child {
+  margin-bottom: 0;
 }
 
 /* --- Carousel controls --- */
 
 .section-carousel-control {
-  width: 40px;
+  width: 32px;
   opacity: 0.85;
 }
 
