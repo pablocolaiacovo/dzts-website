@@ -322,10 +322,10 @@ export default async function PropertyPage({
           ]}
         />
         <div className="row g-4 align-items-start">
-          <div className="col-12 col-lg-7">
+          <div className="col-12 col-lg-6">
             <PropertyGallery property={property} />
           </div>
-          <div className="col-12 col-lg-5">
+          <div className="col-12 col-lg-6">
             <PropertySummary property={property} />
             <PropertyFeatureList features={features} />
             <PropertyPriceBox

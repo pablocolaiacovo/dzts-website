@@ -11,14 +11,14 @@ export default function PropertyLoading() {
         </nav>
 
         <div className="row g-4 align-items-start">
-          <div className="col-12 col-lg-7">
+          <div className="col-12 col-lg-6">
             <div className="carousel-image-container position-relative rounded-2 overflow-hidden">
               <div className="placeholder-glow bg-light w-100 h-100">
                 <span className="placeholder w-100 h-100 d-block"></span>
               </div>
             </div>
           </div>
-          <div className="col-12 col-lg-5 placeholder-glow">
+          <div className="col-12 col-lg-6 placeholder-glow">
             <div className="d-flex gap-2 mb-2">
               <span className="placeholder rounded-pill" style={{ width: 60, height: 22 }}></span>
               <span className="placeholder rounded-pill" style={{ width: 80, height: 22 }}></span>
