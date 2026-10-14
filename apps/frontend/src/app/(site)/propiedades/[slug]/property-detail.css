@@ -91,12 +91,6 @@
   aspect-ratio: 4 / 3;
 }
 
-@media (min-width: 992px) {
-  .property-detail .carousel-image-container {
-    aspect-ratio: 3 / 2;
-  }
-}
-
 .property-description :is(p, li) {
   line-height: var(--line-height-normal);
 }
