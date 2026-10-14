@@ -1,9 +1,12 @@
 import type { ComponentProps } from "react";
 import PropertyCard from "./PropertyCard";
 
-type PropertyCardData = ComponentProps<typeof PropertyCard> & {
+type PropertyCardData = Omit<ComponentProps<typeof PropertyCard>, "imageSizes"> & {
   _id: string;
 };
+
+const LISTING_IMAGE_SIZES =
+  "(min-width: 1460px) 400px, (min-width: 1200px) calc(33.33vw - 86px), (min-width: 1036px) 400px, (min-width: 992px) calc(50vw - 118px), (min-width: 856px) 400px, (min-width: 576px) calc(50vw - 28px), (min-width: 432px) 400px, calc(100vw - 32px)";
 
 interface PropertiesGridProps {
   properties: PropertyCardData[];
@@ -45,6 +48,7 @@ export default function PropertiesGrid({ properties }: PropertiesGridProps) {
             reference={property.reference}
             priority={index === 0}
             headingLevel="h2"
+            imageSizes={LISTING_IMAGE_SIZES}
           />
         </div>
       ))}
