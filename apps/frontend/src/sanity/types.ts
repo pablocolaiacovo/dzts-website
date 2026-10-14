@@ -220,6 +220,7 @@ export type SiteSettings = {
     _type: "certificationLogo";
     _key: string;
   }>;
+  dataFiscalHtml?: string;
   creditLine?: {
     text?: string;
     url?: string;
@@ -736,7 +737,7 @@ export type ORGANIZATION_QUERY_RESULT = {
 
 // Source: ../frontend/src/sanity/queries/siteSettings.ts
 // Variable: SITE_SETTINGS_QUERY
-// Query: *[_type == "siteSettings"][0] {    siteName,    logo {      asset->{        _id,        url,        metadata { lqip, dimensions }      },      crop,      hotspot,      alt    },    headerLogo {      asset->{        _id,        url,        metadata { lqip, dimensions }      },      crop,      hotspot,      alt    },    favicon {      asset->{        _id,        url      }    },    mainNavigation[] {      _key,      label,      linkType,      internalPath,      externalUrl,      actionId    },    phone,    email,    address,    officeHours,    whatsappNumber,    whatsappMessage,    socialLinks[] {      _key,      platform,      url    },    footerLinks[] {      _key,      label,      url    },    certificationLogos[] {      _key,      image {        asset->{          _id,          url,          metadata { lqip, dimensions }        }      },      alt,      title,      url    },    creditLine {      text,      url    },    footerTagline,    licenseNumber  }
+// Query: *[_type == "siteSettings"][0] {    siteName,    logo {      asset->{        _id,        url,        metadata { lqip, dimensions }      },      crop,      hotspot,      alt    },    headerLogo {      asset->{        _id,        url,        metadata { lqip, dimensions }      },      crop,      hotspot,      alt    },    favicon {      asset->{        _id,        url      }    },    mainNavigation[] {      _key,      label,      linkType,      internalPath,      externalUrl,      actionId    },    phone,    email,    address,    officeHours,    whatsappNumber,    whatsappMessage,    socialLinks[] {      _key,      platform,      url    },    footerLinks[] {      _key,      label,      url    },    certificationLogos[] {      _key,      image {        asset->{          _id,          url,          metadata { lqip, dimensions }        }      },      alt,      title,      url    },    dataFiscalHtml,    creditLine {      text,      url    },    footerTagline,    licenseNumber  }
 export type SITE_SETTINGS_QUERY_RESULT = {
   siteName: string | null;
   logo: {
@@ -812,6 +813,7 @@ export type SITE_SETTINGS_QUERY_RESULT = {
     title: string | null;
     url: string | null;
   }> | null;
+  dataFiscalHtml: string | null;
   creditLine: {
     text: string | null;
     url: string | null;
@@ -839,7 +841,7 @@ declare global {
     '\n  *[_type == "homePage"][0].seo {\n  metaTitle,\n  metaDescription,\n  ogImage { asset->{ url } },\n  noIndex\n}\n': HOME_SEO_QUERY_RESULT;
     '\n  *[_type == "propiedadesPage"][0].seo {\n  metaTitle,\n  metaDescription,\n  ogImage { asset->{ url } },\n  noIndex\n}\n': PROPIEDADES_SEO_QUERY_RESULT;
     '\n  *[_type == "siteSettings"][0] {\n    siteName,\n    logo { asset->{ url } },\n    phone,\n    email,\n    address,\n    whatsappNumber,\n    socialLinks[] { url }\n  }\n': ORGANIZATION_QUERY_RESULT;
-    '\n  *[_type == "siteSettings"][0] {\n    siteName,\n    logo {\n      asset->{\n        _id,\n        url,\n        metadata { lqip, dimensions }\n      },\n      crop,\n      hotspot,\n      alt\n    },\n    headerLogo {\n      asset->{\n        _id,\n        url,\n        metadata { lqip, dimensions }\n      },\n      crop,\n      hotspot,\n      alt\n    },\n    favicon {\n      asset->{\n        _id,\n        url\n      }\n    },\n    mainNavigation[] {\n      _key,\n      label,\n      linkType,\n      internalPath,\n      externalUrl,\n      actionId\n    },\n    phone,\n    email,\n    address,\n    officeHours,\n    whatsappNumber,\n    whatsappMessage,\n    socialLinks[] {\n      _key,\n      platform,\n      url\n    },\n    footerLinks[] {\n      _key,\n      label,\n      url\n    },\n    certificationLogos[] {\n      _key,\n      image {\n        asset->{\n          _id,\n          url,\n          metadata { lqip, dimensions }\n        }\n      },\n      alt,\n      title,\n      url\n    },\n    creditLine {\n      text,\n      url\n    },\n    footerTagline,\n    licenseNumber\n  }\n': SITE_SETTINGS_QUERY_RESULT;
+    '\n  *[_type == "siteSettings"][0] {\n    siteName,\n    logo {\n      asset->{\n        _id,\n        url,\n        metadata { lqip, dimensions }\n      },\n      crop,\n      hotspot,\n      alt\n    },\n    headerLogo {\n      asset->{\n        _id,\n        url,\n        metadata { lqip, dimensions }\n      },\n      crop,\n      hotspot,\n      alt\n    },\n    favicon {\n      asset->{\n        _id,\n        url\n      }\n    },\n    mainNavigation[] {\n      _key,\n      label,\n      linkType,\n      internalPath,\n      externalUrl,\n      actionId\n    },\n    phone,\n    email,\n    address,\n    officeHours,\n    whatsappNumber,\n    whatsappMessage,\n    socialLinks[] {\n      _key,\n      platform,\n      url\n    },\n    footerLinks[] {\n      _key,\n      label,\n      url\n    },\n    certificationLogos[] {\n      _key,\n      image {\n        asset->{\n          _id,\n          url,\n          metadata { lqip, dimensions }\n        }\n      },\n      alt,\n      title,\n      url\n    },\n    dataFiscalHtml,\n    creditLine {\n      text,\n      url\n    },\n    footerTagline,\n    licenseNumber\n  }\n': SITE_SETTINGS_QUERY_RESULT;
   }
 }
 // Lets @sanity/client releases that predate the global registry read it too

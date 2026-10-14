@@ -27,6 +27,7 @@ async function SiteShell({ children }: { children: React.ReactNode }) {
         siteName={siteSettings?.siteName}
         footerLinks={siteSettings?.footerLinks}
         certificationLogos={siteSettings?.certificationLogos}
+        dataFiscalHtml={siteSettings?.dataFiscalHtml}
         socialLinks={siteSettings?.socialLinks}
         phone={siteSettings?.phone}
         email={siteSettings?.email}
