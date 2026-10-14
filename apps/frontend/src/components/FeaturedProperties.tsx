@@ -19,6 +19,9 @@ const FEATURED_QUERY = defineQuery(`
     "image": images[0] { asset->{ _id, url, metadata { lqip } } }
   }`);
 
+const FEATURED_IMAGE_SIZES =
+  "(min-width: 1400px) 400px, (min-width: 1200px) 356px, (min-width: 992px) 296px, (min-width: 768px) 336px, (min-width: 424px) 400px, calc(100vw - 24px)";
+
 export default async function FeaturedProperties({
   heading,
 }: {
@@ -58,6 +61,7 @@ export default async function FeaturedProperties({
                 lqip={property.image?.asset?.metadata?.lqip}
                 rooms={property.rooms}
                 city={property.city}
+                imageSizes={FEATURED_IMAGE_SIZES}
               />
             </div>
           ))
