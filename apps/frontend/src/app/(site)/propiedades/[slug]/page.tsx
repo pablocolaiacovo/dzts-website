@@ -322,10 +322,10 @@ export default async function PropertyPage({
           ]}
         />
         <div className="row g-4 align-items-start">
-          <div className="col-12 col-lg-7">
+          <div className="col-12 col-lg-6">
             <PropertyGallery property={property} />
           </div>
-          <div className="col-12 col-lg-5">
+          <div className="col-12 col-lg-6">
             <PropertySummary property={property} />
             <PropertyFeatureList features={features} />
             <PropertyPriceBox
@@ -340,10 +340,9 @@ export default async function PropertyPage({
         {property.description ? (
           <div className="row mt-4">
             <div className="property-description col-12 col-lg-8">
-              <h2 className="fs-5 fw-semibold mb-2">Descripción</h2>
               <PortableText
                 value={property.description}
-                components={portableTextHeadingsAs("h3")}
+                components={portableTextHeadingsAs("h2")}
               />
             </div>
           </div>

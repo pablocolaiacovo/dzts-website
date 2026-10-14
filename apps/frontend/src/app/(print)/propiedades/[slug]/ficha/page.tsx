@@ -149,10 +149,9 @@ export default async function FichaPage({
 
         {property.description && (
           <div className="ficha-description">
-            <h2>Descripción</h2>
             <PortableText
               value={property.description}
-              components={portableTextHeadingsAs("h3")}
+              components={portableTextHeadingsAs("h2")}
             />
           </div>
         )}

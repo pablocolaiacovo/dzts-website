@@ -23,6 +23,7 @@ interface PropertyCardProps {
   reference?: string | null;
   priority?: boolean;
   headingLevel?: "h2" | "h3";
+  imageSizes: string;
 }
 
 export default function PropertyCard({
@@ -40,6 +41,7 @@ export default function PropertyCard({
   reference,
   priority,
   headingLevel: Heading = "h3",
+  imageSizes,
 }: PropertyCardProps) {
   const statusInfo = status ? PROPERTY_STATUS[status] : undefined;
   const imageUrl = image
@@ -59,7 +61,7 @@ export default function PropertyCard({
             src={imageUrl}
             alt={title || "Property Image"}
             fill
-            sizes="(min-width: 992px) 33vw, (min-width: 768px) 50vw, 100vw"
+            sizes={imageSizes}
             className="card-img-top rounded-top-4 object-fit-cover"
             priority={priority}
             {...(lqip ? { placeholder: "blur" as const, blurDataURL: lqip } : {})}

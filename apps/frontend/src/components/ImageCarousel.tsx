@@ -9,7 +9,7 @@ import { useReducedMotion } from "@/hooks/useReducedMotion";
 import "./ImageCarousel.css";
 
 const CAROUSEL_SIZES =
-  "(min-width: 1400px) 746px, (min-width: 1200px) 641px, (min-width: 992px) 536px, (min-width: 768px) 696px, (min-width: 576px) 516px, 100vw";
+  "(min-width: 1400px) 636px, (min-width: 1200px) 546px, (min-width: 992px) 456px, (min-width: 768px) 696px, (min-width: 576px) 516px, calc(100vw - 24px)";
 
 const ImageLightbox = dynamic(() => import("./ImageLightbox"), { ssr: false });
 
