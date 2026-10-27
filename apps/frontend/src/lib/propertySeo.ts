@@ -1,3 +1,5 @@
+import { formatRooms } from "@/lib/propertyFeatures";
+
 const MAX_DESCRIPTION_LENGTH = 155;
 
 export interface PropertySeoInput {
@@ -114,11 +116,9 @@ export function buildPropertyDescription(property: PropertySeoInput): string {
 
   if (
     typeof property.rooms === "number" &&
-    property.rooms > 0 &&
     !MENTIONS_ROOMS_PATTERN.test(property.title ?? "")
   ) {
-    const label = property.rooms === 1 ? "dormitorio" : "dormitorios";
-    sentences.push(`${property.rooms} ${label}.`);
+    sentences.push(`${formatRooms(property.rooms)}.`);
   }
 
   if (typeof property.price === "number") {

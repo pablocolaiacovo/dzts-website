@@ -111,6 +111,16 @@ describe("buildPropertyDescription", () => {
     expect(description).toContain("3 dormitorios.");
   });
 
+  it("adds Monoambiente when rooms is 0", () => {
+    const description = buildPropertyDescription({
+      title: "Departamento en Centro",
+      rooms: 0,
+    });
+
+    expect(description).toContain("Monoambiente.");
+    expect(description).not.toContain("0 dormitorios");
+  });
+
   it("skips the bedrooms sentence when the title already mentions rooms", () => {
     const description = buildPropertyDescription({
       title: "Departamento 1 dormitorio",

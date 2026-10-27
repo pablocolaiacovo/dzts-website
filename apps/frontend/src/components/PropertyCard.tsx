@@ -1,3 +1,4 @@
+import { formatRooms } from "@/lib/propertyFeatures";
 import Link from "next/link";
 import Image from "next/image";
 import { urlFor } from "@/sanity/lib/image";
@@ -49,6 +50,7 @@ export default function PropertyCard({
     : "https://placehold.co/400x300/png";
 
   const currencySymbol = currency === "ARS" ? "AR$" : "US$";
+  const roomsLabel = typeof rooms === "number" ? formatRooms(rooms, "short") : "";
 
   return (
     <Link href={`/propiedades/${slug}`} className="text-decoration-none w-100">
@@ -89,11 +91,11 @@ export default function PropertyCard({
             </div>
           )}
           <Heading className="h5 fw-bold text-dark mb-2 fs-5">{title}</Heading>
-          {(city || rooms) && (
+          {(city || roomsLabel) && (
             <p className="mb-2 text-muted small">
               {city}
-              {city && rooms ? " · " : ""}
-              {rooms ? `${rooms} dorm.` : ""}
+              {city && roomsLabel ? " · " : ""}
+              {roomsLabel}
             </p>
           )}
           {subtitle && <p className="mb-3 text-body small">{subtitle}</p>}

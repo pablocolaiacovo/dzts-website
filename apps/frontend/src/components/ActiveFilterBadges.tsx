@@ -4,6 +4,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import type { TransitionStartFunction } from "react";
 import type { FilterOption } from "@/types/filters";
 import { parseMultiple } from "@/lib/filters";
+import { formatRooms } from "@/lib/propertyFeatures";
 
 interface ActiveFilterBadgesProps {
   cities: FilterOption[];
@@ -45,7 +46,7 @@ export default function ActiveFilterBadges({
 
   const getDormitoriosLabel = (value: string) => {
     const count = parseInt(value, 10);
-    return `${count} ${count === 1 ? "dorm." : "dorms."}`;
+    return formatRooms(count, "short");
   };
 
   const getSuperficieLabel = (min: string, max: string) => {
