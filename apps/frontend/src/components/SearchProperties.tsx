@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import type { FilterOptions } from "@/types/filters";
+import { formatRooms } from "@/lib/propertyFeatures";
 import "./SearchProperties.css";
 
 interface SearchPropertiesProps {
@@ -137,7 +138,7 @@ export default function SearchProperties({
               <option value="">Dormitorios</option>
               {filterOptions?.roomCounts.map((count) => (
                 <option key={count} value={count.toString()}>
-                  {count} {count === 1 ? "dormitorio" : "dormitorios"}
+                  {formatRooms(count)}
                 </option>
               ))}
             </select>

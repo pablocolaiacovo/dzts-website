@@ -14,6 +14,7 @@ import {
 } from "@/sanity/queries/propertyDetail";
 import { resolveMetadata } from "@/lib/seo";
 import { portableTextHeadingsAs } from "@/lib/portableText";
+import { getRoomsUnit, isPositive, MONOAMBIENTE_LABEL } from "@/lib/propertyFeatures";
 import { buildPropertyTitle, buildPropertyDescription } from "@/lib/propertySeo";
 
 import Breadcrumb from "@/components/Breadcrumb";
@@ -138,7 +139,8 @@ function PropertyFeatureList({ features }: { features: PropertyFeature[] }) {
         <li key={feature.icon} className="d-flex align-items-center gap-2">
           <i className={`bi bi-${feature.icon}`} aria-hidden="true" />
           <span>
-            <b>{feature.value}</b> {feature.label}
+            <b>{feature.value}</b>
+            {feature.label && ` ${feature.label}`}
           </span>
         </li>
       ))}
@@ -258,32 +260,32 @@ export default async function PropertyPage({
   };
 
   const features: PropertyFeature[] = [
-    property.rooms != null && {
+    (property.rooms === 0 || isPositive(property.rooms)) && {
       icon: "door-open",
-      value: property.rooms,
-      label: "dorm.",
+      value: property.rooms === 0 ? MONOAMBIENTE_LABEL : property.rooms,
+      label: property.rooms === 0 ? "" : getRoomsUnit(property.rooms, "short"),
     },
-    property.bathrooms != null && {
+    isPositive(property.bathrooms) && {
       icon: "droplet",
       value: property.bathrooms,
       label: property.bathrooms === 1 ? "baño" : "baños",
     },
-    property.garages != null && {
+    isPositive(property.garages) && {
       icon: "car-front",
       value: property.garages,
       label: property.garages === 1 ? "cochera" : "cocheras",
     },
-    property.sizeCovered != null && {
+    isPositive(property.sizeCovered) && {
       icon: "house-door",
       value: `${property.sizeCovered} m²`,
       label: "cub.",
     },
-    property.sizeTotal != null && {
+    isPositive(property.sizeTotal) && {
       icon: "rulers",
       value: `${property.sizeTotal} m²`,
       label: "tot.",
     },
-    property.sizeLand != null && {
+    isPositive(property.sizeLand) && {
       icon: "bounding-box",
       value: `${property.sizeLand} m²`,
       label: "lote",

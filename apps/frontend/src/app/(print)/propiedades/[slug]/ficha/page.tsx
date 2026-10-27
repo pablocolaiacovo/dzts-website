@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import { isPositive, MONOAMBIENTE_LABEL } from "@/lib/propertyFeatures";
 import { PortableText } from "@portabletext/react";
 import { portableTextHeadingsAs } from "@/lib/portableText";
 import type { SanityImageSource } from "@sanity/image-url";
@@ -54,18 +55,21 @@ export default async function FichaPage({
   );
 
   const features: { label: string; value: string | number }[] = [
-    property.rooms != null && { label: "Dormitorios", value: property.rooms },
-    property.bathrooms != null && { label: "Baños", value: property.bathrooms },
-    property.garages != null && { label: "Cocheras", value: property.garages },
-    property.sizeCovered != null && {
+    (property.rooms === 0 || isPositive(property.rooms)) && {
+      label: "Dormitorios",
+      value: property.rooms === 0 ? MONOAMBIENTE_LABEL : property.rooms,
+    },
+    isPositive(property.bathrooms) && { label: "Baños", value: property.bathrooms },
+    isPositive(property.garages) && { label: "Cocheras", value: property.garages },
+    isPositive(property.sizeCovered) && {
       label: "Sup. cubierta",
       value: `${property.sizeCovered} m²`,
     },
-    property.sizeLand != null && {
+    isPositive(property.sizeLand) && {
       label: "Sup. terreno",
       value: `${property.sizeLand} m²`,
     },
-    property.sizeTotal != null && {
+    isPositive(property.sizeTotal) && {
       label: "Sup. total",
       value: `${property.sizeTotal} m²`,
     },
