@@ -1,5 +1,5 @@
-import { isPositive, MONOAMBIENTE_LABEL } from "@/lib/propertyFeatures";
 import { notFound } from "next/navigation";
+import { isPositive, MONOAMBIENTE_LABEL } from "@/lib/propertyFeatures";
 import { PortableText } from "@portabletext/react";
 import { portableTextHeadingsAs } from "@/lib/portableText";
 import type { SanityImageSource } from "@sanity/image-url";
@@ -55,11 +55,10 @@ export default async function FichaPage({
   );
 
   const features: { label: string; value: string | number }[] = [
-    property.rooms === 0 && {
+    (property.rooms === 0 || isPositive(property.rooms)) && {
       label: "Dormitorios",
-      value: MONOAMBIENTE_LABEL,
+      value: property.rooms === 0 ? MONOAMBIENTE_LABEL : property.rooms,
     },
-    isPositive(property.rooms) && { label: "Dormitorios", value: property.rooms },
     isPositive(property.bathrooms) && { label: "Baños", value: property.bathrooms },
     isPositive(property.garages) && { label: "Cocheras", value: property.garages },
     isPositive(property.sizeCovered) && {

@@ -114,11 +114,10 @@ export function buildPropertyDescription(property: PropertySeoInput): string {
     sentences.push(`${normalizeTitle(subtitle)}.`);
   }
 
-  if (
-    typeof property.rooms === "number" &&
-    !MENTIONS_ROOMS_PATTERN.test(property.title ?? "")
-  ) {
-    sentences.push(`${formatRooms(property.rooms)}.`);
+  const roomsLabel =
+    typeof property.rooms === "number" ? formatRooms(property.rooms) : "";
+  if (roomsLabel && !MENTIONS_ROOMS_PATTERN.test(property.title ?? "")) {
+    sentences.push(`${roomsLabel}.`);
   }
 
   if (typeof property.price === "number") {

@@ -121,6 +121,16 @@ describe("buildPropertyDescription", () => {
     expect(description).not.toContain("0 dormitorios");
   });
 
+  it("skips the bedrooms sentence when rooms is negative", () => {
+    const description = buildPropertyDescription({
+      title: "Departamento en Centro",
+      rooms: -1,
+    });
+
+    expect(description).not.toContain("-1");
+    expect(description).not.toContain("dormitorio");
+  });
+
   it("skips the bedrooms sentence when the title already mentions rooms", () => {
     const description = buildPropertyDescription({
       title: "Departamento 1 dormitorio",

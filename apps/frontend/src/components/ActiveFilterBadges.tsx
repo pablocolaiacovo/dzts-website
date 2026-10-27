@@ -46,7 +46,7 @@ export default function ActiveFilterBadges({
 
   const getDormitoriosLabel = (value: string) => {
     const count = parseInt(value, 10);
-    return formatRooms(count, "short");
+    return formatRooms(count, "short") || value;
   };
 
   const getSuperficieLabel = (min: string, max: string) => {

@@ -260,15 +260,10 @@ export default async function PropertyPage({
   };
 
   const features: PropertyFeature[] = [
-    property.rooms === 0 && {
+    (property.rooms === 0 || isPositive(property.rooms)) && {
       icon: "door-open",
-      value: MONOAMBIENTE_LABEL,
-      label: "",
-    },
-    isPositive(property.rooms) && {
-      icon: "door-open",
-      value: property.rooms,
-      label: getRoomsUnit(property.rooms, "short"),
+      value: property.rooms === 0 ? MONOAMBIENTE_LABEL : property.rooms,
+      label: property.rooms === 0 ? "" : getRoomsUnit(property.rooms, "short"),
     },
     isPositive(property.bathrooms) && {
       icon: "droplet",

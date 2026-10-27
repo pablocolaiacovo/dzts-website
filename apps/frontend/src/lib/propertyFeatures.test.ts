@@ -20,7 +20,7 @@ describe("getRoomsUnit", () => {
     expect(getRoomsUnit(1, "long")).toBe("dormitorio");
     expect(getRoomsUnit(2, "long")).toBe("dormitorios");
     expect(getRoomsUnit(1, "short")).toBe("dorm.");
-    expect(getRoomsUnit(3, "short")).toBe("dorms.");
+    expect(getRoomsUnit(3, "short")).toBe("dorm.");
   });
 });
 
@@ -34,6 +34,12 @@ describe("formatRooms", () => {
     expect(formatRooms(1)).toBe("1 dormitorio");
     expect(formatRooms(2)).toBe("2 dormitorios");
     expect(formatRooms(1, "short")).toBe("1 dorm.");
-    expect(formatRooms(2, "short")).toBe("2 dorms.");
+    expect(formatRooms(2, "short")).toBe("2 dorm.");
+  });
+
+  it("returns an empty string for negative or non-finite counts", () => {
+    expect(formatRooms(-1)).toBe("");
+    expect(formatRooms(Number.NaN)).toBe("");
+    expect(formatRooms(Number.POSITIVE_INFINITY, "short")).toBe("");
   });
 });

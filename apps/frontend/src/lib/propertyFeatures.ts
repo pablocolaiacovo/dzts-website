@@ -10,7 +10,7 @@ export function getRoomsUnit(
   count: number,
   style: RoomsLabelStyle = "long",
 ): string {
-  if (style === "short") return count === 1 ? "dorm." : "dorms.";
+  if (style === "short") return "dorm.";
   return count === 1 ? "dormitorio" : "dormitorios";
 }
 
@@ -18,6 +18,7 @@ export function formatRooms(
   count: number,
   style: RoomsLabelStyle = "long",
 ): string {
+  if (count < 0 || !Number.isFinite(count)) return "";
   if (count === 0) return MONOAMBIENTE_LABEL;
   return `${count} ${getRoomsUnit(count, style)}`;
 }

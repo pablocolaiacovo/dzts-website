@@ -1,6 +1,6 @@
-import { formatRooms } from "@/lib/propertyFeatures";
 import Link from "next/link";
 import Image from "next/image";
+import { formatRooms } from "@/lib/propertyFeatures";
 import { urlFor } from "@/sanity/lib/image";
 import type { SanityImageSource } from "@sanity/image-url";
 import {
