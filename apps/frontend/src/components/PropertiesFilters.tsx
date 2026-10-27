@@ -9,6 +9,7 @@ import {
 } from "react";
 import type { FilterOption } from "@/types/filters";
 import { parseMultiple } from "@/lib/filters";
+import { formatRooms } from "@/lib/propertyFeatures";
 import ReferenceSearch from "./ReferenceSearch";
 import "./PropertiesFilters.css";
 
@@ -437,7 +438,7 @@ function PropertiesFiltersInner({
           idPrefix="dormitorios"
           items={roomCounts.map((count) => ({
             value: count.toString(),
-            label: `${count} ${count === 1 ? "dormitorio" : "dormitorios"}`,
+            label: formatRooms(count),
           }))}
           selected={filters.dormitorios}
           onToggle={(value) => dispatch({ type: "TOGGLE_DORMITORIOS", value })}
