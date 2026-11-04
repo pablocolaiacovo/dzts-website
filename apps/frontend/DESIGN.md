@@ -34,7 +34,7 @@ typography:
     fontFamily: "Inter, system-ui, -apple-system, sans-serif"
     fontSize: "1.5rem"
     fontWeight: 700
-    lineHeight: 1.25
+    lineHeight: 1.5
   body:
     fontFamily: "Inter, system-ui, -apple-system, sans-serif"
     fontSize: "1rem"
@@ -102,7 +102,7 @@ components:
     backgroundColor: "{colors.brand-cyan}"
     textColor: "{colors.white}"
     rounded: "{rounded.pill}"
-    padding: "0.25rem 0.6rem"
+    padding: "0.35em 0.65em"
   input-select:
     backgroundColor: "{colors.white}"
     textColor: "{colors.ink}"
@@ -137,7 +137,7 @@ There is no dark mode, because the palette is calibrated against white.
 A strict brand pair of bright cyan and dark grey on white, with outside colors allowed only when they carry a function.
 
 ### Primary
-- **Logo Cyan** (`brand-cyan`): Prices, subtitles, links, the 4px rule on property cards, and fills such as primary buttons, active pagination, checkboxes and pills. Also the heading color on dark sections.
+- **Logo Cyan** (`brand-cyan`): Prices, links, the 4px rule on property cards, and fills such as primary buttons, active pagination, checkboxes and pills. Also the color of `h2` and `h3` headings in home sections on white, light and grey grounds.
 
 ### Secondary
 - **Manual Grey** (`brand-grey`): Header and footer backgrounds, property titles, the label on cyan fills, and the hover state of links and primary buttons.
@@ -145,7 +145,7 @@ A strict brand pair of bright cyan and dark grey on white, with outside colors a
 ### Neutral
 - **White** (`white`): The page ground, and text on grey.
 - **Pale Card Grey** (`surface-light`): Property card bodies, the price box, and the light section variant. It comes from Bootstrap's light token.
-- **Bootstrap Ink** (`ink`): Default running text.
+- **Bootstrap Ink** (`ink`): Default running text. At 75% opacity it is the muted text for card metadata and the detail subtitle. Card subtitles use it at full strength. The palette spec and `CLAUDE.md` list subtitles as cyan, but the shipped site does not, and that conflict is unresolved.
 
 ### Functional
 - **WhatsApp Green** (`whatsapp-float`): The floating WhatsApp button only.
@@ -155,7 +155,7 @@ A strict brand pair of bright cyan and dark grey on white, with outside colors a
 ### Named Rules
 **The Manual Palette Rule.** Brand color means cyan, grey and white. No tints, shades or derived tones of either brand color.
 
-**The Cyan Never Reads Rule.** Cyan on white measures 2.21:1, which the client knowingly accepts for short accents. It may set prices, links and subtitles, never running text.
+**The Cyan Never Reads Rule.** Cyan on white measures 2.21:1, which the client knowingly accepts for short accents. It may set prices, links and section headings, never running text.
 
 **The Channel Exception Rule.** Green and the status colors signal WhatsApp or property state. They never decorate.
 
@@ -169,7 +169,7 @@ A strict brand pair of bright cyan and dark grey on white, with outside colors a
 - **Display** (700, 2.25rem on mobile and 3rem from `md`, line-height 1.25, -0.025em): Page headings, including the hero line. The property detail title is set smaller, at about 1.5rem.
 - **Headline** (700, 1.875rem on mobile and 2.25rem from `md`, line-height 1.25, -0.025em): Section headings.
 - **Title** (700, 1.25rem, line-height 1.5): Property card titles, centered and in grey. CMS titles often arrive in all caps.
-- **Price** (700, 1.5rem, line-height 1.25): Prices, in cyan, right-aligned on cards. Always formatted `es-AR` with `AR$` or `US$`.
+- **Price** (700, 1.5rem, line-height 1.5): Prices, in cyan, right-aligned on cards. The detail price box uses 1.75rem with line-height 1. Both sizes are fluid below 1200px. Always formatted `es-AR` with `AR$` or `US$`.
 - **Body** (400, 1rem, line-height 1.625): Paragraphs. Property descriptions tighten to 1.5.
 - **Label** (600, 0.75rem, 0.1em tracking, uppercase): Footer column headings, in cyan. Filter group headings use a similar small uppercase style.
 
@@ -180,7 +180,7 @@ A strict brand pair of bright cyan and dark grey on white, with outside colors a
 
 Mobile-first on Bootstrap's grid and breakpoints (576, 768, 992, 1200 and 1400px), using its `.container` and spacing scale.
 
-The home page opens with a full-viewport hero, with the search selects stacked on mobile and in one row from `md`. The listing page stacks filters above results on mobile. From `lg` it uses a sticky sidebar beside the grid, 250px wide when expanded and 140px when collapsed. Property cards cap at 400px with 4:3 images.
+The home page opens with a full-viewport hero: a photo under a 50% black overlay, the logo above the heading, and the search selects stacked on mobile and in one row from `md`. The listing page stacks filters above results on mobile. From `lg` it uses a sticky sidebar beside the grid, 250px wide when expanded and 140px when collapsed. Property cards cap at 400px with 4:3 images.
 
 The property detail page pairs the carousel with facts and a price box. Below that come the description and a full-width map, 450px tall. The home contact map fills the viewport between header and footer from `lg`.
 
@@ -196,6 +196,7 @@ Mostly flat. Depth comes from photographs, the grey bars and the pale card bodie
 - **Card lift** (`box-shadow: 0 .125rem .25rem rgba(0,0,0,.075)`): Property cards, using Bootstrap's small shadow.
 - **Float** (`box-shadow: 0 4px 12px rgba(0,0,0,.25)`): The floating WhatsApp button, deepening to `0 6px 16px rgba(0,0,0,.3)` on hover.
 - **Ribbon** (`box-shadow: 0 2px 6px rgba(0,0,0,.3)`): The status ribbon over the detail carousel.
+- **Loading card** (`box-shadow: 0 12px 30px rgba(15,23,42,.12)`): The listing's loading message.
 
 ### Named Rules
 **The Earned Shadow Rule.** A shadow marks something that sits above the page, such as a card, a floating button or a ribbon. Sections and panels stay flat.
@@ -212,22 +213,23 @@ The status ribbon is the one sharp form: square-cornered, overhanging the carous
 Familiar and direct: standard Bootstrap buttons recolored through tokens.
 - **Shape:** Gently curved (`rounded.sm`).
 - **Primary:** Cyan fill with a grey label (4.67:1).
-- **Hover / Focus:** Inverts to a grey fill with a cyan label, with a transition of 0.2s or less. Focus shows a 0.25rem cyan ring at 25% opacity.
+- **Hover / Focus:** Inverts to a grey fill with a cyan label, with a transition of 0.2s or less. Focus shows a 0.25rem cyan ring at 50% opacity.
 - **Outline:** Grey label and cyan border, filling cyan on hover.
-- **Search:** "Buscar" on the hero is white with a cyan border, filling cyan on hover.
+- **Search:** "Buscar" on the hero is white with a cyan border, filling cyan on hover. Padding is 0.75rem 1.25rem below `md`.
 - **WhatsApp:** "Consultar" is a bold, white-on-green button in the price box. Secondary actions such as Ficha and Compartir are small, quiet text links beneath it.
 
 ### Chips
-- **Operation pills:** Venta and Alquiler are cyan with white text, as the client requested, despite about 2.2:1 contrast. They sit top-right on card images.
+- **Operation pills:** Venta and Alquiler are cyan with white text, as the client requested, despite about 2.2:1 contrast. They sit top-right on card images and inline on the detail page.
+- **Property type pill:** On the detail page only, cyan with a grey label.
 - **Status pills:** Vendido, Reservado and Alquilado sit top-left on card images, with white text on red, yellow and green. White on yellow (about 1.6:1) is a client request. The spec's first fix, if readability becomes an issue, is a grey label on Reservado.
-- **Active filter badges:** Dismissible badges with grey labels, shown above the listing results.
+- **Active filter badges:** Dismissible pills with grey labels, a cyan border and a 10% cyan tint, shown above the listing results. The tint is known drift.
 
 ### Cards / Containers
 - **Corner Style:** Generously rounded (`rounded.lg`).
 - **Background:** Pale card grey under a full-width 4:3 photo.
 - **Shadow Strategy:** Card lift only.
 - **Border:** None. A 4px cyan rule separates photo from body.
-- **Internal Padding:** Bootstrap's card default, with centered text and a hairline above the right-aligned price.
+- **Internal Padding:** Bootstrap's card default with reduced bottom padding, centered text, and a hairline above the right-aligned price.
 
 ### Inputs / Fields
 - **Style:** Bootstrap defaults: white, hairline border, `rounded.sm`. Checkboxes and radios fill cyan when checked.
@@ -239,25 +241,25 @@ Familiar and direct: standard Bootstrap buttons recolored through tokens.
 - **Pagination:** Bootstrap's, with a cyan active page and grey numeral. Disabled controls are non-links.
 
 ### Footer
-Solid grey with three columns (brand, contact, explore) and a bottom bar. Text is white at 78% opacity, with cyan uppercase column labels and hairline dividers. Columns stack and center on mobile.
+Solid grey with three columns (brand, contact, explore) and a bottom bar. Text is white at 78% opacity, with cyan uppercase column labels and hairline dividers. Its WhatsApp button is cyan-outlined rather than green, filling cyan on hover. Columns stack and center on mobile.
 
 ### Status Ribbon
 A square-cornered uppercase ribbon (700, about 1.1rem) that overlays the detail carousel when a property is sold, reserved or rented, using the matching status color.
 
 ### Text and Image Section
-A home section block with white, light, grey or cyan backgrounds. Its image or carousel is cropped to a circle. Headings turn cyan on grey and grey on cyan.
+A home section block with white, light, grey or cyan backgrounds. Its image or carousel is cropped to a circle. `h2` and `h3` headings are cyan on white, light and grey grounds, and grey on cyan.
 
 ## Do's and Don'ts
 
 ### Do:
 - **Do** use the brand tokens and Bootstrap's token overrides before writing custom CSS.
-- **Do** set titles in grey and text on cyan fills in grey, except the operation pills the client specified.
+- **Do** set property titles in grey and text on cyan fills in grey, except the operation pills the client specified.
 - **Do** invert primary buttons to grey with a cyan label on hover, rather than darkening the cyan.
-- **Do** keep every interactive element's cyan or 2px focus indicator visible.
+- **Do** keep a visible focus indicator on every interactive element. Buttons, inputs, pagination and navigation have brand focus styles. The hero Search button, floating WhatsApp button and property cards currently rely on the browser default.
 - **Do** honor reduced motion: no logo shrink, no carousel auto-advance, and instant scrolling.
 
 ### Don't:
-- **Don't** introduce derived brand tones. `#0684AC` (feature icons and action hover) and `#495057` (detail action links) in `property-detail.css` are known drift to clean up, not precedents.
+- **Don't** treat existing off-palette UI as precedent. Known drift: `#0684AC` (feature icons and action hover) and `#495057` (detail action links) in `property-detail.css`, the cyan tint on active filter badges, red on "Limpiar todos" and on error text (reference search, error page), the green "Link copiado" badge, and the Bootstrap grey outline buttons in the filters.
 - **Don't** set running text in cyan.
 - **Don't** use WhatsApp green or status colors for anything other than WhatsApp and property state.
 - **Don't** add dark mode or a partial `prefers-color-scheme` block. Swapping text colors without darkening the ground puts bright cyan on white.

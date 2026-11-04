@@ -62,4 +62,4 @@ You deal directly with César Torres, a licensed broker (Mat. N° 1862 COCIR, Co
 
 ## Accessibility & Inclusion
 
-No formal standard has been set. The client knowingly accepts cyan on white at 2.21:1, below WCAG AA, for prices, links and subtitles, so cyan must not carry running text. Reduced-motion preferences are respected across the site.
+No formal standard has been set. The client knowingly accepts cyan on white at 2.21:1, below WCAG AA, for prices, links and section headings, so cyan must not carry running text. Reduced-motion preferences are respected across the site.

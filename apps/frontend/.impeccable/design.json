@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-11-04T02:55:20.538Z",
+  "generatedAt": "2026-11-04T03:02:37.118Z",
   "title": "Design System: DZTS Inmobiliaria",
   "extensions": {
     "colorMeta": {
@@ -91,6 +91,11 @@
         "name": "ribbon",
         "value": "0 2px 6px rgba(0,0,0,.3)",
         "purpose": "Status ribbon over the detail carousel."
+      },
+      {
+        "name": "loading-card",
+        "value": "0 12px 30px rgba(15,23,42,.12)",
+        "purpose": "The listing's loading message."
       }
     ],
     "motion": [
@@ -135,15 +140,15 @@
       "refersTo": "button-primary",
       "description": "Default action: cyan fill, grey label, inverting on hover.",
       "html": "<button class=\"ds-btn-primary\">Aplicar filtros</button>",
-      "css": ".ds-btn-primary { background: var(--brand-cyan); color: var(--brand-grey); border: 1px solid var(--brand-cyan); border-radius: 0.375rem; padding: 0.375rem 0.75rem; font-size: 1rem; cursor: pointer; transition: background-color .15s, color .15s, border-color .15s; } .ds-btn-primary:hover { background: var(--brand-grey); color: var(--brand-cyan); border-color: var(--brand-grey); } .ds-btn-primary:focus-visible { outline: 0; box-shadow: 0 0 0 .25rem rgba(1, 188, 243, .25); }"
+      "css": ".ds-btn-primary { background: var(--brand-cyan); color: var(--brand-grey); border: 1px solid var(--brand-cyan); border-radius: 0.375rem; padding: 0.375rem 0.75rem; font-size: 1rem; cursor: pointer; transition: background-color .15s, color .15s, border-color .15s; } .ds-btn-primary:hover { background: var(--brand-grey); color: var(--brand-cyan); border-color: var(--brand-grey); } .ds-btn-primary:focus-visible { outline: 0; box-shadow: 0 0 0 .25rem rgba(1, 188, 243, .5); }"
     },
     {
       "name": "Outline Button",
       "kind": "button",
       "refersTo": "button-outline",
       "description": "Secondary action: grey label and cyan border, filling cyan on hover.",
-      "html": "<button class=\"ds-btn-outline\">Limpiar filtros</button>",
-      "css": ".ds-btn-outline { background: transparent; color: var(--brand-grey); border: 1px solid var(--brand-cyan); border-radius: 0.375rem; padding: 0.375rem 0.75rem; font-size: 1rem; cursor: pointer; transition: background-color .15s; } .ds-btn-outline:hover { background: var(--brand-cyan); } .ds-btn-outline:focus-visible { outline: 0; box-shadow: 0 0 0 .25rem rgba(1, 188, 243, .25); }"
+      "html": "<button class=\"ds-btn-outline\">Filtros</button>",
+      "css": ".ds-btn-outline { background: transparent; color: var(--brand-grey); border: 1px solid var(--brand-cyan); border-radius: 0.375rem; padding: 0.375rem 0.75rem; font-size: 1rem; cursor: pointer; transition: background-color .15s; } .ds-btn-outline:hover { background: var(--brand-cyan); } .ds-btn-outline:focus-visible { outline: 0; box-shadow: 0 0 0 .25rem rgba(1, 188, 243, .5); }"
     },
     {
       "name": "Search Button",
@@ -151,7 +156,7 @@
       "refersTo": "button-search",
       "description": "Hero search action: white with a cyan border, filling cyan on hover.",
       "html": "<button class=\"ds-btn-search\">Buscar</button>",
-      "css": ".ds-btn-search { background: #fff; color: var(--brand-grey); border: 1px solid var(--brand-cyan); border-radius: 0.375rem; padding: 1rem 2rem; font-size: 1rem; font-weight: 500; cursor: pointer; transition: background-color .2s, color .2s; } .ds-btn-search:hover { background: var(--brand-cyan); } .ds-btn-search:focus-visible { outline: 0; box-shadow: 0 0 0 .25rem rgba(1, 188, 243, .25); }"
+      "css": ".ds-btn-search { background: #fff; color: var(--brand-grey); border: 1px solid var(--brand-cyan); border-radius: 0.375rem; padding: .75rem 1.25rem; font-size: 1rem; font-weight: 500; cursor: pointer; transition: background-color .2s, color .2s; } .ds-btn-search:hover { background: var(--brand-cyan); } @media (min-width: 768px) { .ds-btn-search { padding: 1rem 2rem; } }"
     },
     {
       "name": "WhatsApp Float",
@@ -159,15 +164,15 @@
       "refersTo": "whatsapp-float",
       "description": "Fixed circular WhatsApp button, shown on every site page.",
       "html": "<a class=\"ds-whatsapp-float\" href=\"#\" aria-label=\"WhatsApp\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"16\" height=\"16\" fill=\"currentColor\" class=\"bi bi-whatsapp\" viewBox=\"0 0 16 16\"> <path d=\"M13.601 2.326A7.85 7.85 0 0 0 7.994 0C3.627 0 .068 3.558.064 7.926c0 1.399.366 2.76 1.057 3.965L0 16l4.204-1.102a7.9 7.9 0 0 0 3.79.965h.004c4.368 0 7.926-3.558 7.93-7.93A7.9 7.9 0 0 0 13.6 2.326zM7.994 14.521a6.6 6.6 0 0 1-3.356-.92l-.24-.144-2.494.654.666-2.433-.156-.251a6.56 6.56 0 0 1-1.007-3.505c0-3.626 2.957-6.584 6.591-6.584a6.56 6.56 0 0 1 4.66 1.931 6.56 6.56 0 0 1 1.928 4.66c-.004 3.639-2.961 6.592-6.592 6.592m3.615-4.934c-.197-.099-1.17-.578-1.353-.646-.182-.065-.315-.099-.445.099-.133.197-.513.646-.627.775-.114.133-.232.148-.43.05-.197-.1-.836-.308-1.592-.985-.59-.525-.985-1.175-1.103-1.372-.114-.198-.011-.304.088-.403.087-.088.197-.232.296-.346.1-.114.133-.198.198-.33.065-.134.034-.248-.015-.347-.05-.099-.445-1.076-.612-1.47-.16-.389-.323-.335-.445-.34-.114-.007-.247-.007-.38-.007a.73.73 0 0 0-.529.247c-.182.198-.691.677-.691 1.654s.71 1.916.81 2.049c.098.133 1.394 2.132 3.383 2.992.47.205.84.326 1.129.418.475.152.904.129 1.246.08.38-.058 1.171-.48 1.338-.943.164-.464.164-.86.114-.943-.049-.084-.182-.133-.38-.232\"/> </svg></a>",
-      "css": ".ds-whatsapp-float { display: inline-flex; align-items: center; justify-content: center; width: 56px; height: 56px; border-radius: 50%; background: #25d366; color: #fff; box-shadow: 0 4px 12px rgba(0,0,0,.25); transition: transform .2s, box-shadow .2s; } .ds-whatsapp-float svg { width: 28px; height: 28px; fill: currentColor; } .ds-whatsapp-float:hover { transform: scale(1.1); box-shadow: 0 6px 16px rgba(0,0,0,.3); } .ds-whatsapp-float:focus-visible { outline: 2px solid var(--brand-cyan); outline-offset: 3px; }"
+      "css": ".ds-whatsapp-float { display: inline-flex; align-items: center; justify-content: center; width: 56px; height: 56px; border-radius: 50%; background: #25d366; color: #fff; box-shadow: 0 4px 12px rgba(0,0,0,.25); transition: transform .2s, box-shadow .2s; } .ds-whatsapp-float svg { width: 28px; height: 28px; fill: currentColor; } .ds-whatsapp-float:hover { transform: scale(1.1); box-shadow: 0 6px 16px rgba(0,0,0,.3); }"
     },
     {
       "name": "Property Card",
       "kind": "card",
       "refersTo": "property-card",
       "description": "Listing card: 4:3 photo, pills, cyan rule, grey title and cyan price.",
-      "html": "<a class=\"ds-card\" href=\"#\"><div class=\"ds-card-photo\"><span class=\"ds-card-pill\">Venta</span></div><div class=\"ds-card-rule\"></div><div class=\"ds-card-body\"><div class=\"ds-card-ref\">Ref: DZTS-010</div><h3 class=\"ds-card-title\">DEPARTAMENTO 3 DORMITORIOS</h3><p class=\"ds-card-meta\">Rosario · 3 dorm.</p><div class=\"ds-card-price\">US$285.000</div></div></a>",
-      "css": ".ds-card { display: block; max-width: 400px; border-radius: 1rem; overflow: hidden; text-decoration: none; box-shadow: 0 .125rem .25rem rgba(0,0,0,.075); } .ds-card:focus-visible { outline: 2px solid var(--brand-cyan); outline-offset: 3px; } .ds-card-photo { position: relative; aspect-ratio: 4 / 3; background: #dee2e6; } .ds-card-pill { position: absolute; top: .5rem; right: .5rem; background: var(--brand-cyan); color: #fff; border-radius: 50rem; padding: .25rem .6rem; font-size: .75rem; font-weight: 700; } .ds-card-rule { height: 4px; background: var(--brand-cyan); } .ds-card-body { background: #f8f9fa; padding: 1rem; text-align: center; } .ds-card-ref { font-size: .75rem; color: #6c757d; margin-bottom: .25rem; } .ds-card-title { margin: 0 0 .5rem; font-size: 1.25rem; font-weight: 700; color: var(--brand-grey); } .ds-card-meta { margin: 0 0 .5rem; font-size: .875rem; color: #6c757d; } .ds-card-price { border-top: 1px solid #dee2e6; padding-top: 1rem; text-align: right; font-size: 1.5rem; font-weight: 700; color: var(--brand-cyan); }"
+      "html": "<a class=\"ds-card\" href=\"#\"><div class=\"ds-card-photo\"><span class=\"ds-card-pill\">Venta</span></div><div class=\"ds-card-rule\"></div><div class=\"ds-card-body\"><div class=\"ds-card-ref\">Ref: DZTS-010</div><h3 class=\"ds-card-title\">DEPARTAMENTO 3 DORMITORIOS</h3><p class=\"ds-card-meta\">Rosario · 3 dorm.</p><p class=\"ds-card-subtitle\">A METROS DE PARQUE ESPAÑA</p><div class=\"ds-card-price\">US$285.000</div></div></a>",
+      "css": ".ds-card { display: block; max-width: 400px; border-radius: 1rem; overflow: hidden; text-decoration: none; box-shadow: 0 .125rem .25rem rgba(0,0,0,.075); } .ds-card-photo { position: relative; aspect-ratio: 4 / 3; background: #dee2e6; } .ds-card-pill { position: absolute; top: .5rem; right: .5rem; background: var(--brand-cyan); color: #fff; border-radius: 50rem; padding: .35em .65em; font-size: .75rem; font-weight: 700; line-height: 1; } .ds-card-rule { height: 4px; background: var(--brand-cyan); } .ds-card-body { background: #f8f9fa; padding: 1rem; text-align: center; } .ds-card-ref { font-size: .75rem; color: rgba(33, 37, 41, .75); margin-bottom: .25rem; } .ds-card-title { margin: 0 0 .5rem; font-size: 1.25rem; font-weight: 700; color: var(--brand-grey); } .ds-card-meta { margin: 0 0 .5rem; font-size: .875rem; color: rgba(33, 37, 41, .75); } .ds-card-subtitle { margin: 0 0 1rem; font-size: .875rem; color: #212529; } .ds-card-price { border-top: 1px solid #dee2e6; padding-top: 1rem; text-align: right; font-size: 1.5rem; font-weight: 700; color: var(--brand-cyan); }"
     },
     {
       "name": "Operation and Status Pills",
@@ -175,7 +180,7 @@
       "refersTo": "badge-operation",
       "description": "Operation and status pills with the client-specified white text.",
       "html": "<span class=\"ds-pill ds-pill-op\">Venta</span> <span class=\"ds-pill ds-pill-sold\">Vendido</span> <span class=\"ds-pill ds-pill-res\">Reservado</span> <span class=\"ds-pill ds-pill-rent\">Alquilado</span>",
-      "css": ".ds-pill { display: inline-block; border-radius: 50rem; padding: .25rem .6rem; font-size: .75rem; font-weight: 700; color: #fff; } .ds-pill-op { background: var(--brand-cyan); } .ds-pill-sold { background: #dc3545; } .ds-pill-res { background: #ffc107; } .ds-pill-rent { background: #198754; }"
+      "css": ".ds-pill { display: inline-block; border-radius: 50rem; padding: .35em .65em; font-size: .75rem; font-weight: 700; line-height: 1; color: #fff; } .ds-pill-op { background: var(--brand-cyan); } .ds-pill-sold { background: #dc3545; } .ds-pill-res { background: #ffc107; } .ds-pill-rent { background: #198754; }"
     },
     {
       "name": "Select",
@@ -212,7 +217,7 @@
       },
       {
         "name": "The Cyan Never Reads Rule",
-        "body": "Cyan on white measures 2.21:1, which the client knowingly accepts for short accents. It may set prices, links and subtitles, never running text.",
+        "body": "Cyan on white measures 2.21:1, which the client knowingly accepts for short accents. It may set prices, links and section headings, never running text.",
         "section": "colors"
       },
       {
@@ -233,13 +238,13 @@
     ],
     "dos": [
       "Do use the brand tokens and Bootstrap's token overrides before writing custom CSS.",
-      "Do set titles in grey and text on cyan fills in grey, except the operation pills the client specified.",
+      "Do set property titles in grey and text on cyan fills in grey, except the operation pills the client specified.",
       "Do invert primary buttons to grey with a cyan label on hover, rather than darkening the cyan.",
-      "Do keep every interactive element's cyan or 2px focus indicator visible.",
+      "Do keep a visible focus indicator on every interactive element. Buttons, inputs, pagination and navigation have brand focus styles. The hero Search button, floating WhatsApp button and property cards currently rely on the browser default.",
       "Do honor reduced motion: no logo shrink, no carousel auto-advance, and instant scrolling."
     ],
     "donts": [
-      "Don't introduce derived brand tones. `#0684AC` (feature icons and action hover) and `#495057` (detail action links) in `property-detail.css` are known drift to clean up, not precedents.",
+      "Don't treat existing off-palette UI as precedent. Known drift: `#0684AC` (feature icons and action hover) and `#495057` (detail action links) in `property-detail.css`, the cyan tint on active filter badges, red on \"Limpiar todos\" and on error text (reference search, error page), the green \"Link copiado\" badge, and the Bootstrap grey outline buttons in the filters.",
       "Don't set running text in cyan.",
       "Don't use WhatsApp green or status colors for anything other than WhatsApp and property state.",
       "Don't add dark mode or a partial `prefers-color-scheme` block. Swapping text colors without darkening the ground puts bright cyan on white.",
