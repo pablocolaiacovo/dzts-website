@@ -1,0 +1,249 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-04T02:55:20.538Z",
+  "title": "Design System: DZTS Inmobiliaria",
+  "extensions": {
+    "colorMeta": {
+      "brand-cyan": {
+        "role": "primary",
+        "displayName": "Logo Cyan"
+      },
+      "brand-grey": {
+        "role": "secondary",
+        "displayName": "Manual Grey"
+      },
+      "white": {
+        "role": "neutral",
+        "displayName": "White"
+      },
+      "surface-light": {
+        "role": "neutral",
+        "displayName": "Pale Card Grey"
+      },
+      "ink": {
+        "role": "neutral",
+        "displayName": "Bootstrap Ink"
+      },
+      "whatsapp-float": {
+        "role": "functional",
+        "displayName": "WhatsApp Green"
+      },
+      "whatsapp-cta": {
+        "role": "functional",
+        "displayName": "Consult Green"
+      },
+      "status-sold": {
+        "role": "functional",
+        "displayName": "Sold Red"
+      },
+      "status-reserved": {
+        "role": "functional",
+        "displayName": "Reserved Yellow"
+      },
+      "status-rented": {
+        "role": "functional",
+        "displayName": "Rented Green"
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "Page headings, including the hero line."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Section headings."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Property card titles."
+      },
+      "price": {
+        "displayName": "Price",
+        "purpose": "Prices, in cyan."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Paragraphs."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Footer column headings, uppercase."
+      }
+    },
+    "shadows": [
+      {
+        "name": "card-lift",
+        "value": "0 .125rem .25rem rgba(0,0,0,.075)",
+        "purpose": "Property cards."
+      },
+      {
+        "name": "float",
+        "value": "0 4px 12px rgba(0,0,0,.25)",
+        "purpose": "Floating WhatsApp button."
+      },
+      {
+        "name": "float-hover",
+        "value": "0 6px 16px rgba(0,0,0,.3)",
+        "purpose": "Floating WhatsApp button on hover."
+      },
+      {
+        "name": "ribbon",
+        "value": "0 2px 6px rgba(0,0,0,.3)",
+        "purpose": "Status ribbon over the detail carousel."
+      }
+    ],
+    "motion": [
+      {
+        "name": "state-change",
+        "value": "0.2s ease",
+        "purpose": "Color, background and transform changes on links and buttons."
+      },
+      {
+        "name": "logo-shrink",
+        "value": "scroll(root) range 0 120px, linear",
+        "purpose": "Header logo shrink, static with reduced motion."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "sm",
+        "value": "576px"
+      },
+      {
+        "name": "md",
+        "value": "768px"
+      },
+      {
+        "name": "lg",
+        "value": "992px"
+      },
+      {
+        "name": "xl",
+        "value": "1200px"
+      },
+      {
+        "name": "xxl",
+        "value": "1400px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Default action: cyan fill, grey label, inverting on hover.",
+      "html": "<button class=\"ds-btn-primary\">Aplicar filtros</button>",
+      "css": ".ds-btn-primary { background: var(--brand-cyan); color: var(--brand-grey); border: 1px solid var(--brand-cyan); border-radius: 0.375rem; padding: 0.375rem 0.75rem; font-size: 1rem; cursor: pointer; transition: background-color .15s, color .15s, border-color .15s; } .ds-btn-primary:hover { background: var(--brand-grey); color: var(--brand-cyan); border-color: var(--brand-grey); } .ds-btn-primary:focus-visible { outline: 0; box-shadow: 0 0 0 .25rem rgba(1, 188, 243, .25); }"
+    },
+    {
+      "name": "Outline Button",
+      "kind": "button",
+      "refersTo": "button-outline",
+      "description": "Secondary action: grey label and cyan border, filling cyan on hover.",
+      "html": "<button class=\"ds-btn-outline\">Limpiar filtros</button>",
+      "css": ".ds-btn-outline { background: transparent; color: var(--brand-grey); border: 1px solid var(--brand-cyan); border-radius: 0.375rem; padding: 0.375rem 0.75rem; font-size: 1rem; cursor: pointer; transition: background-color .15s; } .ds-btn-outline:hover { background: var(--brand-cyan); } .ds-btn-outline:focus-visible { outline: 0; box-shadow: 0 0 0 .25rem rgba(1, 188, 243, .25); }"
+    },
+    {
+      "name": "Search Button",
+      "kind": "button",
+      "refersTo": "button-search",
+      "description": "Hero search action: white with a cyan border, filling cyan on hover.",
+      "html": "<button class=\"ds-btn-search\">Buscar</button>",
+      "css": ".ds-btn-search { background: #fff; color: var(--brand-grey); border: 1px solid var(--brand-cyan); border-radius: 0.375rem; padding: 1rem 2rem; font-size: 1rem; font-weight: 500; cursor: pointer; transition: background-color .2s, color .2s; } .ds-btn-search:hover { background: var(--brand-cyan); } .ds-btn-search:focus-visible { outline: 0; box-shadow: 0 0 0 .25rem rgba(1, 188, 243, .25); }"
+    },
+    {
+      "name": "WhatsApp Float",
+      "kind": "custom",
+      "refersTo": "whatsapp-float",
+      "description": "Fixed circular WhatsApp button, shown on every site page.",
+      "html": "<a class=\"ds-whatsapp-float\" href=\"#\" aria-label=\"WhatsApp\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"16\" height=\"16\" fill=\"currentColor\" class=\"bi bi-whatsapp\" viewBox=\"0 0 16 16\"> <path d=\"M13.601 2.326A7.85 7.85 0 0 0 7.994 0C3.627 0 .068 3.558.064 7.926c0 1.399.366 2.76 1.057 3.965L0 16l4.204-1.102a7.9 7.9 0 0 0 3.79.965h.004c4.368 0 7.926-3.558 7.93-7.93A7.9 7.9 0 0 0 13.6 2.326zM7.994 14.521a6.6 6.6 0 0 1-3.356-.92l-.24-.144-2.494.654.666-2.433-.156-.251a6.56 6.56 0 0 1-1.007-3.505c0-3.626 2.957-6.584 6.591-6.584a6.56 6.56 0 0 1 4.66 1.931 6.56 6.56 0 0 1 1.928 4.66c-.004 3.639-2.961 6.592-6.592 6.592m3.615-4.934c-.197-.099-1.17-.578-1.353-.646-.182-.065-.315-.099-.445.099-.133.197-.513.646-.627.775-.114.133-.232.148-.43.05-.197-.1-.836-.308-1.592-.985-.59-.525-.985-1.175-1.103-1.372-.114-.198-.011-.304.088-.403.087-.088.197-.232.296-.346.1-.114.133-.198.198-.33.065-.134.034-.248-.015-.347-.05-.099-.445-1.076-.612-1.47-.16-.389-.323-.335-.445-.34-.114-.007-.247-.007-.38-.007a.73.73 0 0 0-.529.247c-.182.198-.691.677-.691 1.654s.71 1.916.81 2.049c.098.133 1.394 2.132 3.383 2.992.47.205.84.326 1.129.418.475.152.904.129 1.246.08.38-.058 1.171-.48 1.338-.943.164-.464.164-.86.114-.943-.049-.084-.182-.133-.38-.232\"/> </svg></a>",
+      "css": ".ds-whatsapp-float { display: inline-flex; align-items: center; justify-content: center; width: 56px; height: 56px; border-radius: 50%; background: #25d366; color: #fff; box-shadow: 0 4px 12px rgba(0,0,0,.25); transition: transform .2s, box-shadow .2s; } .ds-whatsapp-float svg { width: 28px; height: 28px; fill: currentColor; } .ds-whatsapp-float:hover { transform: scale(1.1); box-shadow: 0 6px 16px rgba(0,0,0,.3); } .ds-whatsapp-float:focus-visible { outline: 2px solid var(--brand-cyan); outline-offset: 3px; }"
+    },
+    {
+      "name": "Property Card",
+      "kind": "card",
+      "refersTo": "property-card",
+      "description": "Listing card: 4:3 photo, pills, cyan rule, grey title and cyan price.",
+      "html": "<a class=\"ds-card\" href=\"#\"><div class=\"ds-card-photo\"><span class=\"ds-card-pill\">Venta</span></div><div class=\"ds-card-rule\"></div><div class=\"ds-card-body\"><div class=\"ds-card-ref\">Ref: DZTS-010</div><h3 class=\"ds-card-title\">DEPARTAMENTO 3 DORMITORIOS</h3><p class=\"ds-card-meta\">Rosario · 3 dorm.</p><div class=\"ds-card-price\">US$285.000</div></div></a>",
+      "css": ".ds-card { display: block; max-width: 400px; border-radius: 1rem; overflow: hidden; text-decoration: none; box-shadow: 0 .125rem .25rem rgba(0,0,0,.075); } .ds-card:focus-visible { outline: 2px solid var(--brand-cyan); outline-offset: 3px; } .ds-card-photo { position: relative; aspect-ratio: 4 / 3; background: #dee2e6; } .ds-card-pill { position: absolute; top: .5rem; right: .5rem; background: var(--brand-cyan); color: #fff; border-radius: 50rem; padding: .25rem .6rem; font-size: .75rem; font-weight: 700; } .ds-card-rule { height: 4px; background: var(--brand-cyan); } .ds-card-body { background: #f8f9fa; padding: 1rem; text-align: center; } .ds-card-ref { font-size: .75rem; color: #6c757d; margin-bottom: .25rem; } .ds-card-title { margin: 0 0 .5rem; font-size: 1.25rem; font-weight: 700; color: var(--brand-grey); } .ds-card-meta { margin: 0 0 .5rem; font-size: .875rem; color: #6c757d; } .ds-card-price { border-top: 1px solid #dee2e6; padding-top: 1rem; text-align: right; font-size: 1.5rem; font-weight: 700; color: var(--brand-cyan); }"
+    },
+    {
+      "name": "Operation and Status Pills",
+      "kind": "chip",
+      "refersTo": "badge-operation",
+      "description": "Operation and status pills with the client-specified white text.",
+      "html": "<span class=\"ds-pill ds-pill-op\">Venta</span> <span class=\"ds-pill ds-pill-sold\">Vendido</span> <span class=\"ds-pill ds-pill-res\">Reservado</span> <span class=\"ds-pill ds-pill-rent\">Alquilado</span>",
+      "css": ".ds-pill { display: inline-block; border-radius: 50rem; padding: .25rem .6rem; font-size: .75rem; font-weight: 700; color: #fff; } .ds-pill-op { background: var(--brand-cyan); } .ds-pill-sold { background: #dc3545; } .ds-pill-res { background: #ffc107; } .ds-pill-rent { background: #198754; }"
+    },
+    {
+      "name": "Select",
+      "kind": "input",
+      "refersTo": "input-select",
+      "description": "Bootstrap select with the brand focus treatment.",
+      "html": "<select class=\"ds-select\" aria-label=\"Operación\"><option>Operación</option><option>Venta</option><option>Alquiler</option></select>",
+      "css": ".ds-select { background: #fff; color: #212529; border: 1px solid #dee2e6; border-radius: .375rem; padding: .375rem .75rem; font-size: 1rem; min-width: 12rem; } .ds-select:focus { outline: 0; border-color: var(--brand-cyan); box-shadow: 0 0 0 .25rem rgba(1, 188, 243, .25); }"
+    },
+    {
+      "name": "Header Bar",
+      "kind": "nav",
+      "refersTo": "header-bar",
+      "description": "Solid grey sticky bar with white links that turn cyan on hover.",
+      "html": "<nav class=\"ds-header\" aria-label=\"Principal\"><a href=\"#\">propiedades</a><a href=\"#\">servicios</a><a href=\"#\">nosotros</a><a href=\"#\">contacto</a></nav>",
+      "css": ".ds-header { display: flex; justify-content: flex-end; gap: 1.5rem; background: var(--brand-grey); padding: 1rem 1.5rem; } .ds-header a { color: #fff; text-decoration: none; font-weight: 500; font-size: 1.125rem; transition: color .2s; } .ds-header a:hover { color: var(--brand-cyan); } .ds-header a:focus-visible { outline: 2px solid var(--brand-cyan); outline-offset: 3px; border-radius: 2px; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Broker's Window",
+    "overview": "The site works like the street window of a small licensed agency: the properties are on display, each with its price in plain sight, and the broker's name is on the glass. The dark grey bar carries the \"by César Torres\" logo, the photographs supply nearly all the color and texture, and the brand cyan points at what a visitor came to compare.\n\nComponents are familiar and direct. The system is Bootstrap 5 with the brand mapped onto it, so visitors meet the selects, cards, pills and pagination they already know. Density is moderate and listing-led. Pages stay on a white ground with a single type family, and hierarchy comes from weight, size and color rather than ornament.\n\nThere is no dark mode, because the palette is calibrated against white.",
+    "keyCharacteristics": [
+      "Three brand colors from the 2015 brand manual, plus functional colors for status and WhatsApp",
+      "Inter throughout, with bold grey titles and bold cyan prices",
+      "Photography as the main visual material, with a full-bleed Rosario skyline on the home hero",
+      "Bootstrap patterns restyled through tokens rather than custom widgets",
+      "Solid grey header and footer framing white content"
+    ],
+    "rules": [
+      {
+        "name": "The Manual Palette Rule",
+        "body": "Brand color means cyan, grey and white. No tints, shades or derived tones of either brand color.",
+        "section": "colors"
+      },
+      {
+        "name": "The Cyan Never Reads Rule",
+        "body": "Cyan on white measures 2.21:1, which the client knowingly accepts for short accents. It may set prices, links and subtitles, never running text.",
+        "section": "colors"
+      },
+      {
+        "name": "The Channel Exception Rule",
+        "body": "Green and the status colors signal WhatsApp or property state. They never decorate.",
+        "section": "colors"
+      },
+      {
+        "name": "The Heavy Price Rule",
+        "body": "A price is always bold and large for its context. Cyan's low contrast is offset by weight and size, so don't set a price small or light.",
+        "section": "typography"
+      },
+      {
+        "name": "The Earned Shadow Rule",
+        "body": "A shadow marks something that sits above the page, such as a card, a floating button or a ribbon. Sections and panels stay flat.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do use the brand tokens and Bootstrap's token overrides before writing custom CSS.",
+      "Do set titles in grey and text on cyan fills in grey, except the operation pills the client specified.",
+      "Do invert primary buttons to grey with a cyan label on hover, rather than darkening the cyan.",
+      "Do keep every interactive element's cyan or 2px focus indicator visible.",
+      "Do honor reduced motion: no logo shrink, no carousel auto-advance, and instant scrolling."
+    ],
+    "donts": [
+      "Don't introduce derived brand tones. `#0684AC` (feature icons and action hover) and `#495057` (detail action links) in `property-detail.css` are known drift to clean up, not precedents.",
+      "Don't set running text in cyan.",
+      "Don't use WhatsApp green or status colors for anything other than WhatsApp and property state.",
+      "Don't add dark mode or a partial `prefers-color-scheme` block. Swapping text colors without darkening the ground puts bright cyan on white.",
+      "Don't add shadows to sections or flat panels."
+    ]
+  }
+}
