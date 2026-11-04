@@ -145,7 +145,7 @@ A strict brand pair of bright cyan and dark grey on white, with outside colors a
 ### Neutral
 - **White** (`white`): The page ground, and text on grey.
 - **Pale Card Grey** (`surface-light`): Property card bodies, the price box, and the light section variant. It comes from Bootstrap's light token.
-- **Bootstrap Ink** (`ink`): Default running text. At 75% opacity it is the muted text for card metadata and the detail subtitle. Card subtitles use it at full strength. The palette spec and `CLAUDE.md` list subtitles as cyan, but the shipped site does not, and that conflict is unresolved.
+- **Bootstrap Ink** (`ink`): Default running text. At 75% opacity it is the muted text for card metadata and the detail subtitle. Card subtitles use it at full strength. Subtitles stay muted rather than cyan, for readability.
 
 ### Functional
 - **WhatsApp Green** (`whatsapp-float`): The floating WhatsApp button only.
