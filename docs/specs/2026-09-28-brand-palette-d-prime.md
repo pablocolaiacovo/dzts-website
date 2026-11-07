@@ -53,3 +53,7 @@ The previous site used cyan on white at 2.0–2.5:1 for years without it being p
 - Section `h2`/`h3` on white/light `TextImageSection` variants were already cyan.
 - The printable ficha keeps its black-and-grey print palette.
 - `FichaActions`' `btn-dark` uses Bootstrap's compiled `#212529`.
+
+## Later decision
+
+- 2026-11-04: property subtitles stay muted, as shipped, instead of cyan as listed above. They are longer text, and cyan on white is only 2.21:1. Recorded in `apps/frontend/DESIGN.md`.

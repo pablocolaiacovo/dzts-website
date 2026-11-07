@@ -1,17 +1,16 @@
 ---
 name: triage
-description: PR and issue triage for this repo. Use to assess which open PRs are ready to merge, rank open PRs and issues by priority, spot blockers (failing checks, conflicts, missing conventions), and produce a recommended merge order. Read-and-report by default — it never merges, closes, or edits code; it applies labels or posts comments only when the task explicitly asks for that.
-model: opus
+description: PR and issue triage for this repo. Use to assess which open PRs are ready to merge, rank open PRs and issues by priority, spot blockers (failing checks, conflicts, missing conventions), match Dependabot alerts to pending PRs, and recommend a merge order and whether to cut a release.
 ---
 
-# Triage Agent
+# Triage
 
-You are the triage specialist for a real estate website monorepo. Your deliverable is a **triage report**: which PRs are ready to merge, in what order, what blocks the rest, and how open issues rank against each other. You decide and recommend — you do not execute.
+The deliverable is a **triage report**: which PRs are ready to merge, in what order, what blocks the rest, and how open issues rank against each other. Triage decides and recommends; acting on it is a separate step the user approves.
 
 ## Ground Rules
 
-- **Never merge, close, or reopen PRs/issues. Never push commits.** Fixes and merges are routed by the orchestrator to the right agent (devops for pipeline issues, implementer/quick-fix for code) or done by the user.
-- Mutations you MAY perform, **only when the task explicitly asks**: applying/removing labels and posting triage comments. Create missing priority labels idempotently (`gh label create ... || true`).
+- A triage run doesn't merge, close, reopen, or push. Merges follow the `devops` skill after the user approves them; code fixes go to `implementer` or are done directly.
+- Mutations allowed **only when the user explicitly asks**: applying/removing labels and posting triage comments. Create missing priority labels idempotently (`gh label create ... || true`).
 - Always pin the repo: `gh ... -R pablocolaiacovo/dzts-website`. This checkout has a stale `upstream` remote (`Euge-Saravia/proyectodzts-inmobiliaria`); never read from or mutate it.
 - Ground every claim in `gh` output you actually ran. Never guess a check's status or a PR's mergeability — query it.
 - If you can't access something (e.g. Dependabot alerts return 403 for missing scopes), say exactly what was inaccessible instead of working around it silently.
@@ -19,7 +18,7 @@ You are the triage specialist for a real estate website monorepo. Your deliverab
 ## Repo Context You Triage Against
 
 - **Branch flow**: feature PRs (`feat/*`, Dependabot branches) target `dev` and are **squashed**. The release PR `dev → main` carries the `release` label and is merged with a **merge commit** — if you find a release PR, flag its merge method; never treat it as a normal PR.
-- **Checks**: `ci` (lint + unit + typecheck + studio build) must pass on every PR. `e2e` only triggers when `apps/frontend/**` or its workflow file changes — a missing e2e run on a docs/studio/deps-root PR is **expected, not a blocker**; verify against the changed paths before flagging. CodeQL is informational, not required. Vercel preview checks are auxiliary.
+- **Checks**: `ci` (lint + unit + typecheck + studio build) must pass on every PR. `e2e` only triggers when `apps/frontend/**`, the root `pnpm-lock.yaml` / `pnpm-workspace.yaml`, or its workflow file changes — a missing e2e run on a docs-only, studio-only, or Actions-only PR is **expected, not a blocker**; verify against the changed paths before flagging. CodeQL is informational, not required. Vercel preview checks are auxiliary.
 - **Conventions**: significant feature/infra PRs should include a spec in `docs/specs/YYYY-MM-DD-<slug>.md` — its absence on a significant PR is a (soft) blocker worth flagging. Small fixes and routine dependency bumps are exempt.
 - **Dependabot PRs**: arrive weekly against `dev`, grouped (`next-ecosystem`, `react`, `sanity`, `eslint`, `bootstrap`) plus individual ungrouped ones. Green CI + green e2e (when triggered) = ready. A `@playwright/test` bump is self-syncing with the e2e container — no extra scrutiny needed.
 - **Unreleased work**: `dev` ahead of `main` means shipped-to-dev but not in production. Part of triage is reporting the release backlog (`git log --first-parent --oneline origin/main..origin/dev`) and recommending when a release PR is warranted.
@@ -67,6 +66,6 @@ git fetch origin && git log --first-parent --oneline origin/main..origin/dev
 
 Label scheme (when asked to apply labels): `priority: high` (`B60205`), `priority: medium` (`FBCA04`), `priority: low` (`C2E0C6`).
 
-## Escalation
+## Report, don't resolve
 
-Hand back to the orchestrator when: a PR needs code or pipeline changes to become mergeable (name the agent that should do it); two items' relative priority hinges on business context you don't have; or repo state contradicts the conventions above (e.g. an unlabeled PR targeting `main`) — report the contradiction, don't resolve it yourself.
+Put in the report rather than acting on: a PR that needs code or pipeline changes to become mergeable (say what change); two items whose relative priority hinges on business context the repo doesn't have; repo state that contradicts the conventions above (e.g. an unlabeled PR targeting `main`).

@@ -1,12 +1,11 @@
 ---
 name: devops
-description: DevOps specialist for this monorepo. Use for GitHub Actions workflows (.github/workflows/**), Dependabot config, CI failures, release cycles (dev → main), deploy issues (FTP frontend, Sanity Studio), branch/PR mechanics, and GitHub environment/secret wiring. Not for application code changes — only the pipelines and processes around them.
-model: sonnet
+description: CI/CD and release procedures for this monorepo. Use when editing GitHub Actions workflows (.github/workflows/**) or dependabot.yml, diagnosing a failing CI/e2e/deploy run, cutting a dev → main release, reviewing or merging Dependabot PRs, or wiring GitHub environment secrets/vars.
 ---
 
-# DevOps Agent
+# DevOps
 
-You are the DevOps specialist for a real estate website monorepo (pnpm workspace, no Turborepo). You own the GitHub CI/CD pipelines and the release process. You do NOT write application code. If a task requires changing app source beyond config/workflow files, stop and report that it should be escalated.
+The pipelines, release process, and their gotchas for this pnpm-workspace monorepo (no Turborepo).
 
 ## Ground Rules
 
@@ -43,7 +42,7 @@ There is **no server in production** for the frontend — it is a static export 
 7. **deploy.yml concurrency**: group `deploy-frontend` with `cancel-in-progress: true` coalesces rapid Sanity publishes into one deploy. Preserve this when editing.
 8. **`SITE_ENV=production`** is set by deploy.yml and baked into robots.txt at build time — only `"production"` allows indexing. Don't remove it or previews/prod swap indexing behavior.
 9. **Schema change flow** (studio): `typegen` → `sanity deploy` → commit `apps/frontend/src/sanity/types.ts`. The frontend's FTP build runs from a clean checkout against **committed** types — deploying the Studio without committing regenerated types breaks the next frontend build.
-10. **e2e.yml has a path filter** (`apps/frontend/**` + the workflow file). If e2e "didn't run" on a PR, check the paths before assuming a failure.
+10. **e2e.yml has a path filter** (`apps/frontend/**`, the root `pnpm-lock.yaml` / `pnpm-workspace.yaml`, and the workflow file). If e2e "didn't run" on a PR, check the paths before assuming a failure.
 11. **`--frozen-lockfile`** is deliberate in CI — a lockfile drift error means the lockfile needs regenerating in the PR, not removing the flag.
 12. **CodeQL is on Default setup** (no workflow file). Don't add a codeql.yml; don't make it a required check.
 13. **This checkout has two remotes**: `origin` (`pablocolaiacovo/dzts-website`, the real repo) and `upstream` (`Euge-Saravia/proyectodzts-inmobiliaria`, a stale fork parent). The `gh` default is pinned to `origin` via `gh repo set-default`, but if a `gh` command ever resolves to the wrong repo (404s on known SHAs, mutations landing on `Euge-Saravia/...`), pin it explicitly with `-R pablocolaiacovo/dzts-website`. Never mutate the upstream repo.
@@ -54,13 +53,13 @@ There is **no server in production** for the frontend — it is a static export 
 
 1. `gh run list --branch <branch> --limit 5` to find the run.
 2. `gh run view <id> --log-failed` for the failing step's output.
-3. Classify: app bug (escalate back with the log excerpt) vs pipeline bug (fix in a `feat/` branch) vs flake (`gh run rerun <id> --failed`, but only once — repeated flakes are a bug).
+3. Classify: app bug (fix the code, quoting the log excerpt) vs pipeline bug (fix in a `feat/` branch) vs flake (`gh run rerun <id> --failed`, but only once — repeated flakes are a bug).
 
 ### Cut a release (dev → main)
 
 1. Verify `dev` is green: `gh run list --branch dev --limit 3`.
 2. `gh pr create --base main --head dev --title "release: dev → main" --label release` with a body summarizing the included PRs (`git log --first-parent main..dev --oneline`). The `release` label excludes this PR from the auto-generated release notes (`.github/release.yml`).
-3. Wait for checks, then merge with a **merge commit**: `gh pr merge --merge` (never `--squash`).
+3. Wait for checks, get the user's go-ahead, then merge with a **merge commit**: `gh pr merge --merge` (never `--squash`).
 4. Confirm post-merge workflows: `deploy.yml` fires if `apps/frontend/**` changed; `deploy-studio.yml` fires if `apps/studio/**` or the committed sanity types changed. Check both runs complete.
 5. Verify `release.yml` ran on `main` and created the CalVer tag + GitHub Release: `gh release list --limit 1`.
 
@@ -68,7 +67,7 @@ There is **no server in production** for the frontend — it is a static export 
 
 1. Check CI + e2e are green on the PR.
 2. Grouped PRs (`next-ecosystem`, `react`, `sanity`, `eslint`, `bootstrap`) are expected; individual PRs for ungrouped packages.
-3. Squash-merge into `dev` like any feature PR. If e2e didn't trigger, verify the path filter before merging (a deps-only root change may legitimately skip it).
+3. With the user's go-ahead, squash-merge into `dev` like any feature PR. If e2e didn't trigger, verify the path filter before merging (npm bumps change `pnpm-lock.yaml` and always trigger it; an Actions-only bump that doesn't touch `e2e.yml` legitimately skips it).
 4. A `@playwright/test` bump is self-syncing in e2e.yml via `resolve-playwright` — no manual image-tag edit needed.
 
 ### Modify a workflow
@@ -78,11 +77,11 @@ There is **no server in production** for the frontend — it is a static export 
 3. Pin new third-party actions by major version at minimum; note that Dependabot's `github-actions` ecosystem will keep them updated.
 4. Open the PR against `dev` and report which run demonstrates the change working.
 
-## Escalation
+## Stop and ask the user
 
-Stop and hand back to the orchestrator when:
+- Before merging any PR (release or Dependabot): show the PR list, checks, and merge method, and merge only after a clear yes. Approval for one merge doesn't cover the next.
+- When a change would alter release semantics (branch protection, merge methods, environments) beyond what was asked.
+- When credentials/secrets appear missing or wrong — name exactly which secret/var in which environment; never guess or hardcode values.
+- When the same failure persists after one targeted fix attempt — report findings instead of iterating blindly.
 
-- The fix requires changing application source code (not config/workflow/infra files).
-- A change would alter release semantics (branch protection, merge methods, environments) beyond what was asked.
-- Credentials/secrets appear missing or wrong — report exactly which secret/var in which environment; never guess or hardcode values.
-- The same failure persists after one targeted fix attempt — report findings instead of iterating blindly.
+A CI failure that traces to an app bug is fixed like any other code change (delegate to `implementer` when it fits), not patched around in the workflow.

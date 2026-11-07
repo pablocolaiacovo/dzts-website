@@ -24,7 +24,7 @@
 
 :root {
   /* Paleta del manual de marca: cyan, gris y blanco */
-  --brand-cyan: #01BCF3;  /* precios, subtítulos, links, barras, rellenos */
+  --brand-cyan: #01BCF3;  /* precios, títulos de sección, links, barras, rellenos */
   --brand-grey: #404041;  /* títulos, texto sobre cyan, fondos oscuros */
 
   /* Los tokens que Bootstrap realmente lee */
