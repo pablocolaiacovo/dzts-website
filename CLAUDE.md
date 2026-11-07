@@ -54,95 +54,37 @@ pnpm typegen  # Generate TypeScript types from schema
 
 Schema changes are a manual three-step flow (`typegen` → `deploy` → commit `types.ts`). See README "Schema changes (manual studio deploy)" for the order and the failure mode for each skipped step. Don't deploy the Studio without committing the regenerated `apps/frontend/src/sanity/types.ts` — the frontend's FTP build runs from a clean checkout against committed types only.
 
-## Model Delegation
+## Agents and Skills
 
-The main Opus agent delegates coding tasks to lighter models via custom agents in `.claude/agents/`. The Explore subagent (built-in, Haiku) handles codebase search and file discovery automatically.
+The main agent does the planning, architecture, design, small edits, and anything that needs the user's approval. Three subagents in `.claude/agents/` cover work that benefits from a cheaper model, an isolated context, or an independent view; three skills in `.claude/skills/` hold procedures the main agent follows itself.
 
-| Tier | Agent | Model | Use For |
-|------|-------|-------|---------|
-| **Quick Fix** | `quick-fix` | Haiku | Typos, import changes, renames, toggling a flag, single constant changes |
-| **Implement** | `implementer` | Sonnet | Components, bug fixes, schema changes, CSS, lint fixes, new routes, caching updates |
-| **DevOps** | `devops` | Sonnet | GitHub Actions workflows, CI failures, releases (dev → main), Dependabot PRs, deploy issues |
-| **Triage** | `triage` | Opus | PR/issue triage: merge-readiness assessment, priority ranking, recommended merge order, release backlog reports |
-| **UI Developer** | `ui-developer` | Opus | Visual design options, HTML prototypes, implementing the approved design as components + CSS within the brand style |
-| **Reviewer** | `reviewer` | Opus | PR code reviews: correctness bugs, static-export violations, Sanity data handling, conventions, missing tests/specs |
-| **SEO Auditor** | `seo-auditor` | Sonnet | Site audits: technical SEO, structured data, Lighthouse/Core Web Vitals, headers, progress vs. the previous audit |
-| **Architect** | _(main agent)_ | Opus | Multi-system debugging, architecture decisions, planning, new patterns |
+| Kind | Name | Model | Use For |
+|------|------|-------|---------|
+| Agent | `implementer` | Sonnet | Components, bug fixes, schema changes, CSS, lint/type fixes, new routes, e2e tests — multi-step coding work with a clear brief |
+| Agent | `reviewer` | Opus | PR code reviews: correctness bugs, static-export violations, Sanity data handling, conventions, missing tests/specs |
+| Agent | `seo-auditor` | Sonnet | Site audits: technical SEO, structured data, Lighthouse/Core Web Vitals, headers, progress vs. the previous audit |
+| Skill | `devops` | _(main agent)_ | GitHub Actions workflows, CI failures, releases (dev → main), Dependabot PRs, environment secrets/vars |
+| Skill | `triage` | _(main agent)_ | PR/issue triage: merge readiness, priority ranking, merge order, release-backlog report |
+| Skill | `verify` | _(main agent, `implementer`, `reviewer`)_ | Checks before calling a change done: lint/typecheck/tests, static-export and schema/selector diff checks, build + e2e, visual check, spec/docs; then (main agent only) a quality review (`ponytail-review` when the plugin is installed, else done by the main agent) whose findings two fresh delegates must both confirm |
 
-### Delegate to `implementer` (Sonnet) when:
+### Do directly (main agent)
 
-- Creating or modifying a component + its CSS
-- Fixing a bug isolated to 1-2 files
-- Adding/modifying a Sanity schema type
-- Fixing lint or TypeScript errors
-- Writing CSS/styling changes
-- Adding a new route/page with straightforward requirements
-- Writing or updating e2e tests in `apps/frontend/e2e/`
+- Small edits: typos, wording, imports, renames, single constants, flags — a one-tool-call change costs more to delegate than to make.
+- Visual design: options, HTML prototypes, and implementing the chosen look, using the Impeccable skill when the plugin is installed (otherwise `apps/frontend/DESIGN.md` and `PRODUCT.md` directly), plus the brand rules under Conventions.
+- Architecture decisions, planning, multi-system debugging, changes across 3+ interdependent files, new patterns, and opinions/recommendations.
+- Merges, releases, and other outward-facing actions, following the `devops` skill and only after the user approves each one.
 
-### Delegate to `quick-fix` (Haiku) when:
+### Delegate to `implementer` when
 
-- Fixing typos or wording
-- Adding/removing an import
-- Renaming a variable or file
-- Changing a single constant value
-- Toggling a boolean flag
+A coding task is well specified and large enough that a fresh Sonnet context pays for itself: a component + its CSS, a bug isolated to 1-2 files, a Sanity schema type, lint/TypeScript fixes, a straightforward route, or e2e tests in `apps/frontend/e2e/`. Give it the brief; review what it reports.
 
-### Delegate to `devops` (Sonnet) when:
+### Delegate to `reviewer` when
 
-- Editing or debugging GitHub Actions workflows (`.github/workflows/**`) or `dependabot.yml`
-- Diagnosing a failing CI/e2e/deploy run (`gh run view --log-failed`)
-- Cutting a release: opening and merging the `dev → main` PR (merge commit, never squash)
-- Reviewing/merging Dependabot PRs
-- Checking or wiring GitHub environment secrets/vars (Preview/Production)
+Reviewing a PR's diff (or a local branch) before merge — correctness, static-export violations (API routes, middleware, server actions, missing `generateStaticParams`), Sanity `null` handling, committed `types.ts` on schema changes, conventions, SEO/a11y, security, and missing e2e selector updates, unit tests, or `docs/specs/` entries. It **judges and explains — it never pushes, approves, or merges**, and posts inline comments only when explicitly asked. It returns a severity-ranked review (🔴 blocking / 🟡 should fix / ⚪ nit) with `path:line` findings; the main agent applies or delegates the fixes. Its fresh context is the point: the author's reasoning shouldn't be the reviewer's.
 
-The devops agent does **not** change application source code — if a CI failure traces to an app bug, it reports back and the fix routes to `implementer` or `quick-fix`.
+### Delegate to `seo-auditor` when
 
-### Delegate to `triage` (Opus) when:
-
-- Assessing which open PRs are ready to merge and in what order
-- Ranking open PRs/issues by priority (security > production breakage > unblocking > dep hygiene > features > chores)
-- Producing a release-backlog report (`dev` ahead of `main`) and a cut-a-release recommendation
-- Matching open Dependabot security alerts to pending dependency PRs
-
-The triage agent **decides and recommends — it never merges, closes, or edits code**. It may apply labels/comments only when explicitly asked. Execution routes onward: merges/releases to `devops`, code fixes to `implementer`/`quick-fix`, business-priority calls to the user.
-
-### Delegate to `ui-developer` (Opus) when:
-
-- Designing a new page, section, or component where the look is not yet decided (needs 2–3 visual options and a recommendation)
-- Building clickable HTML prototypes for review before committing to an implementation
-- Restyling or redesigning existing UI to fit the brand (tokens in `variables.css`, Bootstrap 5, existing component patterns)
-- Implementing an approved design as React components + CSS
-
-The architect writes the brief (requirements, constraints, target page/component); the agent proposes options in phase 1 and implements only the chosen one in phase 2. It is **UI-only**: no Sanity queries/schema, caching, workflows, or e2e tests — it reports data or selector needs back for routing to `implementer`. Plain component/CSS changes with an already-decided look still go to `implementer`.
-
-### Delegate to `reviewer` (Opus) when:
-
-- Reviewing a PR's diff (or a local branch/diff) before merge
-- Auditing a change for correctness bugs, static-export violations (API routes, middleware, server actions, missing `generateStaticParams`), and Sanity `null` handling
-- Checking a schema change ships the regenerated `apps/frontend/src/sanity/types.ts`
-- Checking convention, SEO/a11y, and security regressions, plus missing e2e selector updates, unit tests, or `docs/specs/` entries
-- Posting inline review comments on a PR (only when explicitly asked)
-
-The reviewer **judges and explains — it never pushes, approves, or merges**. It returns a severity-ranked review (🔴 blocking / 🟡 should fix / ⚪ nit) with `path:line` findings and suggested fixes. Fixes route onward to `implementer`/`quick-fix` (app code), `devops` (workflows), or `ui-developer` (design); findings that hinge on an architecture decision come back to the main agent. It differs from `triage`: triage decides *which* PRs are ready and in what order, the reviewer decides *whether one PR's code is right*.
-
-### Delegate to `seo-auditor` (Sonnet) when:
-
-- Auditing the production site or a full local build for technical SEO, structured data, or performance
-- Re-checking pending items from a previous audit after a release
-- Verifying Cache-Control/security headers and sitemap/robots on production
-- Measuring Lighthouse/Core Web Vitals before/after a performance change
-
-The auditor **measures and reports — it never edits code, Sanity content, or GitHub**. Fixes route onward to `implementer`/`quick-fix`/`ui-developer`/`devops`; content fixes route to the user. Content strategy (new page types, competitor gaps) comes back to the main agent. It differs from `reviewer`: the reviewer judges a PR diff before merge, the auditor measures the deployed site.
-
-### Keep on Opus (handle directly) when:
-
-- Task touches 3+ files with interdependencies
-- Architecture or design decisions are needed
-- Debugging complex issues that require reasoning across multiple systems
-- Planning mode
-- Reviews whose findings require an architecture decision (the reviewer escalates these back)
-- Tasks where the user is asking for opinions/recommendations
-- New patterns not yet established in the codebase
+Auditing the production site or a full local build for technical SEO, structured data, or performance; re-checking a previous audit's pending items after a release; verifying Cache-Control/security headers and sitemap/robots; measuring Lighthouse/Core Web Vitals before/after a change. It **measures and reports — it never edits code, Sanity content, or GitHub**. Code fixes come back to the main agent; content fixes go to the user.
 
 ## Tech Stack
 
