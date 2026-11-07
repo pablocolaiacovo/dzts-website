@@ -70,7 +70,7 @@ The main agent does the planning, architecture, design, small edits, and anythin
 ### Do directly (main agent)
 
 - Small edits: typos, wording, imports, renames, single constants, flags — a one-tool-call change costs more to delegate than to make.
-- Visual design: options, HTML prototypes, and implementing the chosen look, using the Impeccable skill with `apps/frontend/DESIGN.md` and `PRODUCT.md` and the brand rules under Conventions.
+- Visual design: options, HTML prototypes, and implementing the chosen look, using the Impeccable skill when the plugin is installed (otherwise `apps/frontend/DESIGN.md` and `PRODUCT.md` directly), plus the brand rules under Conventions.
 - Architecture decisions, planning, multi-system debugging, changes across 3+ interdependent files, new patterns, and opinions/recommendations.
 - Merges, releases, and other outward-facing actions, following the `devops` skill and only after the user approves each one.
 

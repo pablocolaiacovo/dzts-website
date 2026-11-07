@@ -9,7 +9,7 @@ Run the checks that apply to the change, cheapest first, and report each one as 
 
 Sections 1–5 check that the change works; section 6 checks that it is right and no bigger than it needs to be. The `reviewer` agent still does the PR review after the PR is open, and SEO/Lighthouse measurement is `seo-auditor`'s.
 
-Section 6 runs only in the main agent: it needs the ability to start subagents (and uses the ponytail plugin when it's installed). A subagent following this file (`implementer`, `reviewer`) runs sections 1–5 and says section 6 was left to the main agent.
+Section 6 runs only in the main agent: it needs the ability to start subagents (and uses the ponytail plugin when it's installed). Subagents following this file run a subset and say the rest was left to the main agent: `implementer` runs sections 1–5, `reviewer` runs sections 1–3.
 
 ## 1. Static checks (every code change)
 
@@ -29,14 +29,15 @@ The filter names are the `package.json` `name`s; `--filter frontend` matches not
 Against the base branch (`dev` unless the work targets something else):
 
 ```bash
+git fetch origin dev                              # so origin/dev isn't stale
 git diff --name-only origin/dev...HEAD            # plus `git status --short` for uncommitted work
-git diff origin/dev...HEAD -- apps/frontend/src | grep -nE '^\+.*(cookies\(|headers\(|revalidate|"use server"|NextResponse)'
-git diff --name-only origin/dev...HEAD | grep -E 'apps/frontend/src/(app/.*/route\.ts|middleware\.ts)$'
+git diff origin/dev...HEAD -- apps/frontend/src | grep -E '^\+.*(cookies\(|headers\(|revalidate|"use server"|NextResponse)'
+git diff --name-only origin/dev...HEAD | grep -E 'apps/frontend/src/(app/(.*/)?route\.(ts|js)|(middleware|proxy)\.(ts|js))$'
 ```
 
 Then confirm, for what the diff touches:
 
-- **Static export**: no API routes, middleware, server actions, or runtime-only APIs (the greps above should print nothing); every new dynamic route segment exports `generateStaticParams()`.
+- **Static export**: no API routes, middleware/proxy (Next 16's name for middleware), server actions, or runtime-only APIs (the greps above should print nothing); every new dynamic route segment exports `generateStaticParams()`.
 - **Schema**: a change under `apps/studio/schemaTypes/` ships the regenerated `apps/frontend/src/sanity/types.ts` (run `pnpm --filter dzts-studio typegen`, never hand-edit it).
 - **Test selectors**: any ID, class, or aria label from the `CLAUDE.md` "Key Selectors Used by Tests" table that changed is updated in `apps/frontend/e2e/`.
 - **Conventions that have bitten before**: no `prefers-color-scheme` color CSS, no hardcoded site domains or fallback URLs, only one `priority` image per page, colors from `variables.css` tokens.
@@ -83,4 +84,4 @@ Section 6 proposes; it doesn't fix. Accepted findings are fixed like any other c
 
 ## Report
 
-A short list: each check above that applied, with passed / failed + excerpt / not run + why. For section 6, which review ran (plugin or main-agent fallback), the accepted, disputed, and dropped findings with the council's reasons, and the review's `Verdict:` recomputed from the accepted findings only. End with what wasn't verified.
+A short list: each check above that applied, with passed / failed + excerpt / not run + why. For section 6, which review ran (plugin or main-agent fallback), the accepted, disputed, and dropped findings with the council's reasons, and the review's `Verdict:` recomputed from the accepted findings, which keep their original numbers. Disputed findings are listed as pending the user's decision, and while any are pending the verdict can't be `Ship.` End with what wasn't verified.
