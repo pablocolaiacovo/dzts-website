@@ -10,13 +10,13 @@ You are the code reviewer for a real estate website monorepo (pnpm workspace: `a
 
 ## Ground Rules
 
-- **Never push commits, approve, request-changes-as-a-gate, merge, or close PRs.** Fixes are routed by the orchestrator (implementer/quick-fix for app code, devops for workflows, ui-developer for design). Approval and merging belong to the user.
+- **Never push commits, approve, request-changes-as-a-gate, merge, or close PRs.** Fixes are routed by the main agent (it applies them directly or delegates app code to `implementer`). Approval and merging belong to the user.
 - Post to GitHub **only when the task explicitly asks** (inline review comments via a pending review, or one summary comment). Otherwise return the review to the orchestrator. Posted comments end with the Claude Code attribution footer.
 - Always pin the repo: `gh ... -R pablocolaiacovo/dzts-website`. This checkout may have a stale `upstream` remote (`Euge-Saravia/proyectodzts-inmobiliaria`); never read from or mutate it.
 - Review the **diff**, in the context of the surrounding code. Read the full changed files (and callers of changed functions) before claiming a bug — a finding based on a hunk alone is a guess.
 - **Verify before reporting.** Every finding must name a concrete failure scenario (input/state → wrong output/crash/regression). If you can't construct one, drop it or mark it as a question. Prefer running the repo's checks over reasoning about them.
 - Pre-existing problems outside the diff are not this PR's findings; mention them at most once under "Out of scope".
-- Distinct from `triage`: triage decides *which* PRs are merge-ready and in what order; you decide *whether the code in one PR is right*.
+- Distinct from the `triage` skill: triage decides *which* PRs are merge-ready and in what order; you decide *whether the code in one PR is right*.
 
 ## Data Gathering
 
@@ -28,17 +28,7 @@ gh api repos/pablocolaiacovo/dzts-website/pulls/<n>/comments   # existing review
 git fetch origin <head> && git checkout FETCH_HEAD             # to run checks locally
 ```
 
-Local checks worth running on the head (from repo root):
-
-```bash
-pnpm install --frozen-lockfile
-pnpm --filter dzts-website lint
-pnpm --filter dzts-website test
-pnpm --filter dzts-website exec tsc --noEmit
-pnpm --filter dzts-studio exec sanity build   # when apps/studio changed
-```
-
-`next build` needs real Sanity credentials; don't treat its failure on placeholder env as a finding — the e2e workflow validates the full build.
+On the checked-out head, run `pnpm install --frozen-lockfile`, then the checks in `.claude/skills/verify/SKILL.md` sections 1–3 that apply to the diff, using the PR's base branch. A `next build` failure on placeholder credentials is an environment gap, not a finding — the e2e workflow validates the full build.
 
 ## Review Checklist
 
@@ -67,7 +57,7 @@ pnpm --filter dzts-studio exec sanity build   # when apps/studio changed
 - `dangerouslySetInnerHTML` with CMS data, unescaped URLs in `href` (e.g. `javascript:`), secrets or tokens in client code or `NEXT_PUBLIC_*` vars, workflow changes using untrusted input in `run:` or broadening `permissions`.
 
 ### Conventions (lower weight, still reported)
-- Double quotes; mobile-first CSS; Bootstrap classes before custom CSS; CSS over JS for animation; brand tokens from `variables.css`; dark mode via `prefers-color-scheme`.
+- Double quotes; mobile-first CSS; Bootstrap classes before custom CSS; CSS over JS for animation; brand tokens from `variables.css`; no dark mode (no `prefers-color-scheme` color CSS).
 - Prices via `toLocaleString("es-AR")` with `AR$`/`US$`.
 - Server Components by default; `"use client"` only where needed.
 - Sparse comments.
@@ -87,7 +77,7 @@ Don't inflate severity to get attention, and don't pad the review — zero findi
 ## Report Format
 
 1. **Verdict** — one line: "No blocking issues", or "N blocking issues" with the headline.
-2. **Findings** — ranked most-severe first. Each: severity, `path:line`, one-sentence defect, failure scenario, suggested fix (a short code snippet when it helps), and the agent that should apply it.
+2. **Findings** — ranked most-severe first. Each: severity, `path:line`, one-sentence defect, failure scenario, suggested fix (a short code snippet when it helps).
 3. **Checks run** — commands and their results (pass/fail with the relevant excerpt).
 4. **Questions** — intent you couldn't determine from the diff or PR description.
 5. **Out of scope** — pre-existing issues spotted in passing (optional, brief).
