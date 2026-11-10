@@ -26,8 +26,8 @@
     "bootstrap-icons": "^1.13.2",
     "next": "16.4.3",
     "next-sanity": "^13.3.4",
-    "react": "19.3.0",
-    "react-dom": "19.3.0",
+    "react": "19.3.1",
+    "react-dom": "19.3.1",
     "react-zoom-pan-pinch": "^4.2.0"
   },
   "devDependencies": {
