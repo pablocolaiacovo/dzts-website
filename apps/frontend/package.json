@@ -22,7 +22,7 @@
     "@portabletext/types": "^4.0.2",
     "@sanity/client": "^8.16.0",
     "@sanity/image-url": "^2.1.1",
-    "bootstrap": "^5.3.8",
+    "bootstrap": "^5.3.9",
     "bootstrap-icons": "^1.13.2",
     "next": "16.4.5",
     "next-sanity": "^13.4.0",

@@ -54,8 +54,8 @@ importers:
         specifier: ^2.1.1
         version: 2.1.1
       bootstrap:
-        specifier: ^5.3.8
-        version: 5.3.8(@popperjs/core@2.11.8)
+        specifier: ^5.3.9
+        version: 5.3.9(@popperjs/core@2.11.8)
       bootstrap-icons:
         specifier: ^1.13.2
         version: 1.13.2
@@ -3886,8 +3886,8 @@ packages:
   bootstrap-icons@1.13.2:
     resolution: {integrity: sha512-fAU1Ly3dH7hwRg+CB8EZ0Vl0fF80zgXHeUVJyfUOKzoURr+TbwISbCW5tKUoQLERaWYG2emTCybcPbD96hdD1A==}
 
-  bootstrap@5.3.8:
-    resolution: {integrity: sha512-HP1SZDqaLDPwsNiqRqi5NcP0SSXciX2s9E+RyqJIIqGo+vJeN5AJVM98CXmW/Wux0nQ5L7jeWUdplCEf0Ee+tg==}
+  bootstrap@5.3.9:
+    resolution: {integrity: sha512-20cU0rcfw8WdxtVbmfU+xT2EjvVTw9Ror/h1Qvd7DXCujRg8OO9mdBCsmTHdJFf3BuadmBNJtgIuUXsBqSkk/w==}
     peerDependencies:
       '@popperjs/core': ^2.11.8
 
@@ -4307,8 +4307,8 @@ packages:
   devlop@1.1.0:
     resolution: {integrity: sha512-RWmIqhcFf1lRYBvNmr7qTNuyCt/7/ns2jbpp1+PalgE/rDQcBT0fioSMUpJ93irlUhC5hrg4cYqe6U+0ImW0rA==}
 
-  dialog-closedby-polyfill@1.4.0:
-    resolution: {integrity: sha512-ndrASHRWiPhAN1Vu4kzSHFoeqvk04julTtfR4IMP+I7xJvFH9OodurjPAQgK90IvrGZSSIgYLZ3QwPt5oXSH4A==}
+  dialog-closedby-polyfill@1.4.1:
+    resolution: {integrity: sha512-0g5zMqieMT3n9yOUWTHH8pDfdshlgnqHVpT3tW2L9/rzF0W3tN65SZJKMXw0xNpdWwZqdPFaNMbLr7ac+YxgsQ==}
 
   diff@9.0.0:
     resolution: {integrity: sha512-svtcdpS8CgJyqAjEQIXdb3OjhFVVYjzGAPO8WGCmRbrml64SPw/jJD4GoE98aR7r25A0XcgrK3F02yw9R/vhQw==}
@@ -10390,7 +10390,7 @@ snapshots:
       '@sanity/icons': 5.3.0(react@19.3.1)
       clsx: 2.1.1
       comment-json: 5.0.0
-      dialog-closedby-polyfill: 1.4.0
+      dialog-closedby-polyfill: 1.4.1
       interestfor: 1.0.14
       react: 19.3.1
       react-dom: 19.3.1(react@19.3.1)
@@ -11518,7 +11518,7 @@ snapshots:
 
   bootstrap-icons@1.13.2: {}
 
-  bootstrap@5.3.8(@popperjs/core@2.11.8):
+  bootstrap@5.3.9(@popperjs/core@2.11.8):
     dependencies:
       '@popperjs/core': 2.11.8
 
@@ -11945,7 +11945,7 @@ snapshots:
     dependencies:
       dequal: 2.0.3
 
-  dialog-closedby-polyfill@1.4.0: {}
+  dialog-closedby-polyfill@1.4.1: {}
 
   diff@9.0.0: {}
 
